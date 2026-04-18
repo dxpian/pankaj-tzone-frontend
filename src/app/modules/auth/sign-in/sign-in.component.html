@@ -1,0 +1,130 @@
+<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
+    <div class="relative hidden md:flex flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden dark:border-l" style="background-color: #14a73c !important;">
+
+        <!-- Content -->
+        <div class="z-10 relative w-full max-w-2xl">
+            <div class="text-7xl font-bold leading-none text-gray-100">
+                <!-- <div class="w-12 justify-center justify-items-center">
+                    <img src="assets/images/logo/logo.png">
+                </div> -->
+                <div class="pt-4">Real Time Monitoring</div>
+            </div>
+        </div>
+    </div>
+    <div  class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card" style="background-color: #e2efe4 !important;">
+
+    </div>
+
+</div>
+
+
+<!-- last div  -->
+<div class="centered-div">
+        <div class="w-full max-w-140 sm:w-140 mx-auto sm:mx-0 pl-18 pr-18">
+            <!-- Logo -->
+            <div class="flex justify-center mt-2">
+                <img src="assets/images/device/logoIBTrace.png" style="width: 100% !important;">
+            </div>
+
+            <!-- Title -->
+            <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight flex justify-center">Sign in</div>
+
+            <!-- Sign in form -->
+            <form
+                class="mt-8"
+                [formGroup]="signInForm"
+                #signInNgForm="ngForm">
+
+                <!-- Email field -->
+                <mat-form-field class="w-full">
+                    <mat-label>Email</mat-label>
+                    <input
+                        id="email"
+                        matInput
+                        [formControlName]="'email'">
+                    <mat-error *ngIf="signInForm.get('email').hasError('required')">
+                        Email address is required
+                    </mat-error>
+
+                </mat-form-field>
+
+                <!-- Password field -->
+                <mat-form-field class="w-full">
+                    <mat-label>Password</mat-label>
+                    <input
+                        id="password"
+                        matInput
+                        type="password"
+                        [formControlName]="'password'"
+                        #passwordField>
+                    <button
+                        mat-icon-button
+                        type="button"
+                        (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                        matSuffix>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="passwordField.type === 'password'"
+                            [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="passwordField.type === 'text'"
+                            [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                    </button>
+                    <mat-error>
+                        Password is required
+                    </mat-error>
+                </mat-form-field>
+
+
+                <!-- Submit button -->
+                <button
+                    class="kitkat-mat-button-small w-full mt-6 mb-6 RTM-button-color"
+                    mat-flat-button
+                    [color]="'primary'"
+                    [disabled]="signInForm.disabled"
+                    (click)="Login()">
+                    <span *ngIf="!signInForm.disabled">
+                        Sign in
+                    </span>
+                    <mat-progress-spinner
+                        *ngIf="signInForm.disabled"
+                        [diameter]="24"
+                        [mode]="'indeterminate'"></mat-progress-spinner>
+                </button>
+
+
+                <!-- Actions -->
+                <!-- <div class="inline-flex items-center justify-center w-full mt-1.5">
+                    <a class="text-md font-medium text-primary-500 hover:underline"
+                        [routerLink]="['/sign-up']">&nbsp; Sign up
+                    </a>
+                </div> -->
+                <div class="inline-flex items-center justify-center w-full mt-1.5">
+                    <a class="text-md font-medium text-primary-500 hover:underline"
+                        [routerLink]="['/forgot-password']">&nbsp; Forgot Password
+                    </a>
+                </div>
+
+
+            </form>
+        </div>
+    <!-- Content goes here -->
+</div>
+
+<style>
+ .centered-div {
+    position: absolute;
+    border-radius: 25px !important;
+    top: 50%;
+    left: 75%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    background-color: #fff; /* Set background color if needed */
+    /* Additional styles for the centered div */
+    max-width: 140%;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+</style>

@@ -1,0 +1,169 @@
+<section class="w-full h-full ">
+         <!-- Breadcrum portion -->
+    <div class="w-full flex justify-between">
+
+      <!-- Breadcrum and heading Section -->
+      <div class="flex flex-wrap items-center font-medium">
+        <div class="pr-4" style="border-right: 1px solid">
+          <a class="text-2xl whitespace-nowrap">Report</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <div class="pl-3">
+            <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+          </div>
+          <div class="pl-0" style="display: flex; align-items: center;">
+            <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+            <span><a class="text-lg ml-1 text-primary-500">Report</a></span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- device listing -->
+    <div class="w-full bg-card">
+
+      <div class="flex flex-row">
+        <div class="w-full flex-col mt-3 p-4">
+          <div class="flex">
+            <label class="form-label">Keywords:</label>
+          </div>
+          <div class="w-full searchboxWrap flex flex-row mt-2">
+            <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchInputControl"
+              placeholder="Device Name/Device ID">
+          </div>
+        </div>
+      </div>
+      <hr style="margin-top: 0px !important;">
+
+      <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource">
+
+        <!-- id -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
+              #
+            </mat-checkbox>
+
+          </th>
+          <td mat-cell *matCellDef="let row; let i=index">
+            <mat-checkbox (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null;isSomeSelected()" [checked]="selection.isSelected(row)">
+              {{i+1}}
+            </mat-checkbox>
+
+          </td>
+        </ng-container>
+
+        <!-- Device Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Device Name
+          </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.name}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Device Id -->
+        <ng-container matColumnDef="serial">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Device ID </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.serial}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Model -->
+        <ng-container matColumnDef="model">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Model</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.model}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Groups -->
+        <ng-container matColumnDef="groups">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Groups</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{getGroupName(item?.groups)}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Last activated time -->
+        <ng-container matColumnDef="time">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Last Activated Time </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.time | date:"dd/mm/yyyy hh:mm:ss"}}</p>
+            </div>
+          </td>
+        </ng-container>
+        <!-- Condition -->
+        <ng-container matColumnDef="cond">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Condition </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <div *ngIf="!item.cond">
+                <button>
+                  <span class="w-4 h-4 mr-3 rounded-full bg-green-500"></span>
+                  <span>Online</span>
+                </button>
+              </div>
+              <div *ngIf="item.cond">
+                <span class="w-4 h-4 mr-3 rounded-full bg-black"></span>
+                <span>Offline</span>
+              </div>
+
+            </div>
+          </td>
+        </ng-container>
+
+             <!-- Operate -->
+        <ng-container matColumnDef="Actions">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text" (click)="$event.stopPropagation()">
+              <div class="example-button-row flex flex-row">
+                <div class="example-flex-container flex flex-row">
+                  <div class="p-1">
+                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:eye" style="color: #0D6EFD !important;" (click)="reportingView(item)"></mat-icon>
+                  </div>
+                  <div class="p-1">
+                    <mat-icon svgIcon="heroicons_outline:arrow-down-tray" style="color:#0DCAF0 !important"></mat-icon>
+                   </div>
+                </div>
+              </div>
+            </div>
+
+          </td>
+        </ng-container>
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+      </table>
+      <div class="flex flex-row justify-end w-full">
+        <mat-paginator class="mt-4 mb-4 mr-16"
+          [pageSize]="20"
+          [pageSizeOptions]="[20, 50, 100, 200]"
+          [length]="totalRecords"
+          (page)="onPageChange($event)">
+          >
+        </mat-paginator>
+      </div>
+
+    </div>
+
+  </section>
+
+

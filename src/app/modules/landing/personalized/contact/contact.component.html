@@ -1,0 +1,62 @@
+<section class="w-full">
+    <div class="w-full flex justify-between mb-4">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">Site</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span>
+                        <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:globe-alt'"></mat-icon>
+                        <a class="text-lg ml-1 text-primary-500">Personalized</a></span>
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon> <span>Contact</span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="flex flex-col bg-card justify-center shadow-md rounded-md mr-auto ml-auto w-2/4">
+        <form class="flex flex-row w-full mt-0 pl-4 pr-4 pt-12 pb-8  overflow-hidden" [formGroup]="contactForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine"> 
+                    <mat-form-field class="gt-xs:pr-0 w-full">
+                        <mat-label>Company Name:</mat-label>
+                        <input matInput formControlName="name" placeholder="Tzone Technology Co.ltd"> 
+                    </mat-form-field>
+                    <mat-form-field class=" gt-xs:pl-3 w-full">
+                        <mat-label>Company Address:</mat-label>
+                        <input matInput formControlName="address" placeholder="16D, Haiying Building, South of Caitian Road, Futian District, Shenzhen, China">
+    
+                    </mat-form-field>
+                    <mat-form-field class=" gt-xs:pl-3 w-full">
+                        <mat-label>Tel</mat-label>
+                        <input matInput formControlName="phone" placeholder="86-755-82840647">
+                    </mat-form-field> 
+                    <mat-form-field class=" gt-xs:pl-3 w-full">
+                        <mat-label>Website</mat-label>
+                        <input matInput formControlName="website" placeholder="https://www.tzonedigital.com">
+                    </mat-form-field> 
+                    <mat-form-field class=" gt-xs:pl-3 w-full">
+                        <mat-label>Copyright</mat-label>
+                        <input matInput formControlName="copyright" placeholder="Copyright © Tzone Digital Technology Co., Ltd">
+                    </mat-form-field> 
+             
+                <div class="flex flex-row justify-start pr-8 mb-4"> 
+                    <button mat-raised-button (click)="saveSettings()" class="RTM-button-color p-4 border-radius-button" type="submit"
+                       color="primary">Save Settings</button>
+                  </div>
+
+                 
+                
+            </div> 
+        </form> 
+    </div>
+</section>

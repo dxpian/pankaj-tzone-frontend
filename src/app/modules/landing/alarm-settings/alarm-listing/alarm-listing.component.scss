@@ -1,0 +1,90 @@
+.Querybutton{
+    border-radius: 5px !important;
+}
+.searchbox {
+    border: 1px solid #ccc; 
+    width: 40% !important;
+    max-height: 40px !important;
+    padding-left: 10px;
+    border-radius: 5px !important;
+}
+
+.emailtable_container {
+    height: fit-content; /* set table height to fit content */
+    max-height: 400px; /* set maximum height to 400 pixels */
+    overflow-y: auto; /* add scrollbar if content height is more than 400 pixels */
+}
+
+#searchID::placeholder {
+    padding-left: 0px !important;
+}
+::ng-deep .custom-modalbox {
+    .mat-mdc-dialog-surface.mdc-dialog__surface {
+        border-radius: 5px !important;
+        padding: 0px !important;
+    }
+ 
+
+    .mat-mdc-dialog-container .mdc-dialog__content {
+        padding-bottom: 13px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        padding-top: 0px !important;
+    }
+} 
+
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Default to 4 columns */
+    grid-template-rows: repeat(auto-fill, minmax(30px, 1fr)); /* Reduce row height to 30px */
+    gap: 5px; /* Reduce the gap between rows and columns */
+    min-height: 0; /* Allow the container to shrink below 500px if content is smaller */
+    max-height: 500px; /* Limit the height to 500px */
+    overflow-y: auto; /* Add a vertical scrollbar when content exceeds the height */
+    background-color: #f0f0f0; /* Light gray background */
+    padding: 5px; /* Reduce padding for a more compact look */
+    border-radius: 8px; /* Add rounded corners */
+    border: 1px solid #ccc; /* Add a border */
+  }
+  
+  .grid-container .flex {
+    display: flex;
+    align-items: center; /* Center items vertically */
+    justify-content: flex-start; /* Align items to the start */
+    margin: 0; /* Remove any default margins */
+    padding: 0; /* Remove any default padding */
+  }
+  
+  .grid-container h3 {
+    margin: 0; /* Remove margin from <h3> elements */
+    padding: 0; /* Remove padding from <h3> elements */
+    font-size: 14px; /* Optionally reduce font size for a more compact look */
+  }
+
+  /* Custom scrollbar for WebKit browsers (Chrome, Safari) */
+.grid-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .grid-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .grid-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  .grid-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  .horizontal-line {
+    width: 100%;
+    height: 0.1px;
+    background-color: rgb(90, 90, 90);
+    margin-top:5px;
+  }
+
+  

@@ -1,0 +1,71 @@
+.rtm-bg-color {
+    // background-color: #6C757D !important;
+    color: white !important;
+}
+.hr-color {
+    color: #7E868D !important;
+    border: none;
+    border-top: 0.5px solid rgba(14, 248, 209, 0.3);
+    height: 0;
+    background-color: transparent;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+ .group-section {
+   height: fit-content !important;
+   border-radius: 5px !important ;
+   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1) !important;
+ }
+.rtm-card-section {
+    border-radius: 5px !important ;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1) !important;
+}.example-tree-invisible {
+    display: none;
+  }
+
+  .example-tree ul,
+  .example-tree li {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none;
+  }
+
+  /*
+   * This padding sets alignment of the nested nodes.
+   */
+  .example-tree .mat-nested-tree-node div[role=group] {
+    padding-left: 40px;
+  }
+
+  /*
+   * Padding for leaf nodes.
+   * Leaf nodes need to have padding so as to align with other non-leaf nodes
+   * under the same parent.
+   */
+  .example-tree div[role=group] > .mat-tree-node {
+    padding-left: 40px;
+  }
+
+  .searchbox {
+    border: 1px solid #ccc;
+    max-width: 250px !important;
+    // max-height: 40px !important;
+    height: 40px;
+    border-radius: 5px !important;
+    padding-left: 12px !important;
+}
+
+
+#searchID::placeholder {
+    padding-left: 0px ;
+}
+
+.custom-mat-form-field {
+  min-width: fit-content;
+  max-width: fit-content;
+  width: auto;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+

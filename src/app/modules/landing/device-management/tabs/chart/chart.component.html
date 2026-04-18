@@ -1,0 +1,79 @@
+<div class="flex flex-col w-full">
+  <div class="flex flex-row">
+    <div class="w-full flex-col p-2">
+        <div class="w-full flex flex-row mt-2">
+            <mat-form-field class="flex pl-3 gt-xs:pr-3 w-1/4">
+                <input class="searchbox flex" id="searchID" matInput
+                    [matDatepicker]="picker" [(ngModel)]="this.currentTime"
+                    [ngModelOptions]="{standalone: true}">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field class="flex pl-3 gt-xs:pr-3 w-1/4">
+                <input class="searchbox flex" id="searchID" matInput
+                    [matDatepicker]="picker2" [(ngModel)]="this.currentTime2"
+                    [ngModelOptions]="{standalone: true}">
+                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+
+            <div class="ml-6">
+                <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                    class="kitkat-mat-button RTM-button-color Querybutton" (click)="getAllQueries()">
+                    <mat-icon>search</mat-icon>
+                    Query</button>
+            </div>
+        </div>
+    </div>
+</div>
+<hr style="margin-top: 0px !important;">
+    <!-- Temperature and Humidity
+    <highcharts-chart [Highcharts]="Highcharts" [constructorType]="'stockChart'" [options]="chartOptions" style="height: 400px;">
+    </highcharts-chart>
+      <br> -->
+
+      <!-- temeperature -->
+     <highcharts-chart *ngIf="showChart(ChartType.Temp)"
+     [Highcharts]="Highcharts"
+     [constructorType]="'stockChart'"
+     [options]="chartOptionsForTemperature">
+    </highcharts-chart>
+    <br>
+
+    <!-- prob temperature -->
+    <highcharts-chart *ngIf="showChart(ChartType.TempProp)"
+    [Highcharts]="Highcharts"
+    [constructorType]="'stockChart'"  [options]="chartOptionsForTemperatureProb">
+    </highcharts-chart>
+    <br>
+
+        <!-- humidity -->
+     <highcharts-chart *ngIf="showChart(ChartType.Humi)"
+     [Highcharts]="Highcharts"
+      [constructorType]="'stockChart'"  [options]="chartOptionsForHumidity">
+    </highcharts-chart>
+    <br>
+     <!-- Light -->
+     <highcharts-chart *ngIf="showChart(ChartType.Light)"
+     [Highcharts]="Highcharts"
+     [constructorType]="'stockChart'"  [options]="chartOptionsForLight">
+    </highcharts-chart>
+    <br>
+     <!-- Vibration -->
+     <highcharts-chart *ngIf="showChart(ChartType.Vibration)"
+     [Highcharts]="Highcharts"
+     [constructorType]="'stockChart'"  [options]="chartOptionsForVibration">
+    </highcharts-chart>
+    <br>
+     <!-- RSSI -->
+     <highcharts-chart *ngIf="showChart(ChartType.Rssi)"
+     [Highcharts]="Highcharts"
+     [constructorType]="'stockChart'"  [options]="chartOptionsForRSSI">
+    </highcharts-chart>
+    <br>
+     <!-- Voltage & Battery -->
+     <highcharts-chart *ngIf="showChart(ChartType.Battery)"
+     [Highcharts]="Highcharts"
+      [constructorType]="'stockChart'"  [options]="chartOptionsForVoltageAndBattery">
+    </highcharts-chart>
+</div>

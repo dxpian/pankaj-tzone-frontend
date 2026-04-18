@@ -1,0 +1,230 @@
+<section class="w-full h-full ">
+    <div class="w-full flex justify-between">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">SMS</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span><a class="text-lg ml-1 text-primary-500">SMS</a></span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="w-full bg-card mt-2">
+        <div class="flex flex-row justify-between p-4">
+            <h4 class="text-2xl">Remaining number of platform SMS</h4>
+            <h6 class="text-2xl">Unlimited</h6>
+        </div>
+
+    </div>
+
+    <!-- SMS listing -->
+    <div class="w-full bg-card mt-2">
+
+        <div class="flex flex-row">
+            <div class="w-full flex-col mt-3 p-4">
+                <div class="flex">
+                    <h4 class="form text-2xl">Add SMS service</h4>
+                </div>
+            </div>
+        </div>
+        <hr style="margin-top: 0px !important;">
+
+        <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource">
+            <!-- id -->
+
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                        <p class="header-text">No</p>
+                    </mat-checkbox>
+
+                </th>
+                <td mat-cell *matCellDef="let row; let i=index">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null;isSomeSelected()"
+                        [checked]="selection.isSelected(row)">
+                        {{i+1}}
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <!-- Account ID -->
+            <ng-container matColumnDef="service">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                    ServiceUri
+                </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.service}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Server Address -->
+            <ng-container matColumnDef="body">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Body</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.body}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+ 
+
+            <!-- Created Time -->
+            <ng-container matColumnDef="time">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Create Time</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.time }}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Operate -->
+
+            <ng-container matColumnDef="operate">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text" (click)="$event.stopPropagation()">
+                        <div class="example-button-row flex flex-row">
+                            <div class="example-flex-container flex flex-row">
+                                <div class="p-1"> <mat-icon class="cursor-pointer" (click)="openSendSmsDialog(item)"
+                                        svgIcon="mat_outline:attach_email" style="color:#0DCAF0 !important"></mat-icon>
+
+                                </div>
+
+                                <div class="p-1" *ngIf="item.role != 0">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square"
+                                        style="color: #0D6EFD !important;" (click)="editSmsPush(item)"></mat-icon>
+                                </div>
+                                <div class="p-1" *ngIf="item.role != 0">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash"
+                                        style="color: red !important;" (click)="deleteSmsPush(item)"></mat-icon>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+        </table>
+        <hr class="m-0" *ngIf="this.tableData.length == 0">
+        <div class="flex flex-col w-40 mt-5 pl-4" *ngIf="this.tableData.length == 0">
+            <button [color]="'primary'" mat-flat-button id="btnSearch" type="button" 
+                class="kitkat-mat-button RTM-button-color Querybutton rounded-1" (click)="SmsPush()">
+                Add</button>
+        </div>
+        <div class="flex flex-row justify-end w-full">
+            <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="50" [pageSizeOptions]="[50, 100, 200]"
+                [length]="totalRecords"></mat-paginator>
+        </div>
+        <kitkat-alert [type]="'primary'" [appearance]="'border'" class="m-4">
+            <span fuseAlertTitle>Note:</span>
+            <div>
+                1、Each user can create a maximum of 1 SMS account. <br>
+                2、The platform gives priority to using the SMS service added by the customer.
+            </div>
+
+        </kitkat-alert>
+
+    </div>
+
+</section>
+<!-- text sms Popup -->
+<ng-template #testSms>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">Send a test message</div>
+        <hr>
+    </section>
+    <section class="w-full">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="sendSmsForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine"> 
+
+                <mat-form-field class="gt-xs:pl-3">
+                    <mat-label>Recipient:</mat-label>
+                    <input matInput formControlName="recipient">
+                </mat-form-field>
+                <mat-form-field class="gt-xs:pl-3">
+                    <mat-label>Content:</mat-label>
+                    <textarea matInput formControlName="content" cdkTextareaAutosize
+                        [cdkAutosizeMinRows]="3"></textarea>
+                </mat-form-field>
+            </div>
+
+
+
+        </form>
+
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button (click)="cancel()" type="submit"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button (click)="sendTestSms()" class="RTM-button-color p-4 border-radius-button"
+                type="submit" color="primary">Send</button>
+        </div>
+    </section>
+</ng-template>
+
+
+<ng-template #addSmsPush>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">{{(!this.editState) ? 'Add': 'Revise'}}</div>
+        <hr>
+    </section>
+    <section class="w-full">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="smsForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+                <mat-form-field class="gt-xs:pr-3">
+                    <mat-label>Service:</mat-label>
+                    <input matInput formControlName="service">
+
+                </mat-form-field>
+                <mat-form-field class="gt-xs:pl-3">
+                    <mat-label>Body:</mat-label>
+                    <textarea matInput formControlName="body" cdkTextareaAutosize
+                        [cdkAutosizeMinRows]="3"></textarea>
+                </mat-form-field>
+            </div>
+        </form>
+
+        <kitkat-alert [type]="'primary'" [appearance]="'border'" class="m-4">
+            <span fuseAlertTitle>Note:</span>
+            <div>
+                $Tel$ : SMS number. <br>
+                $Message$ : Content
+            </div>
+        </kitkat-alert>
+  
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button (click)="cancel()" type="submit"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button (click)="saveSmsPush()" class="RTM-button-color p-4 border-radius-button"
+                type="submit" color="primary">Save</button>
+        </div>
+    </section>
+</ng-template>

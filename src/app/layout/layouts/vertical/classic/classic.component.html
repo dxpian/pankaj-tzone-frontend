@@ -1,0 +1,82 @@
+<!-- Loading bar -->
+<kitkat-loading-bar></kitkat-loading-bar>
+
+<!-- Navigation -->
+<kitkat-vertical-navigation
+    class="shadow dark:shadow-none dark:border-b bg-card dark:bg-transparent print:hidden dark bg-gray-900 print:hidden"
+    [mode]="isScreenSmall ? 'over' : 'side'"
+    [name]="'mainNavigation'"
+    [navigation]="navigation.default"
+    [opened]="!isScreenSmall">
+    <!-- Navigation header hook -->
+    <ng-container fuseVerticalNavigationContentHeader>
+        <!-- Logo -->
+        <div class="flex items-center h-16 p-6 pb-0 border-nav">
+            <!-- Light version -->
+            <img
+                class="dark:hidden w-12 logo-nav"
+                src="assets/images/device/small-Logo-ibtrace.png"
+                alt="Logo image">
+            <!-- Dark version -->
+            <img
+                class="hidden dark:flex w-12 logo-nav"
+                src="assets/images/device/small-Logo-ibtrace.png"
+                alt="Logo image">
+            
+            <p class="pl-2 text-2xl logo-nav-text">IB-trace-G</p>    
+       
+        </div>
+        <mat-divider class="my-2 mb-4"></mat-divider>
+    </ng-container>
+  
+</kitkat-vertical-navigation>
+
+<!-- Wrapper -->
+<div class="flex flex-col flex-auto w-full min-w-0 overflow-y-auto">
+
+    <!-- Header -->
+    <div class="relative flex flex-0 items-center w-full h-16 px-4 md:px-6 z-49 shadow dark:shadow-none dark:border-b bg-card dark:bg-transparent print:hidden">
+        <!-- Navigation toggle button -->
+        <!-- <button
+            mat-icon-button
+            (click)="toggleNavigation('mainNavigation')">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button> -->
+        <!-- Components -->
+        <div class="flex items-center pl-2 ml-auto space-x-0.5 sm:space-x-2 "> 
+            <user></user>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex flex-col flex-auto defaultcontainer ">
+        <!-- *ngIf="true" hack is required here for router-outlet to work correctly.
+             Otherwise, layout changes won't be registered and the view won't be updated! -->
+        <router-outlet *ngIf="true"></router-outlet>
+    </div>
+
+    <!-- Footer -->
+    <!-- <div class="relative flex flex-0 items-center justify-start w-full h-14 px-4 md:px-6 z-49 border-t bg-card dark:bg-transparent print:hidden">
+        <span class="font-medium text-secondary">Copyright © {{currentYear}} Tzone Digital Technology Co., Ltd </span>
+    </div> -->
+
+</div>
+<style>
+    .defaultcontainer {
+        margin: 15px;
+        padding: 15px;
+        /* background-color: #fff;
+        box-shadow: 0px 0px 3px 3px #ecececc9; */
+        border-radius: 2px;
+        /* overflow-y: hidden; */
+    }
+
+    .defaultcontainerforDownload {
+        /* margin: 15px; */
+        padding: 15px;
+        background-color: #fff;
+        box-shadow: 0px 0px 3px 3px #ecececc9;
+        border-radius: 2px;
+        /* overflow-y: hidden; */
+    }
+</style>

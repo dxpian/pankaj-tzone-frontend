@@ -1,0 +1,11 @@
+.user-table__row {
+  cursor: pointer;
+}
+
+.user-table__row--selected {
+  background-color: rgba(13, 110, 253, 0.08);
+}
+
+.user-table__row:hover:not(.user-table__row--selected) {
+  background-color: rgba(0, 0, 0, 0.04);
+}

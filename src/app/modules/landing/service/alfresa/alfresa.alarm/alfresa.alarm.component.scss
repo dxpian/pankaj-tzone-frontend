@@ -1,0 +1,11 @@
+.searchbox {
+    border: 1px solid #ccc;
+    width: 30% !important;
+
+    max-height: 40px !important;
+    border-radius: 5px !important;
+    padding-left: 12px !important;
+}
+#searchID::placeholder {
+    padding-left: 0px ;
+}

@@ -1,0 +1,212 @@
+<section class="w-full">
+    <div class="flex flex-row p-8 pb-4">
+        <img src="assets/images/logo/logo.png" style="width: 100px">
+    </div>
+    <hr>
+     <div class="pl-12 pr-12 pb-2">
+        <p>Device Id : {{this.serialId}}</p>
+     </div>
+    <div class="flex flex-row flex-wrap p-12 pt-4">
+        <!-- Temperature -->
+        <div class="w-full md:w-1/2 xl:w-1/3 p-3">
+            <div class="shadow-xl dark:bg-card rounded-lg" style="box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1) !important;">
+                <div class="p-4">
+                    <div class="flex items-center w-full mt-1">
+                        <div class="w-1/2">
+                            <p class="mb-0 text-secondary text-lg">Temperature</p>
+                            <h4 class="my-1" id="labRealtime_Temperature text-lg" style="font-size: x-large;">{{getData('temperature')}}</h4>
+                            <p class="mb-0 font-13 text-success"></p>
+                        </div>
+                        <div class="widgets-icons bg-light-success text-success ms-auto w-1/2 flex justify-end">
+                            <div class="iconBox" style="background-color: #E6F5E5 !important;">
+                                <svg t="1628827124984" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="2753" width="30" height="30">
+                                    <path
+                                        d="M497.240276 817.681655a75.564138 75.564138 0 0 1-75.599448-75.564138 75.211034 75.211034 0 0 1 51.623724-71.326896V176.587034h48.551724v494.238897a75.458207 75.458207 0 0 1-24.576 146.891035m138.663724-299.643587v-75.917241h-41.454345v-27.61269h41.454345v-48.551724h-41.454345v-26.482758h41.454345V288.203034h-41.454345V263.415172h41.454345V213.168552h-41.454345v-25.388138h41.454345V138.628414a138.628414 138.628414 0 0 0-277.256828 0v379.444965A267.29931 267.29931 0 0 0 229.517241 746.813793a267.723034 267.723034 0 0 0 267.758345 267.758345 267.723034 267.723034 0 0 0 267.758345-267.758345 267.334621 267.334621 0 0 0-129.129931-228.705103"
+                                        p-id="2754" fill="#4aa004"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- humidity -->
+        <div class="w-full md:w-1/2 xl:w-1/3 p-3">
+            <div class="shadow-xl dark:bg-card rounded-lg" style="box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1) !important;">
+                <div class="p-4">
+                    <div class="flex items-center w-full mt-1">
+                        <div class="w-1/2">
+                            <p class="mb-0 text-secondary text-lg">Humidity</p>
+                            <h4 class="my-1" id="labRealtime_Humidity text-2xl" style="font-size: x-large;">{{getData('humidity')}}</h4>
+                            <p class="mb-0 font-13 text-primary"></p>
+                        </div>
+                        <div class="widgets-icons  text-primary ms-auto w-1/2 flex justify-end">
+                            <div class="bg-light-primary iconBox">
+                                <svg t="1628827277891" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="3040" width="30" height="30">
+                                    <path
+                                        d="M856.4 0S723.1 126.3 723.1 200c0 73.6 59.7 133.3 133.3 133.3S989.7 273.6 989.7 200 856.4 0 856.4 0z m0 288.8c-49.1 0-88.9-39.8-88.9-88.9s88.9-133.3 88.9-133.3 88.9 84.2 88.9 133.3-39.9 88.9-88.9 88.9zM412 0S34.3 427.1 34.3 638.8 203.4 1022 412 1022s377.7-171.6 377.7-383.2S412 0 412 0z m0 955.4c-171.8 0-311-141.9-311-317S412 88.9 412 88.9s311 374.4 311 549.5c0.1 175-139.2 317-311 317z">
+                                    </path>
+                                    <path
+                                        d="M412 933.1c-159.5 0-288.8-128.4-288.8-286.8s150.1-78.2 288.8 0c139.3 78.5 288.8-158.4 288.8 0S571.5 933.1 412 933.1z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- light -->
+        <div class="w-full md:w-1/2 xl:w-1/3 p-3">
+            <div class="shadow-xl dark:bg-card rounded-lg" style="box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1) !important;">
+                <div class="p-4">
+                    <div class="flex items-center w-full mt-1">
+                        <div class="w-1/2">
+                            <p class="mb-0 text-secondary text-lg">Light</p>
+                            <h4 class="my-1" id="labRealtime_Light text-lg" style="font-size: x-large;">{{getData('light')}}</h4>
+                            <p class="mb-0 font-13 text-warning"></p>
+                        </div>
+                        <div class="widgets-icons bg-light-warning text-warning ms-auto w-1/2 flex justify-end">
+                            <div class="iconBox" style="background-color: #FFF8E4;">
+                                <svg t="1662000028600" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="3182" width="30" height="30">
+                                    <path
+                                        d="M511.74 308.29c56.24 0 106.99 22.76 144.2 59.67 36.62 37.21 59.38 87.96 59.38 143.88 0 56.26-22.76 107.28-59.38 144.2v0.29l-0.59 0.29C618.15 693.25 567.69 716 511.74 716s-106.7-23.04-143.88-59.96v0.29c-36.65-36.62-59.7-87.96-59.7-144.49 0-55.92 23.05-106.67 59.7-143.88 36.62-36.92 87.94-59.67 143.88-59.67z m-206.45 56.5L101.68 247.42c-11.53-6.92-26.51-3.17-32.84 8.65-6.95 11.82-2.9 26.56 8.36 33.16L281.04 406.9c11.26 6.63 26.27 2.58 33.16-8.65 6.66-11.85 2.61-26.54-8.91-33.46z m101.48-83.63l-60.55-104.97c-6.92-11.82-21.32-15.86-33.46-8.94-11.52 6.65-15.57 21.05-8.65 32.9l60.55 105.24c6.36 11.55 21.35 15.57 32.9 9.24 11.82-6.93 15.57-21.94 9.21-33.47zM281.04 617.4L77.49 735.06c-11.55 6.6-15.6 21.32-8.65 32.87 6.33 12.08 21.32 15.54 32.84 8.65L305.29 659.5c11.52-6.92 15.57-21.64 8.92-32.87-6.61-11.81-21.62-16.15-33.17-9.23z m-21.9-129.76c13.55 0 24.81 10.94 24.81 24.49 0 13.29-11.26 24.52-24.81 24.52H138.01c-13.25 0-24.51-11.23-24.51-24.52 0-13.54 11.26-24.49 24.51-24.49h121.13z m228.38 277.39c0-13.81 10.97-24.51 24.22-24.51 13.84 0 24.81 10.7 24.81 24.51v234.75c0 13.25-10.97 24.22-24.81 24.22-13.25 0-24.22-10.97-24.22-24.22V765.03z m-122.85-46.41l-60.55 104.97c-6.92 11.82-2.87 26.8 8.65 33.46 11.55 6.6 26.54 2.61 33.46-8.94l60.55-104.97c6.92-11.52 2.61-26.54-8.65-32.87-12.12-6.93-26.52-3.18-33.46 8.35z m354.12-59.12l203 117.08c12.14 6.89 26.56 3.43 33.46-8.36 6.95-11.84 2.61-26.56-8.65-33.16L743.03 617.4c-11.55-6.92-26.56-2.58-32.9 9.24-6.91 11.22-3.16 25.94 8.66 32.86zM617.3 743.13l60.55 104.97c6.92 11.55 21.32 15.54 32.87 8.94 11.82-6.65 16.16-21.35 9.24-33.16l-60.55-104.97c-6.95-11.55-21.64-15.57-33.46-8.65-10.96 6.33-15.3 21.34-8.65 32.87zM742.74 406.9l203.85-117.67c10.97-6.6 15.6-21.35 8.65-32.87-6.6-12.11-21.32-15.86-33.14-8.94L718.79 364.79c-11.82 6.92-15.57 21.32-9.21 33.46 6.89 11.23 21.9 15.27 33.16 8.65z m22.2 129.75c-13.84 0-24.81-10.94-24.81-24.52 0-13.54 10.97-24.49 24.81-24.49h121.13c13.25 0 24.22 10.94 24.22 24.49 0 13.57-10.97 24.52-24.22 24.52H764.94zM536.55 259.81c0 13.26-10.97 24.22-24.81 24.22-13.25 0-24.49-10.96-24.49-24.22V24.51C487.26 11.26 498.49 0 511.74 0c13.84 0 24.81 11.26 24.81 24.51v235.3z m122.56 45.57l60.84-104.97c6.92-12.11 2.58-26.51-8.65-33.16-11.84-6.92-26.54-2.87-33.46 8.94L617 281.16c-6.63 11.52-2.61 26.54 8.94 33.46 11.56 6.33 26.52 2.58 33.17-9.24z m-60.28 119.98c-22.49-22.51-53.04-35.77-87.09-35.77-33.75 0-64.59 13.25-86.5 35.77-22.22 22.47-35.77 52.76-35.77 86.48 0 34.07 13.55 64.62 35.77 87.09h-0.29 0.29c21.91 21.93 52.75 35.77 86.5 35.77 34.04 0 64.3-13.84 87.09-35.77 21.9-22.46 35.77-53.02 35.77-87.09 0-33.72-13.87-64.01-35.77-86.48z"
+                                        fill="#ea9518" p-id="3183"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- vibaration -->
+        <div class="w-full md:w-1/2 xl:w-1/3 p-3">
+            <div class="shadow-xl dark:bg-card rounded-lg" style="box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1) !important;">
+                <div class="p-4">
+                    <div class="flex items-center w-full mt-1">
+                        <div class="w-1/2">
+                            <p class="mb-0 text-secondary text-lg">Vibration</p>
+                            <h4 class="my-1" id="labRealtime_Vibration text-lg" style="font-size: x-large;">{{getData('vibration')}}</h4>
+                            <p class="mb-0 font-13 text-info"></p>
+                        </div>
+                        <div class="widgets-icons bg-light-info text-info ms-auto w-1/2 flex justify-end">
+                            <!-- Add your icon for Vibration here -->
+                            <div class="iconBox" style="background-color: #FEE5E7;">
+                                <svg t="1692605709361" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="1590" width="30" height="30">
+                                    <path
+                                        d="M378.538667 682.666667a486.741333 486.741333 0 0 0-53.930667 3.413333v52.565333a238.933333 238.933333 0 0 1 47.104-4.096c38.912 0 47.104 10.24 47.104 37.888v6.144h-54.613333c-59.392 0-90.794667 19.114667-90.794667 72.704C273.066667 898.730667 300.032 921.6 349.184 921.6a76.458667 76.458667 0 0 0 70.314667-31.061333l5.802666 26.965333H477.866667v-159.402667c0-49.493333-25.258667-75.434667-99.328-75.434666z m39.936 164.522666a58.368 58.368 0 0 1-54.613334 26.965334c-22.528 0-32.426667-7.168-32.426666-25.258667 0-23.210667 11.946667-28.672 41.301333-28.672h45.738667zM631.466667 733.866667h-68.266667V785.066667H512v68.266666h51.2v51.2h68.266667V853.333333H682.666667v-68.266666h-51.2v-51.2zM955.733333 402.432l-52.906666 53.248A406.528 406.528 0 0 1 921.6 580.266667h68.266667a474.453333 474.453333 0 0 0-34.133334-177.834667zM636.586667 190.122667L689.834667 136.533333A477.866667 477.866667 0 0 0 34.133333 580.266667h68.266667A409.6 409.6 0 0 1 636.586667 190.122667zM931.157333 322.901333l36.181334-157.013333a34.133333 34.133333 0 0 0-9.216-31.744 34.133333 34.133333 0 0 0-31.744-9.216l-157.013334 36.181333a34.133333 34.133333 0 0 0-24.917333 23.893334 34.133333 34.133333 0 0 0 8.533333 34.133333l36.181334 36.181333-313.685334 314.026667 48.128 48.128 314.026667-313.685333 36.181333 35.498666a34.133333 34.133333 0 0 0 23.893334 9.898667 29.354667 29.354667 0 0 0 9.557333 0 34.133333 34.133333 0 0 0 23.893333-26.282667z"
+                                        p-id="1591" fill="#e43d27"></path>
+                                </svg>
+                            </div>
+    
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- RSSI Metric -->
+        <div class="w-full md:w-1/2 xl:w-1/3 p-3">
+            <div class="shadow-xl dark:bg-card rounded-lg" style="box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1) !important;">
+                <div class="p-4">
+                    <div class="flex items-center w-full mt-1">
+                        <div class="w-1/2">
+                            <p class="mb-0 text-secondary text-lg">RSSI</p>
+                            <h4 class="my-1" id="labRealtime_RSSI text-lg" style="font-size: x-large;">{{getData('wifi')}}</h4>
+                            <p class="mb-0 font-13 text-primary"></p>
+                        </div>
+                        <div class="widgets-icons  text-primary ms-auto w-1/2 flex justify-end">
+                            <div class="iconBox" style="background-color: #D3F5FC;">
+                                <svg t="1628827874240" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="5664" width="30" height="30">
+                                    <path
+                                        d="M955.225 361.872c-6.893 7.079-18.146 7.333-25.414 0.64-114.717-105.607-263.002-163.554-419.554-163.554-155.047 0-302.275 56.985-416.577 160.846-7.313 6.645-18.565 6.321-25.413-0.802l-0.001-0.001c-7.084-7.368-6.741-19.154 0.822-26.03 121.033-110.035 276.959-170.41 441.169-170.41 87.057 0 171.629 16.778 251.369 49.871 71.29 29.583 136.118 71.058 192.953 123.411 7.515 6.922 7.776 18.709 0.648 26.028l-0.002 0.001zM507.322 803.909z"
+                                        p-id="5665" fill="#515151"></path>
+                                    <path
+                                        d="M821.637 495.088c-6.647 7.148-17.755 7.786-25.158 1.425-79.593-68.382-180.443-105.843-285.915-105.843-104.345 0-204.372 36.764-283.598 103.876-7.449 6.311-18.552 5.601-25.152-1.593l-0.001-0.001c-6.99-7.62-6.23-19.523 1.662-26.208 85.793-72.666 194.105-112.472 307.088-112.472 114.199 0 223.399 40.557 309.588 114.594 7.846 6.739 8.53 18.647 1.486 26.222zM508.245 803.909zM686.069 631.594c-6.377 7.129-17.179 8.095-24.731 2.224-42.87-33.334-95.624-51.518-150.314-51.518-53.831 0-105.923 17.677-148.452 50.085-7.612 5.801-18.406 4.743-24.72-2.45-6.951-7.919-5.755-20.085 2.624-26.472 48.858-37.245 108.705-57.56 170.549-57.56 62.822 0 123.417 20.892 172.662 59.186 8.322 6.472 9.413 18.648 2.382 26.505zM508.245 803.909zM513.132 802.841z m-61.417 0c0 33.92 27.497 61.417 61.417 61.417s61.418-27.497 61.418-61.417a61.415 61.415 0 0 0-92.126-53.188 61.415 61.415 0 0 0-30.709 53.188"
+                                        p-id="5666" fill="#515151"></path>
+                                </svg>
+                            </div>
+    
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Battery Metric -->
+        <div class="w-full md:w-1/2 xl:w-1/3 p-3">
+            <div class="shadow-xl dark:bg-card rounded-lg" style="box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1) !important;">
+                <div class="p-4">
+                    <div class="flex items-center w-full mt-1">
+                        <div class="w-1/2">
+                            <p class="mb-0 text-secondary text-lg">Battery</p>
+                            <h4 class="my-1" id="labRealtime_Battery text-lg" style="font-size: x-large;">{{getData('battery')}}</h4>
+                            <p class="mb-0 font-13 text-danger"></p>
+                        </div>
+                        <div class="widgets-icons bg-light-danger text-danger ms-auto w-1/2 flex justify-end">
+                            <div class="iconBox" style="background-color: #E6F5E5;">
+                                <svg t="1628827711475" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg" p-id="4690" width="30" height="30">
+                                <path
+                                    d="M512 0a512 512 0 1 1 0 1024A512 512 0 0 1 512 0z m0 73.142857a438.857143 438.857143 0 1 0 0 877.714286A438.857143 438.857143 0 0 0 512 73.142857z"
+                                    p-id="4691" fill="#4aa004"></path>
+                                <path
+                                    d="M717.092571 508.416l-160.914285-26.038857c-10.971429-1.828571-17.188571-8.923429-13.019429-15.140572l101.010286-159.012571c7.314286-11.702857-17.700571-21.065143-32.256-12.068571L297.837714 496.64c-9.874286 6.582857-5.193143 16.822857 8.850286 18.944l160.914286 26.038857c10.971429 1.828571 17.188571 8.923429 13.019428 15.140572L380.123429 715.776c-7.314286 11.702857 17.700571 21.065143 32.256 12.068571L725.942857 527.36c10.386286-6.217143 5.193143-16.822857-8.850286-18.944z"
+                                    p-id="4692" fill="#4aa004"></path>
+                            </svg>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+
+    <hr style="margin-top: 0px !important;"> 
+        <div class="flex-auto -mt-px pt-4 sm:pt-6">
+        <div class="w-full max-w-screen-xl mx-auto">
+            <!-- Tabs -->
+            <mat-tab-group
+                class="sm:px-2"
+                mat-stretch-tabs="false"
+                [animationDuration]="'0'"> 
+                <!-- chart -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon svgIcon="heroicons_outline:presentation-chart-line"></mat-icon> 
+                            <span class="">Chart</span> 
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                        <app-chart [dataProps]="dataForChart"></app-chart>
+                        <app-map></app-map>
+                    </ng-template>
+                  
+                </mat-tab>
+                <!-- List -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon>grid_on</mat-icon>
+                            <span class="">List</span>
+                           
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                       <app-list></app-list>
+                    </ng-template>
+                  
+                </mat-tab>
+ 
+
+            </mat-tab-group>
+        </div>
+    </div>
+</section>

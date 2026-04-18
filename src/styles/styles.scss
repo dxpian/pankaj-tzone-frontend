@@ -1,0 +1,86 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and kitkat's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+.dark kitkat-vertical-navigation-basic-item > .kitkat-vertical-navigation-item-wrapper .kitkat-vertical-navigation-item:not(.kitkat-vertical-navigation-item-disabled).kitkat-vertical-navigation-item-active {
+    color:white;
+    background-color: #14a73c !important;
+}
+kitkat-vertical-navigation.kitkat-vertical-navigation-position-left.kitkat-vertical-navigation-mode-side.kitkat-vertical-navigation-opened {
+    background-color: white !important;
+}
+
+.dark kitkat-vertical-navigation-basic-item > .kitkat-vertical-navigation-item-wrapper .kitkat-vertical-navigation-item:not(.kitkat-vertical-navigation-item-active-forced):not(.kitkat-vertical-navigation-item-active):not(.kitkat-vertical-navigation-item-disabled):hover {
+    color: #14a73c  !important;
+    background-color: #c4dfc8 !important;
+}
+
+.dark kitkat-vertical-navigation-basic-item > .kitkat-vertical-navigation-item-wrapper .kitkat-vertical-navigation-item:not(.kitkat-vertical-navigation-item-active-forced):not(.kitkat-vertical-navigation-item-active):not(.kitkat-vertical-navigation-item-disabled) {
+    color: black !important;
+}
+
+
+.dark kitkat-vertical-navigation-collapsable-item > .kitkat-vertical-navigation-item-wrapper .kitkat-vertical-navigation-item:not(.kitkat-vertical-navigation-item-active-forced):not(.kitkat-vertical-navigation-item-active):not(.kitkat-vertical-navigation-item-disabled) {
+    color: black !important;
+}
+.dark kitkat-vertical-navigation-collapsable-item > .kitkat-vertical-navigation-item-wrapper .kitkat-vertical-navigation-item:not(.kitkat-vertical-navigation-item-active-forced):not(.kitkat-vertical-navigation-item-active):not(.kitkat-vertical-navigation-item-disabled):hover {
+    color: #14a73c  !important;
+    background-color: #c4dfc8 !important;
+}
+.dark kitkat-vertical-navigation .kitkat-vertical-navigation-wrapper .kitkat-vertical-navigation-content > kitkat-vertical-navigation-divider-item
+{
+    color: black !important;
+    background-color: black !important;
+    background: black !important;
+}
+.border-nav {
+  border-bottom: 1px solid #ccc  !important;
+}
+.logo-nav {
+    margin-top: -19px !important;
+}
+.logo-nav-text {
+    font-size: 22px;
+    margin-left: 10px;
+    margin-bottom: 0;
+    letter-spacing: 1px;
+    color: black
+}
+.RTM-button-color {
+    color: white !important;
+}
+.mdc-snackbar.mat-mdc-snack-bar-container.mdc-snackbar--open.success-bar {
+    background-color: green !important;
+    color: white !important;
+    --mdc-snackbar-container-color: green !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+}
+
+.mdc-snackbar.mat-mdc-snack-bar-container.mdc-snackbar--open.warn {
+    background-color: red !important;
+    color: white !important;
+    --mdc-snackbar-container-color: red !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.gm-style-iw {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  max-width: unset !important;
+  overflow: visible !important;
+}
+
+.gm-style-iw-d {
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+.gm-style-iw + div {
+  display: none !important;
+}
+.gm-style-iw + div {
+  display: none !important; /* Hides the close button container */
+}

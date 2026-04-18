@@ -1,0 +1,153 @@
+.bg-img {
+    background-image: url('/tzone/assets/images/device/monitor_bg.png');
+}
+
+.header-img {
+    background: url('/tzone/assets/images/device/header_bg.png') no-repeat top center;
+
+    position: relative;
+    height: 60px;
+    background-size: contain;
+    margin: 20px 0px 10px 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+}
+
+.heading {
+    font-size: 40px !important;
+    font-weight: bold !important;
+    color: #2FCAFF;
+}
+
+.time {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    font-size: 18px;
+    color: #2FCAFF;
+}
+
+.logout {
+    position: absolute;
+    top: 40px;
+    right: 50px;
+    font-size: 24px;
+    color: #2FCAFF;
+    text-decoration: none;
+}
+
+marquee {
+    height: 30px;
+    line-height: 30px;
+    width: calc(100% - 40px);
+    background: linear-gradient(90deg, rgba(6, 113, 204, 0.2), #0A3162, rgba(6, 113, 204, 0.2));
+    color: #08AFED;
+    margin: 0px auto;
+    border-radius: 10px
+}
+
+.ant-card-head-title {
+    position: relative;
+    padding: 10PX;
+    margin-top: 8PX;
+    padding-top: 0px;
+    padding-bottom: 0PX;
+    font-size: 18px;
+    margin-left: 10px;
+    background: url('/tzone/assets/images/device/title_bg.png') no-repeat left;
+    background-size: 260px;
+}
+
+.borderSetting {
+    background-color: transparent;
+    border: 2PX solid #0f3c7e;
+    border-radius: 10PX;
+}
+
+.theme-monitor .light .mat-mdc-table,
+.theme-monitor.light .mat-mdc-table {
+    background-color: transparent !important;
+}
+
+.mat-mdc-table {
+    background-color: transparent !important;
+}
+
+.customTable {
+    background-color: transparent !important;
+}
+
+.theme-monitor .light .mdc-data-table__header-cell,
+.theme-monitor.light .mdc-data-table__header-cell {
+    background-color: transparent !important;
+}
+
+.header-text {
+    background-color: transparent !important;
+    color: #8EBCDE !important;
+}
+
+.column-text {
+    color: #8EBCDE !important;
+} 
+.overview .overviewItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 120px;
+    margin: 0;
+}
+.overview .ant-progress {
+    display: flex;
+    align-items: center;
+}
+.overview .overviewItem span:first-child {
+    color: #2FCAFF !important;
+    font-size: 24px !important;
+    margin-bottom: 26px !important;
+    margin-top: 14px !important;
+}
+.overview .overviewItem span:last-child {
+    color: #b0deff;
+    font-size: 12px;
+}
+.ant-progress-text {
+    position: relative;
+    top: -46px;
+    left: 40px;
+    width: 100%;
+    color: rgba(0, 0, 0, 0.85) !important;
+    font-size: 1em !important;
+    line-height: 1;
+    white-space: normal;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    display: inline-block;
+    vertical-align: middle;
+}
+.realTimeData {
+    position: relative;
+    height: 300px;
+}
+.realTimeData .list {
+    width: calc(100% - 0px);
+    overflow-y: hidden;
+    overflow-x: hidden;
+    position: absolute;
+    top: 0px;
+    bottom: 26px;
+    padding-left: 0px;
+    list-style: none;
+}
+.realTimeData .list .listItem {
+    list-style: none;
+    background: url('/tzone/assets/images/device/datapoint_bg.png') no-repeat;
+    background-size: 100% 100%;
+}
+.highcharts-background{
+    background-color: transparent !important;
+}

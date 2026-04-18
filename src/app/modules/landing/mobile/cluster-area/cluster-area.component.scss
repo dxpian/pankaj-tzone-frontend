@@ -1,0 +1,26 @@
+.searchbox {
+    border: 1px solid #ccc;
+    width: 300px !important;
+
+    max-height: 40px !important;
+    margin-right: 20px;
+    border-radius: 5px !important;
+    padding-left: 12px !important;
+}
+
+/* Clusters without manage permission (e.g. web admin, cluster.permission === 0) */
+.cluster-table__row--no-permission {
+    opacity: 0.78;
+    filter: grayscale(1);
+}
+
+.cluster-table__row--no-permission .tab-row {
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.cluster-table__action-icon--disabled {
+    opacity: 0.55;
+    filter: grayscale(1);
+    cursor: not-allowed !important;
+    pointer-events: none;
+}

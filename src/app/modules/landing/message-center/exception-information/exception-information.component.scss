@@ -1,0 +1,13 @@
+.Querybutton{
+    border-radius: 5px !important;
+}
+.searchboxForException {
+    border: 1px solid #ccc; 
+    width: 100% !important;
+   min-height: 48px;
+    max-height: 100px !important;
+    border-radius: 5px !important;
+}
+#searchIDForException::placeholder {
+    padding-left: 12px !important;
+}

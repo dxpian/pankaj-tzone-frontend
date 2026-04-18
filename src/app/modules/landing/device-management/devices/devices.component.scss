@@ -1,0 +1,51 @@
+.Querybutton{
+    border-radius: 5px !important;
+}
+.searchbox {
+    border: 1px solid #ccc;
+    width: 40% !important;
+
+    max-height: 40px !important;
+    border-radius: 5px !important;
+    padding-left: 12px !important;
+}
+#searchID::placeholder {
+    padding-left: 0px ;
+}
+
+.bg-black-dead {
+    background-color: #383838; /* Black for Battery Dead */
+}
+
+.bg-black-offline {
+    background-color: #000; /* Black for Offline */
+}
+
+.bg-red-SIM {
+    background-color: #b80808; /* Black for Offline */
+}
+
+
+::ng-deep .custom-modalbox {
+    .mat-mdc-dialog-surface.mdc-dialog__surface {
+        border-radius: 5px !important;
+        padding: 0px !important;
+    }
+
+
+    .mat-mdc-dialog-container .mdc-dialog__content {
+        padding-bottom: 13px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        padding-top: 0px !important;
+    }
+}
+.borderLine {
+    border-right: 1px solid black;
+}
+.mapStyle {
+    position: relative; width: 100%; height: 300px;
+}
+.border-radius-button {
+    border-radius:5px !important;
+}

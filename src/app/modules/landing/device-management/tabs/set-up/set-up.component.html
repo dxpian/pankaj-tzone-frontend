@@ -1,0 +1,474 @@
+<section class="w-full">
+    <div class="bg-cardbg-white border border-gray-200 rounded-lg shadow">
+        <!-- <form [formGroup]="setupForm"> -->
+        <table class="w-full table align-middle mb-0">
+            <tbody>
+                <!-- sending interval -->
+                <tr class="border-gray-100" style="border-bottom: 2px solid #e9edf3;">
+
+                    <th scope="row">Set the device data sending interval: [5~1440]</th>
+                    <td>
+                        <form [formGroup]="setupIntervalForm">
+                            <div class="m-3 pt-5">
+                                <label class="form-label">Data transmission interval</label>
+                                <div class="input-group">
+                                    <mat-form-field class="w-full">
+                                        <input matInput type="number" formControlName="value">
+                                        <span class="input-group-text">Minute</span>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                    <td class="flex justify-center mt-11">
+                        <div class="m-3 flex justify-center w-full">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="input-group w-full">
+                                <button mat-raised-button class="w-full RTM-button-color p-4 border-radius-button"
+                                    [disabled]="!enableCommand"
+                                    type="submit" color="primary" (click)="sendInterval()"><i
+                                        class="bx bx-send"></i>
+                                        Send
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+
+                </tr>
+
+                <!-- gps -->
+
+                <tr style="border-bottom: 2px solid #e9edf3;">
+
+                    <th scope="row">Set GPS on time: [1~5]</th>
+                    <td>
+                        <form [formGroup]="setGPSForm">
+                            <div class="row flex">
+                                <div class="col-1">
+                                    <div class="m-3" style="width:43px;">
+                                        <label class="form-label">Enable</label>
+                                        <div class="input-group-text">
+                                            <!-- <mat-form-field> -->
+                                            <mat-checkbox checked="true" formControlName="enable"
+                                                (change)="gpsEnabled($event.checked)"></mat-checkbox>
+                                            <!-- </mat-form-field> -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col w-full">
+                                    <div class="m-3">
+                                        <div class="input-group">
+                                            <mat-form-field class="w-full">
+                                                <mat-label class="form-label">Open time</mat-label>
+                                                <input matInput formControlName="value" type="number">
+                                                <span class="input-group-text">Minute</span>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                    <td class="flex justify-center mt-2">
+                        <div class="m-3 w-full">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="input-group w-full ">
+                                <button mat-raised-button class="w-full RTM-button-color p-4 border-radius-button"
+                                    [disabled]="!enableCommand"
+                                    type="submit" color="primary" (click)="sendGPS()"><i
+                                        class="bx bx-send"></i>Send</button>
+                            </div>
+                        </div>
+                    </td>
+
+                </tr>
+
+                <!-- airplane mode -->
+                <!-- <form formGroup="setupForm"> -->
+                <tr style="border-bottom: 2px solid #e9edf3;">
+                    <th scope="row">Set Airplane Mode <br>
+                        <span class="local-time">(local time)</span>
+                    </th>
+                    <td>
+                        <form [formGroup]="setAirplaneModeForm">
+                            <div class = "flex flex-col gt-xs:flex-row pr-3 borderLine" >
+                                <div class = "row flex">
+                                    <div class="col-1">
+                                        <div class="m-3" style="width:43px;">
+                                            <label class="form-label">Enable</label>
+                                            <div class="input-group-text">
+                                                <!-- <mat-form-field> -->
+                                                <mat-checkbox formControlName="enable"
+                                                    (change)="airplaneModeEnabled($event.checked)"></mat-checkbox>
+                                                <!-- </mat-form-field> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row flex">
+                                    <!-- label -->
+                                    <div class="col" style="width: 120px;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-label class="form-label">Enter flight</mat-label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- year -->
+                                    <div class="col" style="width: 20% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Year</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.ENT_YEAR]" matInput formControlName="enter_year"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.ENT_YEAR, $event)" >
+                                                        <mat-option *ngFor="let option of year_options_enter" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- month -->
+                                    <div class="col" style="width: 18% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Mon</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.ENT_MON]" matInput formControlName="enter_month"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.ENT_MON, $event)">
+                                                        <mat-option *ngFor="let option of month_options_enter" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- day -->
+                                    <div class="col" style="width: 18% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Day</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.ENT_DAY]" matInput formControlName="enter_day"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.ENT_DAY, $event)" >
+                                                        <mat-option *ngFor="let option of day_options_enter" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- hour -->
+                                    <div class="col" style="width: 18% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Hour</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.ENT_HOUR]" matInput formControlName="enter_hour">
+                                                        <mat-option *ngFor="let option of hour_options" [value]="option"
+                                                        (selectionChange)="AirplaneTimeChange(TIME_TYPE.ENT_HOUR, $event) ">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- minutes -->
+                                    <div class="col" style="width: 18% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Minutes</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.ENT_MIN]" matInput formControlName="enter_minute"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.ENT_MIN, $event)">
+                                                        <mat-option *ngFor="let option of minutes_options" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- exit flight time -->
+                                <div class="row flex">
+                                    <!-- label -->
+                                    <div class="col" style="width: 120px;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-label class="form-label">Exit flight</mat-label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- year -->
+                                    <div class="col" style="width: 20% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Year</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.EXT_YEAR]" matInput formControlName="exit_year"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.EXT_YEAR, $event)">
+                                                        <mat-option *ngFor="let option of year_options_exit" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- month -->
+                                    <div class="col" style="width: 18% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Mon</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.EXT_MON]" matInput formControlName="exit_month"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.EXT_MON, $event)"
+                                                    >
+                                                        <mat-option *ngFor="let option of month_options_exit" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- day -->
+                                    <div class="col" style="width: 18% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Day</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.EXT_DAY]" matInput formControlName="exit_day"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.EXT_DAY, $event)">
+                                                        <mat-option *ngFor="let option of day_options_exit" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- hour -->
+                                    <div class="col" style="width: 18% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Hour</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.EXT_HOUR]" matInput formControlName="exit_hour"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.EXT_HOUR, $event)">
+                                                        <mat-option *ngFor="let option of hour_options" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- minutes -->
+                                    <div class="col" style="width: 18% !important;">
+                                        <div class="m-3">
+                                            <div class="input-group">
+                                                <mat-form-field class="w-full">
+                                                    <mat-label class="form-label">Minutes</mat-label>
+                                                    <mat-select [(value)]="air_times[TIME_TYPE.EXT_MIN]" matInput formControlName="exit_minute"
+                                                    (selectionChange)="AirplaneTimeChange(TIME_TYPE.EXT_MIN, $event)" >
+                                                        <mat-option *ngFor="let option of minutes_options" [value]="option">
+                                                        {{ option }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </td>
+                    <td class="flex justify-center mt-1">
+                        <div class="m-3 w-full">
+                          <div class="input-group" style="display: flex; justify-content: flex-end;">
+                            <button mat-raised-button class=" w-full RTM-button-color p-4 border-radius-button"
+                                [disabled]="!enableCommand"
+                                type="submit" color="primary" (click)="setAirplaneMode()"><i
+                                        class="bx bx-send"></i>Send</button>
+                            <label class="form-label">&nbsp;</label>
+                          </div>
+                        </div>
+                    </td>
+                </tr>
+                <!-- </form> -->
+                <!-- custom command -->
+                <!-- <form formGroup="setupForm"> -->
+                <tr style="border-bottom: 2px solid #e9edf3;">
+                    <th scope="row">Custom Command</th>
+                    <td>
+                        <form [formGroup]="setCommandForm">
+                            <div class="m-3">
+
+                                <div class="input-group">
+                                    <mat-form-field class="w-full">
+                                        <mat-label class="form-label">Input Command</mat-label>
+                                        <span class="input-group-text bg-transparent"><i
+                                                class="bx bx-terminal"></i></span>
+                                        <input type="text" matInput formControlName="value">
+                                    </mat-form-field>
+
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                    <td class="flex justify-center">
+                        <div class="m-3 mt-4 w-full">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="input-group">
+                                <button mat-raised-button class="w-full RTM-button-color p-4 border-radius-button"
+                                [disabled]="!enableCommand" type="submit" color="primary" (click)="sendCustomCommand()"><i
+                                        class="bx bx-send"></i>Send</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <!-- </form> -->
+            </tbody>
+        </table>
+
+        <kitkat-alert [type]="'primary'" [appearance]="'border'" class="w-full mt-4 p-4">
+            <span fuseAlertTitle>Note:</span>
+            1、Downlink commands require the device to be online before they can be issued.
+            <br>
+            2、Downlink commands are sent in the order in which they are sent.
+        </kitkat-alert>
+        <!-- </form> -->
+
+    </div>
+
+    <div class="w-full bg-card mt-6">
+
+        <div class="fuse-card bg-white border border-gray-200 rounded-lg shadow">
+            <div class="row">
+                <h4 class="text-2xl font-semibold-bold text-center text-muted py-3 mt-4 mb-4">Downlink command record
+                </h4>
+            </div>
+            <hr style="margin-top: 0px !important;">
+
+            <table class="w-full table-responsive mat-card fuse-card bg-white border border-gray-200 rounded-lg shadow"
+                mat-table [dataSource]="dataSource">
+
+                <!-- Toggle -->
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">#
+                    </th>
+
+                    <td mat-cell *matCellDef="let row; let i=index">
+                        <div class="column-text">
+                            {{i+1}}
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- command -->
+                <ng-container matColumnDef="command">
+                    <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                        Command</th>
+                    <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                        <div class="column-text">
+                            <p>{{item?.command}}</p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- description -->
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef class="text-left header-text">description</th>
+                    <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                        <div class="column-text">
+                            <p>{{item?.description}}</p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- createTime -->
+                <ng-container matColumnDef="created">
+                    <th mat-header-cell *matHeaderCellDef class="text-left header-text">Create Time</th>
+                    <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                        <div class="column-text">
+                            <p>{{item?.created}}</p>
+                        </div>
+                    </td>
+                </ng-container>
+
+
+
+                <!-- Condition -->
+                <ng-container matColumnDef="condition">
+                    <th mat-header-cell *matHeaderCellDef class="text-left header-text">Condition</th>
+                    <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                        <div class="column-text">
+                            <p>{{item?.condition}}</p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- Reply Time-->
+                <ng-container matColumnDef="reply">
+                    <th mat-header-cell *matHeaderCellDef class="text-left header-text">Reply Time</th>
+                    <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                        <div class="column-text">
+                            <p>{{item?.reply}}</p>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="response">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Response</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div
+                        class="column-text"
+                        *ngIf="copyAvailable(item?.response)"
+                        (click)="copyToClipboard(item.response)"
+                        style="cursor: pointer;"
+                    >
+                        <mat-icon matTooltip="Copy to clipboard" class="copy-icon">content_copy</mat-icon>
+                    </div>
+                </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="operate">
+                    <th mat-header-cell *matHeaderCellDef class="text-center header-text">Operate</th>
+                    <td mat-cell *matCellDef="let item" class="tab-row text-center">
+                        <div class="icon-align">
+                            <mat-icon class="cursor-pointer items-center" svgIcon="heroicons_outline:trash"
+                                    style="color: red !important;" (click)="deleteDownlinkCommand(item)"></mat-icon>
+
+                        </div>
+                    </td>
+                </ng-container>
+
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+            </table>
+            <div class="flex flex-row justify-end w-full">
+                <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="50" [pageSizeOptions]="[50, 100, 200]"
+                    [length]="totalRecords"></mat-paginator>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    th span.local-time {
+      color: red;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+</style>
