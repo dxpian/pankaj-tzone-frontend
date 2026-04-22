@@ -91,15 +91,15 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   ) {
     this.mobileAlarmForm = this._formBuilder.group({
       id: [null],
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(64)]],
       alarm_type: [MobileAlarmType.Temperature, Validators.required],
       alarm_target: [[], Validators.required],
-      status: [1, Validators.required],
+      status: [1, [Validators.required, Validators.min(0), Validators.max(1)]],
       repeat: [[1, 2, 3, 4, 5], Validators.required],
-      intervalWarn: [5, [Validators.required, Validators.min(1)]],
-      intervalAlarm: [10, [Validators.required, Validators.min(1)]],
-      time_from: [''],
-      time_to: [''],
+      intervalWarn: [5, [Validators.required, Validators.min(5), Validators.max(60 * 24)]],
+      intervalAlarm: [10, [Validators.required, Validators.min(5), Validators.max(60 * 24)]],
+      time_from: ['8:00 AM'],
+      time_to: ['20:00'],
       warningLow: [5, Validators.required],
       warningHigh: [30],
       alarmLow: [0, Validators.required],
@@ -234,8 +234,9 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   }
 
   saveMobileAlarm(): void {
-    if (!this.mobileAlarmForm.value.name?.trim()) {
-      this._snackBar.open('Invalid alarm name', '', snackBarConfigWarn);
+    const alarmName = (this.mobileAlarmForm.value.name || '').trim();
+    if (!alarmName || alarmName.length < 3 || alarmName.length > 64) {
+      this._snackBar.open('Alarm name length must be 3 to 64 characters', '', snackBarConfigWarn);
       return;
     }
 
@@ -251,6 +252,23 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const repeatString = repeat.map((day) => `${day}`).join(',');
+    if (repeatString.length < 1 || repeatString.length > 20) {
+      this._snackBar.open('Repeat value is invalid', '', snackBarConfigWarn);
+      return;
+    }
+
+    const intervalWarn = Number(this.mobileAlarmForm.value.intervalWarn);
+    const intervalAlarm = Number(this.mobileAlarmForm.value.intervalAlarm);
+    if (intervalWarn < 5 || intervalWarn > 60 * 24) {
+      this._snackBar.open('intervalWarn must be in range 5~1440 minutes', '', snackBarConfigWarn);
+      return;
+    }
+    if (intervalAlarm < 5 || intervalAlarm > 60 * 24) {
+      this._snackBar.open('intervalAlarm must be in range 5~1440 minutes', '', snackBarConfigWarn);
+      return;
+    }
+
     const value = this.buildAlarmValue();
     if (!value) {
       this._snackBar.open('Invalid alarm value setting', '', snackBarConfigWarn);
@@ -259,16 +277,16 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
 
     const payload: MobileAlarmConfig = {
       user: this.currentUserId,
-      name: this.mobileAlarmForm.value.name.trim(),
+      name: alarmName,
       alarm_type: Number(this.mobileAlarmForm.value.alarm_type),
       alarm_target: targets.join(','),
       value,
       status: Number(this.mobileAlarmForm.value.status),
       time_from: this.mobileAlarmForm.value.time_from || '',
       time_to: this.mobileAlarmForm.value.time_to || '',
-      repeat: repeat.map((day) => `${day}`).join(','),
-      intervalWarn: Number(this.mobileAlarmForm.value.intervalWarn),
-      intervalAlarm: Number(this.mobileAlarmForm.value.intervalAlarm),
+      repeat: repeatString,
+      intervalWarn,
+      intervalAlarm,
     };
 
     if (!this.editState) {
@@ -381,8 +399,8 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       repeat: [1, 2, 3, 4, 5],
       intervalWarn: 5,
       intervalAlarm: 10,
-      time_from: '',
-      time_to: '',
+      time_from: '8:00 AM',
+      time_to: '20:00',
       warningLow: 5,
       warningHigh: 30,
       alarmLow: 0,
