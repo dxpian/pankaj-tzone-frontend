@@ -10,10 +10,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
 import { debounceTime, Subject, switchMap, takeUntil } from 'rxjs';
 import { DeviceManagementService } from '../../device-management/device-management.service';
-import { DB_RESULT, Device, MobileAlarmConfig, PageData, PageQuery } from '../../utils/typedef';
+import { DB_RESULT, Device, MobileAdmin, MobileAlarmConfig, PageData, PageQuery, PERMISSION } from '../../utils/typedef';
 import { MobileAlarmService } from '../service/mobile.alarm.service';
 import { FuseConfirmDialogComponent } from '@kitkat/components/confirm-dialog/confirm-dialog.component';
 import { SharedService } from 'app/services/shared.service';
+import { MobileUserService } from '../service/mobile.service';
 
 export enum MobileAlarmType {
   Temperature = 0,
@@ -76,6 +77,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   public alarmTypes = mobileAlarmTypes;
   public dayOptions = days;
   public filteredDevices: Device[] = [];
+  public mobileAdmins: MobileAdmin[] = [];
 
   private _unsubscribeAll = new Subject<void>();
   private currentUserId = '';
@@ -87,11 +89,13 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     private _snackBar: MatSnackBar,
     private _cdr: ChangeDetectorRef,
     public dialog: MatDialog,
-    private _sharedService: SharedService
+    private _sharedService: SharedService,
+    private _mobileUserService: MobileUserService
   ) {
     this.mobileAlarmForm = this._formBuilder.group({
       id: [null],
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(64)]],
+      user: ['', Validators.required],
+      name: ['mobile alarm', [Validators.required, Validators.minLength(3), Validators.maxLength(64)]],
       alarm_type: [MobileAlarmType.Temperature, Validators.required],
       alarm_target: [[], Validators.required],
       status: [1, [Validators.required, Validators.min(0), Validators.max(1)]],
@@ -111,7 +115,8 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     this.currentUserId = this._sharedService.getId() || JSON.parse(localStorage.getItem('userInfo') || '{}')?.id || '';
     this.dataSourceAlarm.paginator = this.paginator;
     this.dataSourceAlarm.sort = this.sort;
-    this.getDevices();
+    this.getDevices(this.currentUserId);
+    this.getMobileAdmins();
     this.getMobileAlarms();
 
     this.searchInputControl.valueChanges
@@ -189,12 +194,45 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       .catch((err: HttpErrorResponse) => console.error(err));
   }
 
-  getDevices(): void {
-    if (!this.currentUserId) {
+  getMobileAdmins(): void {
+    this._mobileUserService.getSubUsersOfSelf().then((response: DB_RESULT) => {
+      if (response && response.error_code === 0 && Array.isArray(response.object)) {
+        const allUsers = response.object as MobileAdmin[];
+        const mobAdmins = allUsers.filter((user) => Number(user.permission) === PERMISSION.MOB_ADMIN);
+        // Some API responses may omit permission; keep usable users so device lookup still works.
+        this.mobileAdmins = mobAdmins.length > 0 ? mobAdmins : allUsers.filter((user) => !!user.id);
+      } else {
+        this.mobileAdmins = [];
+      }
+
+      if (this.mobileAdmins.length === 0 && this.currentUserId) {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+        this.mobileAdmins = [
+          {
+            id: this.currentUserId,
+            name: userInfo?.name || 'Current User',
+            email: userInfo?.email || '',
+            permission: PERMISSION.MOB_ADMIN,
+          },
+        ];
+      }
+
+      const selectedUser = this.mobileAlarmForm.value.user;
+      const hasSelectedUser = this.mobileAdmins.some((user) => user.id === selectedUser);
+      if (!hasSelectedUser) {
+        this.mobileAlarmForm.patchValue({ user: this.getDefaultMobileAdminId() }, { emitEvent: true });
+      }
+      this._cdr.markForCheck();
+    });
+  }
+
+  getDevices(ownerId?: string): void {
+    const userId = ownerId || this.mobileAlarmForm.value.user || this.currentUserId;
+    if (!userId) {
       return;
     }
     this._deviceService
-      .getuserDeviceSummarize(this.currentUserId)
+      .getuserDeviceSummarize(userId)
       .then((res: any) => {
         if (res && !res.error_code && Array.isArray(res.object)) {
           this.userDevices = res.object;
@@ -234,6 +272,12 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   }
 
   saveMobileAlarm(): void {
+    const userId = this.mobileAlarmForm.value.user;
+    if (!userId) {
+      this._snackBar.open('Select mobile admin user', '', snackBarConfigWarn);
+      return;
+    }
+
     const alarmName = (this.mobileAlarmForm.value.name || '').trim();
     if (!alarmName || alarmName.length < 3 || alarmName.length > 64) {
       this._snackBar.open('Alarm name length must be 3 to 64 characters', '', snackBarConfigWarn);
@@ -276,7 +320,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     }
 
     const payload: MobileAlarmConfig = {
-      user: this.currentUserId,
+      user: userId,
       name: alarmName,
       alarm_type: Number(this.mobileAlarmForm.value.alarm_type),
       alarm_target: targets.join(','),
@@ -392,7 +436,8 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   private resetForm(): void {
     this.mobileAlarmForm.reset({
       id: null,
-      name: '',
+      user: this.getDefaultMobileAdminId(),
+      name: 'mobile alarm',
       alarm_type: MobileAlarmType.Temperature,
       alarm_target: [],
       status: 1,
@@ -417,6 +462,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
 
     this.mobileAlarmForm.patchValue({
       id: item.id || null,
+      user: item.user || this.getDefaultMobileAdminId(),
       name: item.name || '',
       alarm_type: Number(item.alarm_type),
       alarm_target: targetIds,
@@ -475,6 +521,13 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       const serial = (device.serial || '').toString().toLowerCase();
       return name.includes(normalized) || serial.includes(normalized);
     });
+  }
+
+  private getDefaultMobileAdminId(): string {
+    if (this.mobileAdmins.length > 0 && this.mobileAdmins[0]?.id) {
+      return this.mobileAdmins[0].id;
+    }
+    return this.currentUserId || '';
   }
 
   private openDeviceSelectPanel(): void {
