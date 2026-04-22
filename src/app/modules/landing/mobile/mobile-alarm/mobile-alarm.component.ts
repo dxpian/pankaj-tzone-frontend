@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
+import { MatSelect } from '@angular/material/select';
 import { MatTableDataSource } from '@angular/material/table';
 import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
 import { debounceTime, Subject, switchMap, takeUntil } from 'rxjs';
@@ -46,6 +47,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   @ViewChild('alarmDialog', { static: true }) alarmDialog: TemplateRef<any>;
   @ViewChild('alarmPaginator', { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild('deviceSelect') deviceSelect?: MatSelect;
 
   displayedColumns: string[] = [
     'index',
@@ -128,7 +130,14 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       });
 
     this.deviceSearchControl.valueChanges.pipe(takeUntil(this._unsubscribeAll)).subscribe((query) => {
-      this.updateFilteredDevices((query || '').toString());
+      const keyword = (query || '').toString();
+      this.updateFilteredDevices(keyword);
+      const normalized = keyword.trim();
+      if (normalized.length > 0) {
+        this.openDeviceSelectPanel();
+      } else if (this.deviceSelect?.panelOpen) {
+        this.deviceSelect.close();
+      }
     });
 
     this.mobileAlarmForm.get('alarm_type')?.valueChanges.pipe(takeUntil(this._unsubscribeAll)).subscribe((type) => {
@@ -202,7 +211,8 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     this.editState = false;
     this.selectedAlarm = undefined;
     this.resetForm();
-    this.deviceSearchControl.setValue('', { emitEvent: true });
+    this.deviceSearchControl.setValue('', { emitEvent: false });
+    this.updateFilteredDevices('');
     this.dialog.open(this.alarmDialog, { width: '760px', panelClass: 'custom-modalbox', disableClose: false });
   }
 
@@ -210,7 +220,8 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     this.editState = true;
     this.selectedAlarm = item;
     this.patchForm(item);
-    this.deviceSearchControl.setValue('', { emitEvent: true });
+    this.deviceSearchControl.setValue('', { emitEvent: false });
+    this.updateFilteredDevices('');
     this.dialog.open(this.alarmDialog, { width: '760px', panelClass: 'custom-modalbox', disableClose: false });
   }
 
@@ -343,17 +354,6 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     return selected?.length || 0;
   }
 
-  getSelectedDevicePreview(): string {
-    const selected = (this.mobileAlarmForm.value.alarm_target || []) as string[];
-    if (!selected.length) {
-      return '--';
-    }
-    const names = this.userDevices
-      .filter((device) => selected.includes(String(device.id)))
-      .map((device) => `${device.name}`);
-    return names.join(', ');
-  }
-
   getRowIndex(index: number): number {
     return this.paginator.pageIndex * this.paginator.pageSize + index + 1;
   }
@@ -457,6 +457,17 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       const serial = (device.serial || '').toString().toLowerCase();
       return name.includes(normalized) || serial.includes(normalized);
     });
+  }
+
+  private openDeviceSelectPanel(): void {
+    setTimeout(() => {
+      if (!this.deviceSelect) {
+        return;
+      }
+      if (!this.deviceSelect.panelOpen) {
+        this.deviceSelect.open();
+      }
+    }, 0);
   }
 
   private buildAlarmValue(): string {
