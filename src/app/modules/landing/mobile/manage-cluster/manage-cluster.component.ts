@@ -16,7 +16,7 @@ import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
 import { SharedService } from 'app/services/shared.service';
 import { DB_RESULT, MobileAdmin, MobileCluster } from '../../utils/typedef';
-import { MobileUserService } from '../mobile.service';
+import { MobileUserService } from '../service/mobile.service';
 
 /** Table row: cluster plus draft/server permission for the selected web admin. */
 export interface ClusterPermissionRow {

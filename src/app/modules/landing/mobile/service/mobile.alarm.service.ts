@@ -16,8 +16,31 @@ export class MobileAlarmService extends BaseService {
 
     // get all web admin users
     createMobileAlarm(data: any){
-        const url = `${environment.apiURL}/v1/mobile/user-management/get-web-admin`;
+        const url = `${environment.apiURL}/v1/mobile/alarm/create-alarm`;
+        return this.post(url,data);
+    }
+
+    updateMobileAlarm(data: any, alarm_id: string){
+        const url = `${environment.apiURL}/v1/mobile/alarm/update-alarm/${alarm_id}`;
+        return this.post(url,data);
+    }
+
+    getMobileAlarm(alarm_id: string){
+        const url = `${environment.apiURL}/v1/mobile/alarm/get-alarms-of-user/${alarm_id}`;
         return this.post(url,{});
     }
+
+    getMobileAlarmPage(page: any){
+        const url = `${environment.apiURL}/v1/mobile/alarm/get-alarms-of-user-page`;
+        return this.post(url,page);
+    }
+
+    deleteMobileAlarm(alarm_id: string){
+        const url = `${environment.apiURL}/v1/mobile/alarm/delete-alarm/${alarm_id}`;
+        return this.delete(url);
+    }
+
+
+
  }
 

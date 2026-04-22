@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MobileAlarmConfig } from '../../utils/typedef';
+import { MobileAlarmService } from '../service/mobile.alarm.service';
 
 @Component({
   selector: 'app-mobile-alarm',
@@ -6,5 +9,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./mobile-alarm.component.scss']
 })
 export class MobileAlarmComponent {
+  
+  public dataSourceAlarm = new MatTableDataSource<MobileAlarmConfig>()
+
+
+  constructor(private _mobileAlarmService: MobileAlarmService){
+
+  }
+
+  
+
 
 }

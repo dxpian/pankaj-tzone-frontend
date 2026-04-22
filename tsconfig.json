@@ -4,6 +4,15 @@
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
         "baseUrl": "./src",
+        "paths": {
+            "app/*": [
+                "app/*"
+            ],
+            "@kitkat/*": [
+                "@kitkat/*"
+            ]
+        },
+        
         "outDir": "./dist/out-tsc",
         "sourceMap": true,
         "declaration": false,

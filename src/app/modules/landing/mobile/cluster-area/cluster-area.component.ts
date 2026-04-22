@@ -9,7 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from '../../account/account.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MobileUserService } from '../mobile.service';
+import { MobileUserService } from '../service/mobile.service';
 import { SharedService } from 'app/services/shared.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';

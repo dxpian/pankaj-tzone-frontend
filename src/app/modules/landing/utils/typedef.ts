@@ -293,3 +293,18 @@ export interface DownlinkCommand{
   response: string,   // response data
 }
 
+
+export type MobileAlarmConfig = {
+    id?:          string;       // id of mobileAlarmSetting
+    user:        string;        // owner user id of this mobile alarm
+    name:         string;
+    alarm_type:   number;       // AlarmType
+    alarm_target: string;       // comma separated string of device ids
+    value:        string;       // alarm configuration value, comma separated
+    status:       number;       // status of alarm. 0: disable, 1: enable
+    time_from?:     string;     // start time of alarm
+    time_to?:       string;     // end time of alarm,   
+    repeat:         string;     // command separated list for alarm day. 0~6
+    intervalWarn:   number;     // interval minutes for warning message
+    intervalAlarm:  number;     // interval minutes for alarm message
+}
