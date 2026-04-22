@@ -40,6 +40,11 @@ export class MobileAlarmService extends BaseService {
         return this.delete(url);
     }
 
+    enableMobileAlarm(alarm_id: string, status: number){
+        const url = `${environment.apiURL}/v1/mobile/alarm/enable-alarm/${alarm_id}`;
+        return this.post(url, { status });
+    }
+
     // attach mobile user to alarm
     attachMobileUserToAlarm(alarm_id: string, users: string[]){
         const url = `${environment.apiURL}/v1/mobile/alarm/bind-users-to-alarm/${alarm_id}`;

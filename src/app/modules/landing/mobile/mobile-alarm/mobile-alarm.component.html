@@ -99,10 +99,9 @@
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef class="text-left header-text">Status</th>
         <td mat-cell *matCellDef="let item" class="tab-row text-left">
-          <div class="status-cell">
-            <mat-icon [svgIcon]="getStatusIcon(item.status)" [ngClass]="getStatusIconClass(item.status)"></mat-icon>
-            <span>{{ getStatusName(item.status) }}</span>
-          </div>
+          <mat-checkbox [checked]="item.status === 1" (change)="onStatusToggle(item, $event.checked)">
+            {{ item.status === 1 ? 'Enable' : 'Disable' }}
+          </mat-checkbox>
         </td>
       </ng-container>
 
@@ -116,7 +115,7 @@
                   <mat-icon
                     class="cursor-pointer"
                     svgIcon="heroicons_outline:clipboard-copy"
-                    style="color: #0d6efd !important;"
+                    style="color: #16a34a !important;"
                     matTooltip="Copy alarm"
                     (click)="copyAlarm(item)"
                   ></mat-icon>
@@ -124,20 +123,8 @@
                 <div class="p-1">
                   <mat-icon
                     class="cursor-pointer"
-                    svgIcon="heroicons_outline:user-group"
-                    style="color: #0d6efd !important;"
-                    matTooltip="Allocate mobile users"
-                    (click)="openAllocateDialog(item)"
-                  ></mat-icon>
-                  <span class="allocate-count-badge" [matTooltip]="'Bound users: ' + getAllocatedUserCount(item.id)">
-                    {{ getAllocatedUserCount(item.id) }}
-                  </span>
-                </div>
-                <div class="p-1">
-                  <mat-icon
-                    class="cursor-pointer"
                     svgIcon="heroicons_outline:pencil-square"
-                    style="color: #0d6efd !important;"
+                    style="color: #15803d !important;"
                     matTooltip="Edit alarm"
                     (click)="openEditDialog(item)"
                   ></mat-icon>
@@ -146,13 +133,31 @@
                   <mat-icon
                     class="cursor-pointer"
                     svgIcon="heroicons_outline:trash"
-                    style="color: red !important;"
+                    style="color: #166534 !important;"
                     matTooltip="Delete alarm"
                     (click)="deleteAlarm(item)"
                   ></mat-icon>
                 </div>
               </div>
             </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="bound_users">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Bound Users</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="bound-users-cell" (click)="$event.stopPropagation()">
+            <mat-icon
+              class="cursor-pointer"
+              svgIcon="heroicons_outline:bell"
+              style="color: #0d6efd !important;"
+              matTooltip="Allocate mobile users"
+              (click)="openAllocateDialog(item)"
+            ></mat-icon>
+            <span class="allocate-count-badge" [matTooltip]="'Bound users: ' + getAllocatedUserCount(item.id)">
+              {{ getAllocatedUserCount(item.id) }}
+            </span>
           </div>
         </td>
       </ng-container>
@@ -188,7 +193,7 @@
         <div class="grid grid-cols-2 gap-4">
           <mat-form-field>
             <mat-label>Mobile Admin User*</mat-label>
-            <mat-select formControlName="user">
+            <mat-select formControlName="user" [disabled]="editState">
               <mat-option *ngFor="let admin of mobileAdmins" [value]="admin.id">
                 {{ admin.name }} ({{ admin.email }})
               </mat-option>
@@ -338,12 +343,23 @@
 
         <div class="allocate-user-list" *ngIf="allocationUsers.length > 0; else noUsers">
           <div class="allocate-user-item" *ngFor="let user of allocationUsers">
-            <mat-checkbox
-              [checked]="isUserAllocated(user.id)"
-              (change)="onAllocationChanged(user.id, $event.checked)"
-            >
-              {{ user.name }} <span class="allocate-user-email">{{ user.email }}</span>
-            </mat-checkbox>
+            <div class="allocate-user-row">
+              <mat-checkbox
+                [checked]="isUserAllocated(user.id)"
+                (change)="onAllocationChanged(user.id, $event.checked)"
+              >
+                {{ user.name }}
+              </mat-checkbox>
+              <div class="allocate-email-wrap">
+                <span class="allocate-user-email">{{ user.email }}</span>
+                <mat-icon
+                  class="cursor-pointer allocate-email-copy"
+                  svgIcon="heroicons_outline:clipboard-copy"
+                  matTooltip="Copy email"
+                  (click)="copyEmail(user.email, $event)"
+                ></mat-icon>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -76,9 +76,35 @@
   padding: 0.25rem 0;
 }
 
+.bound-users-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.allocate-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+.allocate-email-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 280px;
+  justify-content: flex-start;
+}
+
+.allocate-email-copy {
+  color: #16a34a;
+  font-size: 16px;
+}
+
 .allocate-user-email {
   color: #6b7280;
-  margin-left: 0.25rem;
+  margin-left: 0;
 }
 
 .allocate-count-badge {

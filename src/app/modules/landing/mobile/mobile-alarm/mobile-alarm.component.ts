@@ -61,6 +61,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     'intervalAlarm',
     'devices',
     'status',
+    'bound_users',
     'operation',
   ];
 
@@ -286,7 +287,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   }
 
   saveMobileAlarm(): void {
-    const userId = this.mobileAlarmForm.value.user;
+    const userId = this.editState ? (this.selectedAlarm?.user || this.mobileAlarmForm.value.user) : this.mobileAlarmForm.value.user;
     if (!userId) {
       this._snackBar.open('Select mobile admin user', '', snackBarConfigWarn);
       return;
@@ -546,6 +547,26 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     this.mobileAlarmForm.patchValue({ status: checked ? 1 : 0 });
   }
 
+  onStatusToggle(item: MobileAlarmConfig, checked: boolean): void {
+    if (!item?.id) {
+      this._snackBar.open('Invalid alarm selected', '', snackBarConfigWarn);
+      return;
+    }
+    const newStatus = checked ? 1 : 0;
+    const prevStatus = Number(item.status) === 1 ? 1 : 0;
+    item.status = newStatus;
+    this._mobileAlarmService.enableMobileAlarm(item.id, newStatus).then((res: DB_RESULT) => {
+      if (res && !res.error_code) {
+        this._snackBar.open(`Alarm ${newStatus === 1 ? 'enabled' : 'disabled'}`, '', snackBarConfig);
+        this._cdr.markForCheck();
+      } else {
+        item.status = prevStatus;
+        this._snackBar.open(res?.meta || 'Failed to update alarm status', '', snackBarConfigWarn);
+        this._cdr.markForCheck();
+      }
+    });
+  }
+
   copyAlarm(item: MobileAlarmConfig): void {
     this.copiedAlarm = JSON.parse(JSON.stringify(item));
     this._snackBar.open('Alarm copied. Click "Create Mobile Alarm" to use copied settings.', '', snackBarConfig);
@@ -716,6 +737,28 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       return 0;
     }
     return this.allocatedUserCountMap[alarmId] ?? 0;
+  }
+
+  copyEmail(email?: string, event?: Event): void {
+    event?.stopPropagation();
+    if (!email) {
+      this._snackBar.open('No email to copy', '', snackBarConfigWarn);
+      return;
+    }
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(email).then(() => {
+        this._snackBar.open('Email copied', '', snackBarConfig);
+      });
+      return;
+    }
+
+    const textArea = document.createElement('textarea');
+    textArea.value = email;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    this._snackBar.open('Email copied', '', snackBarConfig);
   }
 
   private buildAlarmValue(): string {
