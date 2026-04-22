@@ -70,6 +70,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   public keyword = '';
   public editState = false;
   public selectedAlarm?: MobileAlarmConfig;
+  public copiedAlarm?: MobileAlarmConfig;
   public searchInputControl = new FormControl('');
   public deviceSearchControl = new FormControl('');
   public mobileAlarmForm: FormGroup;
@@ -248,7 +249,12 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   openCreateDialog(): void {
     this.editState = false;
     this.selectedAlarm = undefined;
-    this.resetForm();
+    if (this.copiedAlarm) {
+      this.patchForm(this.copiedAlarm, true);
+      this.copiedAlarm = undefined;
+    } else {
+      this.resetForm();
+    }
     this.deviceSearchControl.setValue('', { emitEvent: false });
     this.updateFilteredDevices('');
     this.dialog.open(this.alarmDialog, { width: '760px', panelClass: 'custom-modalbox', disableClose: false });
@@ -411,6 +417,23 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     return Number(status) === 1 ? 'Enable' : 'Disable';
   }
 
+  getStatusIcon(status: number): string {
+    return Number(status) === 1 ? 'heroicons_solid:check-circle' : 'heroicons_solid:x-circle';
+  }
+
+  getStatusIconClass(status: number): string {
+    return Number(status) === 1 ? 'status-enabled' : 'status-disabled';
+  }
+
+  onStatusChanged(checked: boolean): void {
+    this.mobileAlarmForm.patchValue({ status: checked ? 1 : 0 });
+  }
+
+  copyAlarm(item: MobileAlarmConfig): void {
+    this.copiedAlarm = JSON.parse(JSON.stringify(item));
+    this._snackBar.open('Alarm copied. Click "Create Mobile Alarm" to use copied settings.', '', snackBarConfig);
+  }
+
   getSelectedDeviceCount(): number {
     const selected = this.mobileAlarmForm.value.alarm_target as string[];
     return selected?.length || 0;
@@ -453,7 +476,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     });
   }
 
-  private patchForm(item: MobileAlarmConfig): void {
+  private patchForm(item: MobileAlarmConfig, fromCopy = false): void {
     const targetIds = (item.alarm_target || '').split(',').filter((v) => !!v);
     const repeats = (item.repeat || '')
       .split(',')
@@ -461,9 +484,9 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       .map((v) => Number(v));
 
     this.mobileAlarmForm.patchValue({
-      id: item.id || null,
+      id: fromCopy ? null : item.id || null,
       user: item.user || this.getDefaultMobileAdminId(),
-      name: item.name || '',
+      name: fromCopy ? this.getCopiedAlarmName(item.name || 'mobile alarm') : item.name || '',
       alarm_type: Number(item.alarm_type),
       alarm_target: targetIds,
       status: Number(item.status) === 1 ? 1 : 0,
@@ -489,6 +512,15 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       alarmLow: Number.isFinite(values[2]) ? values[2] : 0,
       alarmHigh: Number.isFinite(values[3]) ? values[3] : 35,
     });
+  }
+
+  private getCopiedAlarmName(name: string): string {
+    const suffix = ' (copy)';
+    const trimmed = (name || 'mobile alarm').trim();
+    if (trimmed.length + suffix.length <= 64) {
+      return `${trimmed}${suffix}`;
+    }
+    return `${trimmed.substring(0, 64 - suffix.length)}${suffix}`;
   }
 
   private applyAlarmTypeDefaults(type: number): void {

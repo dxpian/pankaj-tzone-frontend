@@ -92,7 +92,10 @@
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef class="text-left header-text">Status</th>
         <td mat-cell *matCellDef="let item" class="tab-row text-left">
-          <div class="column-text">{{ getStatusName(item.status) }}</div>
+          <div class="status-cell">
+            <mat-icon [svgIcon]="getStatusIcon(item.status)" [ngClass]="getStatusIconClass(item.status)"></mat-icon>
+            <span>{{ getStatusName(item.status) }}</span>
+          </div>
         </td>
       </ng-container>
 
@@ -102,6 +105,14 @@
           <div class="column-text" (click)="$event.stopPropagation()">
             <div class="example-button-row flex flex-row">
               <div class="example-flex-container flex flex-row">
+                <div class="p-1">
+                  <mat-icon
+                    class="cursor-pointer"
+                    svgIcon="heroicons_outline:clipboard-copy"
+                    style="color: #0d6efd !important;"
+                    (click)="copyAlarm(item)"
+                  ></mat-icon>
+                </div>
                 <div class="p-1">
                   <mat-icon
                     class="cursor-pointer"
@@ -174,13 +185,11 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Status</mat-label>
-            <mat-select formControlName="status">
-              <mat-option [value]="1">Enable</mat-option>
-              <mat-option [value]="0">Disable</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <div class="status-checkbox-wrap">
+            <mat-checkbox [checked]="mobileAlarmForm.value.status === 1" (change)="onStatusChanged($event.checked)">
+              Enable
+            </mat-checkbox>
+          </div>
 
           <mat-form-field>
             <mat-label>Repeat Days</mat-label>

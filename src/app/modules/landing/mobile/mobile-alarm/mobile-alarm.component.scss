@@ -1,10 +1,30 @@
 .searchbox {
-  min-width: 420px;
+  border: 1px solid #ccc;
+  width: 300px !important;
+
+  max-height: 40px !important;
+  margin-right: 20px;
+  border-radius: 5px !important;
+  padding-left: 12px !important;
 }
 
 .column-text {
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.status-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.status-enabled {
+  color: #16a34a;
+}
+
+.status-disabled {
+  color: #dc2626;
 }
 
 .time-row {
@@ -32,6 +52,12 @@
 
 .target-device-search {
   width: 100%;
+}
+
+.status-checkbox-wrap {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
 }
 
 .mobile-alarm-dialog {
