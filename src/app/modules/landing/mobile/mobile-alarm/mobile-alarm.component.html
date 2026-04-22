@@ -180,24 +180,55 @@
           </mat-form-field>
         </div>
 
-        <mat-form-field>
-          <mat-label>Target Devices</mat-label>
-          <mat-select formControlName="alarm_target" multiple>
-            <mat-option *ngFor="let device of userDevices" [value]="device.id">
-              {{ device.name }} ({{ device.serial }})
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+        <div class="target-device-section">
+          <div class="target-device-label">Target Devices</div>
+          <div class="target-device-summary">
+            <div class="target-summary-count">{{ getSelectedDeviceCount() }} selected</div>
+            <div class="target-summary-list" [title]="getSelectedDevicePreview()">{{ getSelectedDevicePreview() }}</div>
+            <mat-form-field class="target-summary-search" appearance="outline">
+              <mat-label>Search by serial/name</mat-label>
+              <input matInput [formControl]="deviceSearchControl" />
+            </mat-form-field>
+          </div>
+          <mat-form-field class="w-full">
+            <mat-label>Select Devices</mat-label>
+            <mat-select formControlName="alarm_target" multiple>
+              <mat-option *ngFor="let device of filteredDevices" [value]="device.id">
+                {{ device.name }} ({{ device.serial }})
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="time-row">
           <mat-form-field>
             <mat-label>Time From</mat-label>
-            <input matInput type="time" formControlName="time_from" />
+            <input
+              matInput
+              formControlName="time_from"
+              [ngxMatTimepicker]="timeFromPicker"
+              placeholder="08:00 AM"
+              readonly
+            />
+            <mat-icon matSuffix (click)="timeFromPicker.open()" svgIcon="watch_later"></mat-icon>
           </mat-form-field>
+
           <mat-form-field>
             <mat-label>Time To</mat-label>
-            <input matInput type="time" formControlName="time_to" />
+            <input
+              matInput
+              formControlName="time_to"
+              [ngxMatTimepicker]="timeToPicker"
+              placeholder="06:00 PM"
+              readonly
+            />
+            <mat-icon matSuffix (click)="timeToPicker.open()" svgIcon="watch_later"></mat-icon>
           </mat-form-field>
+        </div>
+        <ngx-mat-timepicker #timeFromPicker></ngx-mat-timepicker>
+        <ngx-mat-timepicker #timeToPicker></ngx-mat-timepicker>
+
+        <div class="grid grid-cols-2 gap-4">
           <mat-form-field>
             <mat-label>intervalWarn (minute)</mat-label>
             <input matInput type="number" formControlName="intervalWarn" />

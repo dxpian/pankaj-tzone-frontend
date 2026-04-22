@@ -26,6 +26,7 @@ import { FuseConfirmDialogModule } from '@kitkat/components/confirm-dialog/confi
 import { SharedModule } from 'app/shared/shared.module';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
+import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 
 import { MobileRoutingModule } from './mobile-routing.module';
 import { MobileAdminManagementComponent } from '../mobile/mobile-admin-management/mobile-admin-management.component';
@@ -74,6 +75,7 @@ import { MobileAlarmComponent } from './mobile-alarm/mobile-alarm.component';
     NgxMaskDirective,
     NgxMaskPipe,  
     NgxIntlTelInputModule,
+    NgxMatTimepickerModule,
   ]
 })
 export class MobileModule { }

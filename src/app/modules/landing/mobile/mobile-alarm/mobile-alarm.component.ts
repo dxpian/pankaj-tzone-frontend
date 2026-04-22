@@ -68,10 +68,12 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   public editState = false;
   public selectedAlarm?: MobileAlarmConfig;
   public searchInputControl = new FormControl('');
+  public deviceSearchControl = new FormControl('');
   public mobileAlarmForm: FormGroup;
   public MobileAlarmType = MobileAlarmType;
   public alarmTypes = mobileAlarmTypes;
   public dayOptions = days;
+  public filteredDevices: Device[] = [];
 
   private _unsubscribeAll = new Subject<void>();
   private currentUserId = '';
@@ -124,6 +126,10 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
         next: (response) => this.updateDataSource(response),
         error: (err: HttpErrorResponse) => console.error(err),
       });
+
+    this.deviceSearchControl.valueChanges.pipe(takeUntil(this._unsubscribeAll)).subscribe((query) => {
+      this.updateFilteredDevices((query || '').toString());
+    });
 
     this.mobileAlarmForm.get('alarm_type')?.valueChanges.pipe(takeUntil(this._unsubscribeAll)).subscribe((type) => {
       this.applyAlarmTypeDefaults(type);
@@ -186,6 +192,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
         } else {
           this.userDevices = [];
         }
+        this.updateFilteredDevices(this.deviceSearchControl.value || '');
         this._cdr.markForCheck();
       })
       .catch((err: HttpErrorResponse) => console.error(err));
@@ -195,6 +202,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     this.editState = false;
     this.selectedAlarm = undefined;
     this.resetForm();
+    this.deviceSearchControl.setValue('', { emitEvent: true });
     this.dialog.open(this.alarmDialog, { width: '760px', panelClass: 'custom-modalbox', disableClose: false });
   }
 
@@ -202,6 +210,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     this.editState = true;
     this.selectedAlarm = item;
     this.patchForm(item);
+    this.deviceSearchControl.setValue('', { emitEvent: true });
     this.dialog.open(this.alarmDialog, { width: '760px', panelClass: 'custom-modalbox', disableClose: false });
   }
 
@@ -329,6 +338,22 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     return Number(status) === 1 ? 'Enable' : 'Disable';
   }
 
+  getSelectedDeviceCount(): number {
+    const selected = this.mobileAlarmForm.value.alarm_target as string[];
+    return selected?.length || 0;
+  }
+
+  getSelectedDevicePreview(): string {
+    const selected = (this.mobileAlarmForm.value.alarm_target || []) as string[];
+    if (!selected.length) {
+      return '--';
+    }
+    const names = this.userDevices
+      .filter((device) => selected.includes(String(device.id)))
+      .map((device) => `${device.name}`);
+    return names.join(', ');
+  }
+
   getRowIndex(index: number): number {
     return this.paginator.pageIndex * this.paginator.pageSize + index + 1;
   }
@@ -417,6 +442,20 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       warningHigh: 30,
       alarmLow: 0,
       alarmHigh: 35,
+    });
+  }
+
+  private updateFilteredDevices(keyword: string): void {
+    const normalized = keyword.trim().toLowerCase();
+    if (!normalized) {
+      this.filteredDevices = [...this.userDevices];
+      return;
+    }
+
+    this.filteredDevices = this.userDevices.filter((device) => {
+      const name = (device.name || '').toString().toLowerCase();
+      const serial = (device.serial || '').toString().toLowerCase();
+      return name.includes(normalized) || serial.includes(normalized);
     });
   }
 
