@@ -1,1 +1,253 @@
-<p>mobile-alarm works!</p>
+<section class="w-full h-full">
+  <div class="w-full flex justify-between">
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">Mobile Alarm Settings</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+        </div>
+        <div class="pl-0" style="display: flex; align-items: center;">
+          <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span><a class="text-lg ml-1 text-primary-500">Mobile Alarm</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full bg-card mt-2">
+    <div class="w-full flex-col mt-3 p-4">
+      <div class="flex">
+        <label class="form-label">Keywords:</label>
+      </div>
+      <div class="w-full flex flex-row mt-2">
+        <input
+          class="searchbox flex-shrink"
+          matInput
+          type="search"
+          [formControl]="searchInputControl"
+          placeholder="alarm name / device name"
+        />
+        <button
+          [color]="'primary'"
+          mat-flat-button
+          type="button"
+          class="kitkat-mat-button RTM-button-color Querybutton ms-1"
+          (click)="openCreateDialog()"
+        >
+          Create Mobile Alarm
+        </button>
+      </div>
+    </div>
+
+    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceAlarm" matSort>
+      <ng-container matColumnDef="index">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">No</th>
+        <td mat-cell *matCellDef="let row; let i = index">{{ getRowIndex(i) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="alarm_name">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Alarm Name</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ item.name }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="alarm_type">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Alarm Type</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getAlarmTypeName(item.alarm_type) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="alarm_interval">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Alarm Interval</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getAlarmIntervalText(item) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="intervalWarn">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">intervalWarn (min)</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ item.intervalWarn }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="intervalAlarm">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">intervalAlarm (min)</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ item.intervalAlarm }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="devices">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Devices</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getDeviceNames(item.alarm_target) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Status</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getStatusName(item.status) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="operation">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operation</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text" (click)="$event.stopPropagation()">
+            <div class="example-button-row flex flex-row">
+              <div class="example-flex-container flex flex-row">
+                <div class="p-1">
+                  <mat-icon
+                    class="cursor-pointer"
+                    svgIcon="heroicons_outline:pencil-square"
+                    style="color: #0d6efd !important;"
+                    (click)="openEditDialog(item)"
+                  ></mat-icon>
+                </div>
+                <div class="p-1">
+                  <mat-icon
+                    class="cursor-pointer"
+                    svgIcon="heroicons_outline:trash"
+                    style="color: red !important;"
+                    (click)="deleteAlarm(item)"
+                  ></mat-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <div class="flex flex-row justify-end w-full">
+      <mat-paginator
+        #alarmPaginator
+        class="mt-4 mb-4 mr-16"
+        [pageSize]="10"
+        [pageSizeOptions]="[10, 20, 50]"
+        [length]="totalRecords"
+        (page)="onPageChange($event)"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+</section>
+
+<ng-template #alarmDialog>
+  <section class="w-full">
+    <div class="text-lg font-medium text-secondary pt-5 pl-6">{{ getDialogTitle() }}</div>
+    <hr class="p-0 m-0 mb-4" />
+  </section>
+
+  <section class="w-full">
+    <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="mobileAlarmForm">
+      <div class="w-full flex flex-col gap-4">
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field>
+            <mat-label>Alarm Name</mat-label>
+            <input matInput formControlName="name" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Alarm Type</mat-label>
+            <mat-select formControlName="alarm_type">
+              <mat-option *ngFor="let item of alarmTypes" [value]="item.value">{{ item.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option [value]="1">Enable</mat-option>
+              <mat-option [value]="0">Disable</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Repeat Days</mat-label>
+            <mat-select formControlName="repeat" multiple>
+              <mat-option *ngFor="let day of dayOptions" [value]="day.value">{{ day.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field>
+          <mat-label>Target Devices</mat-label>
+          <mat-select formControlName="alarm_target" multiple>
+            <mat-option *ngFor="let device of userDevices" [value]="device.id">
+              {{ device.name }} ({{ device.serial }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field>
+            <mat-label>Time From</mat-label>
+            <input matInput type="time" formControlName="time_from" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Time To</mat-label>
+            <input matInput type="time" formControlName="time_to" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>intervalWarn (minute)</mat-label>
+            <input matInput type="number" formControlName="intervalWarn" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>intervalAlarm (minute)</mat-label>
+            <input matInput type="number" formControlName="intervalAlarm" />
+          </mat-form-field>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field>
+            <mat-label>Warning Low</mat-label>
+            <input matInput type="number" formControlName="warningLow" />
+          </mat-form-field>
+
+          <mat-form-field *ngIf="!isBatteryAlarm()">
+            <mat-label>Warning High</mat-label>
+            <input matInput type="number" formControlName="warningHigh" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Alarm Low</mat-label>
+            <input matInput type="number" formControlName="alarmLow" />
+          </mat-form-field>
+
+          <mat-form-field *ngIf="!isBatteryAlarm()">
+            <mat-label>Alarm High</mat-label>
+            <input matInput type="number" formControlName="alarmHigh" />
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <hr class="mt-0" />
+  <section class="w-full mb-4">
+    <div class="flex flex-row justify-end pr-8 mb-4">
+      <button mat-raised-button (click)="closeDialog()" type="button" class="p-4 pr-4 mr-4 border-radius-button">
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        (click)="saveMobileAlarm()"
+        class="RTM-button-color p-4 border-radius-button"
+        type="button"
+        color="primary"
+      >
+        Save
+      </button>
+    </div>
+  </section>
+</ng-template>
