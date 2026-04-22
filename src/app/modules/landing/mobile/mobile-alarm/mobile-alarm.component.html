@@ -54,6 +54,13 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="mobile_admin">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Mobile Admin</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getMobileAdminName(item.user) }}</div>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="alarm_type">
         <th mat-header-cell *matHeaderCellDef class="text-left header-text">Alarm Type</th>
         <td mat-cell *matCellDef="let item" class="tab-row text-left">
@@ -110,14 +117,28 @@
                     class="cursor-pointer"
                     svgIcon="heroicons_outline:clipboard-copy"
                     style="color: #0d6efd !important;"
+                    matTooltip="Copy alarm"
                     (click)="copyAlarm(item)"
                   ></mat-icon>
                 </div>
                 <div class="p-1">
                   <mat-icon
                     class="cursor-pointer"
+                    svgIcon="heroicons_outline:user-group"
+                    style="color: #0d6efd !important;"
+                    matTooltip="Allocate mobile users"
+                    (click)="openAllocateDialog(item)"
+                  ></mat-icon>
+                  <span class="allocate-count-badge" [matTooltip]="'Bound users: ' + getAllocatedUserCount(item.id)">
+                    {{ getAllocatedUserCount(item.id) }}
+                  </span>
+                </div>
+                <div class="p-1">
+                  <mat-icon
+                    class="cursor-pointer"
                     svgIcon="heroicons_outline:pencil-square"
                     style="color: #0d6efd !important;"
+                    matTooltip="Edit alarm"
                     (click)="openEditDialog(item)"
                   ></mat-icon>
                 </div>
@@ -126,6 +147,7 @@
                     class="cursor-pointer"
                     svgIcon="heroicons_outline:trash"
                     style="color: red !important;"
+                    matTooltip="Delete alarm"
                     (click)="deleteAlarm(item)"
                   ></mat-icon>
                 </div>
@@ -290,6 +312,56 @@
         <button
           mat-raised-button
           (click)="saveMobileAlarm()"
+          class="RTM-button-color border-radius-button"
+          type="button"
+          color="primary"
+        >
+          Save
+        </button>
+      </div>
+    </section>
+  </div>
+</ng-template>
+
+<ng-template #allocateDialog>
+  <div class="mobile-alarm-dialog">
+    <section class="w-full dialog-header">
+      <div class="text-lg font-medium text-secondary">Allocate Mobile Users</div>
+      <hr class="p-0 m-0" />
+    </section>
+
+    <section class="w-full dialog-body">
+      <div class="dialog-form">
+        <div class="allocate-description">
+          Select mobile users owned by this mobile admin to bind with the alarm.
+        </div>
+
+        <div class="allocate-user-list" *ngIf="allocationUsers.length > 0; else noUsers">
+          <div class="allocate-user-item" *ngFor="let user of allocationUsers">
+            <mat-checkbox
+              [checked]="isUserAllocated(user.id)"
+              (change)="onAllocationChanged(user.id, $event.checked)"
+            >
+              {{ user.name }} <span class="allocate-user-email">{{ user.email }}</span>
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <ng-template #noUsers>
+          <div class="allocate-description">No mobile users available for this mobile admin.</div>
+        </ng-template>
+      </div>
+    </section>
+
+    <hr class="m-0" />
+    <section class="w-full dialog-actions">
+      <div class="flex flex-row justify-end">
+        <button mat-raised-button (click)="closeDialog()" type="button" class="pr-4 mr-4 border-radius-button">
+          Cancel
+        </button>
+        <button
+          mat-raised-button
+          (click)="saveAllocation()"
           class="RTM-button-color border-radius-button"
           type="button"
           color="primary"

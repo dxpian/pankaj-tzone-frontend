@@ -10,7 +10,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
 import { debounceTime, Subject, switchMap, takeUntil } from 'rxjs';
 import { DeviceManagementService } from '../../device-management/device-management.service';
-import { DB_RESULT, Device, MobileAdmin, MobileAlarmConfig, PageData, PageQuery, PERMISSION } from '../../utils/typedef';
+import { DB_RESULT, Device, MobileAdmin, MobileAlarmConfig, MobileUser, PageData, PageQuery, PERMISSION } from '../../utils/typedef';
 import { MobileAlarmService } from '../service/mobile.alarm.service';
 import { FuseConfirmDialogComponent } from '@kitkat/components/confirm-dialog/confirm-dialog.component';
 import { SharedService } from 'app/services/shared.service';
@@ -46,6 +46,7 @@ const days = [
 })
 export class MobileAlarmComponent implements OnInit, OnDestroy {
   @ViewChild('alarmDialog', { static: true }) alarmDialog: TemplateRef<any>;
+  @ViewChild('allocateDialog', { static: true }) allocateDialog: TemplateRef<any>;
   @ViewChild('alarmPaginator', { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild('deviceSelect') deviceSelect?: MatSelect;
@@ -53,6 +54,7 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = [
     'index',
     'alarm_name',
+    'mobile_admin',
     'alarm_type',
     'alarm_interval',
     'intervalWarn',
@@ -79,6 +81,10 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
   public dayOptions = days;
   public filteredDevices: Device[] = [];
   public mobileAdmins: MobileAdmin[] = [];
+  public allocationUsers: MobileUser[] = [];
+  public allocatedUserIds: Set<string> = new Set<string>();
+  public allocatingAlarm?: MobileAlarmConfig;
+  public allocatedUserCountMap: Record<string, number> = {};
 
   private _unsubscribeAll = new Subject<void>();
   private currentUserId = '';
@@ -185,7 +191,9 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
       this.alarms = [];
       this.dataSourceAlarm.data = [];
       this.totalRecords = 0;
+      this.allocatedUserCountMap = {};
     }
+    this.loadAllocatedUserCounts(this.alarms);
     this._cdr.markForCheck();
   }
 
@@ -389,6 +397,99 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     });
   }
 
+  openAllocateDialog(item: MobileAlarmConfig): void {
+    if (!item?.id || !item?.user) {
+      this._snackBar.open('Invalid alarm or mobile admin user', '', snackBarConfigWarn);
+      return;
+    }
+
+    this.allocatingAlarm = item;
+    this.allocationUsers = [];
+    this.allocatedUserIds = new Set<string>();
+
+    Promise.all([
+      this._mobileUserService.getSubUsers(item.user),
+      this._mobileAlarmService.getConnectedMobileUsersToAlarm(item.id),
+    ])
+      .then(([ownedUsersRes, connectedUsersRes]) => {
+        const ownedUsers = ownedUsersRes && !ownedUsersRes.error_code && Array.isArray(ownedUsersRes.object)
+          ? (ownedUsersRes.object as MobileUser[])
+          : [];
+        const connectedUsers = connectedUsersRes && !connectedUsersRes.error_code && Array.isArray(connectedUsersRes.object)
+          ? (connectedUsersRes.object as MobileUser[])
+          : [];
+
+        // Include owner mobile admin itself in selectable users.
+        const ownerAdmin = this.mobileAdmins.find((admin) => admin.id === item.user);
+        const ownerAsUser: MobileUser = {
+          id: item.user,
+          name: ownerAdmin?.name || this.getMobileAdminName(item.user),
+          email: ownerAdmin?.email || '',
+          permission: PERMISSION.MOB_ADMIN,
+        };
+
+        const userMap = new Map<string, MobileUser>();
+        [ownerAsUser, ...ownedUsers].forEach((user) => {
+          if (user?.id) {
+            userMap.set(user.id, user);
+          }
+        });
+        this.allocationUsers = Array.from(userMap.values());
+
+        connectedUsers.forEach((user) => {
+          if (user?.id) {
+            this.allocatedUserIds.add(user.id);
+          }
+        });
+
+        this.dialog.open(this.allocateDialog, {
+          width: '680px',
+          panelClass: 'custom-modalbox',
+          disableClose: false,
+        });
+        this._cdr.markForCheck();
+      })
+      .catch(() => {
+        this._snackBar.open('Failed to load mobile users for allocation', '', snackBarConfigWarn);
+      });
+  }
+
+  isUserAllocated(userId?: string): boolean {
+    if (!userId) {
+      return false;
+    }
+    return this.allocatedUserIds.has(userId);
+  }
+
+  onAllocationChanged(userId: string | undefined, checked: boolean): void {
+    if (!userId) {
+      return;
+    }
+    if (checked) {
+      this.allocatedUserIds.add(userId);
+    } else {
+      this.allocatedUserIds.delete(userId);
+    }
+  }
+
+  saveAllocation(): void {
+    const alarmId = this.allocatingAlarm?.id;
+    if (!alarmId) {
+      this._snackBar.open('No alarm selected for allocation', '', snackBarConfigWarn);
+      return;
+    }
+    const selectedIds = Array.from(this.allocatedUserIds);
+    this._mobileAlarmService.attachMobileUserToAlarm(alarmId, selectedIds).then((res: DB_RESULT) => {
+      if (res && !res.error_code) {
+        this.allocatedUserCountMap[alarmId] = selectedIds.length;
+        this._snackBar.open('Success to update bound mobile users', '', snackBarConfig);
+        this.closeDialog();
+      } else {
+        this._snackBar.open(res?.meta || 'Failed to update bound mobile users', '', snackBarConfigWarn);
+      }
+    });
+  }
+
   getAlarmTypeName(type: number): string {
     return this.alarmTypes.find((item) => item.value === Number(type))?.name || '--';
   }
@@ -400,6 +501,22 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
     const ids = target.split(',').map((id) => id.trim());
     const matched = this.userDevices.filter((device) => ids.includes(String(device.id)));
     return matched.length > 0 ? matched.map((device) => device.name).join(', ') : '--';
+  }
+
+  getMobileAdminName(userId?: string): string {
+    if (!userId) {
+      return '--';
+    }
+    const matched = this.mobileAdmins.find((admin) => admin.id === userId);
+    if (matched?.name) {
+      return matched.name;
+    }
+
+    const localUserInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    if (this.currentUserId === userId) {
+      return localUserInfo?.name || userId;
+    }
+    return userId;
   }
 
   getRepeatDayNames(repeat?: string): string {
@@ -571,6 +688,34 @@ export class MobileAlarmComponent implements OnInit, OnDestroy {
         this.deviceSelect.open();
       }
     }, 0);
+  }
+
+  private loadAllocatedUserCounts(alarms: MobileAlarmConfig[]): void {
+    if (!alarms || alarms.length === 0) {
+      this.allocatedUserCountMap = {};
+      return;
+    }
+
+    alarms.forEach((alarm) => {
+      if (!alarm?.id) {
+        return;
+      }
+      this._mobileAlarmService.getConnectedMobileUsersToAlarm(alarm.id).then((res: DB_RESULT) => {
+        if (res && !res.error_code && Array.isArray(res.object)) {
+          this.allocatedUserCountMap[alarm.id!] = (res.object as MobileUser[]).length;
+        } else {
+          this.allocatedUserCountMap[alarm.id!] = 0;
+        }
+        this._cdr.markForCheck();
+      });
+    });
+  }
+
+  getAllocatedUserCount(alarmId?: string): number {
+    if (!alarmId) {
+      return 0;
+    }
+    return this.allocatedUserCountMap[alarmId] ?? 0;
   }
 
   private buildAlarmValue(): string {
