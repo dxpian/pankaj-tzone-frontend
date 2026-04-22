@@ -66,6 +66,7 @@ export class MobileUserService extends BaseService {
         }
         return this.post(url,data);
     }
+    
     deleteAccount(user_id: string, permission: number){
         var url = ''
         if(permission == PERMISSION.WEB_MOB_ADMIN)

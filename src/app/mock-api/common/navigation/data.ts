@@ -38,6 +38,49 @@ export const defaultNavigation: FuseNavigationItem[] = [
         link: '/alarm'
     },
     {
+        id: 'Mobile',
+        title: 'Mobile',
+        type: 'collapsable',
+        icon: 'heroicons_outline:device-phone-mobile',
+        children:[
+            {
+                id: 'MobileAdminUser', 
+                title: 'Mobile Users',
+                type: 'basic',
+                icon: 'heroicons_outline:user-circle',
+                link: '/mobile/mobile-admin-user-management'
+            },
+            {
+                id: 'MobileUser', 
+                title: 'Mobile Users',
+                type: 'basic',
+                icon: 'heroicons_outline:user-circle',
+                link: '/mobile/mobile-user-management'
+            },
+            {
+                id: 'AreaCluster', 
+                title: 'Area & Cluster',
+                type: 'basic',
+                icon: 'heroicons_outline:rectangle-group',
+                link: '/mobile/cluster-area'
+            },
+            {
+                id: 'ManageCluster', 
+                title: 'Manage Cluster',
+                type: 'basic',
+                icon: 'heroicons_outline:rectangle-group',
+                link: '/mobile/manage-cluster'
+            }, 
+            {
+                id: 'MobileAlarm', 
+                title: 'Mobile Alarm',
+                type: 'basic',
+                icon: 'heroicons_outline:bell-alert',
+                link: '/mobile/mobile-alarm'
+            }
+        ]
+    },
+    {
         id: 'Message Center',
         title: 'Message Center',
         type: 'collapsable',
@@ -89,42 +132,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                         icon: 'heroicons_outline:user-group',
                         link: '/account/admin-user-management'
                     },
-                    {
-                        id: 'Mobile',
-                        title: 'Mobile',
-                        type: 'collapsable',
-                        icon: 'heroicons_outline:device-phone-mobile',
-                        children:[
-                            {
-                                id: 'MobileAdminUser', 
-                                title: 'Mobile Users',
-                                type: 'basic',
-                                icon: 'heroicons_outline:user-circle',
-                                link: '/mobile/mobile-admin-user-management'
-                            },
-                            {
-                                id: 'MobileUser', 
-                                title: 'Mobile Users',
-                                type: 'basic',
-                                icon: 'heroicons_outline:user-circle',
-                                link: '/mobile/mobile-user-management'
-                            },
-                            {
-                                id: 'AreaCluster', 
-                                title: 'Area & Cluster',
-                                type: 'basic',
-                                icon: 'heroicons_outline:rectangle-group',
-                                link: '/mobile/cluster-area'
-                            },
-                            {
-                                id: 'ManageCluster', 
-                                title: 'Manage Cluster',
-                                type: 'basic',
-                                icon: 'heroicons_outline:rectangle-group',
-                                link: '/mobile/manage-cluster'
-                            }
-                        ]
-                    },
+                    
                     {
                         id: 'User Management',
                         title: 'Sub-User Management',

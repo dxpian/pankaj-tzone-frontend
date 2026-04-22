@@ -4,6 +4,7 @@ import { MobileAdminManagementComponent } from './mobile-admin-management/mobile
 import { MobileManagementComponent } from './mobile-management/mobile-management.component';
 import { ClusterAreaComponent } from './cluster-area/cluster-area.component';
 import { ManageClusterComponent } from './manage-cluster/manage-cluster.component';
+import { MobileAlarmComponent } from './mobile-alarm/mobile-alarm.component';
 const routes: Routes = [
   {
     path: '',
@@ -23,6 +24,9 @@ const routes: Routes = [
   },{
     path: 'manage-cluster',
     component: ManageClusterComponent
+  }, {
+    path: 'mobile-alarm', 
+    component: MobileAlarmComponent
   }
   
 ];

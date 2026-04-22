@@ -80,6 +80,7 @@ export interface DeviceRealTime{
     time ?  :   string,
     simexpire?: string,
     state ? : DeviceState,
+    cluster?:   string; // cluster 
 }
 
 export interface DB_RESULT{

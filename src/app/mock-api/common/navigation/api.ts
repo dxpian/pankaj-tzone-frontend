@@ -84,7 +84,8 @@ export class NavigationMockApi
                         if (
                             item.id === 'MobileAdminUser' ||
                             item.id === 'MobileUser' ||
-                            item.id === 'AreaCluster'
+                            item.id === 'AreaCluster' ||
+                            item.id === 'MobileAlarm'
                         ) {
                             return null;
                         }     

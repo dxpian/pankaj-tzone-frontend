@@ -32,6 +32,7 @@ import { MobileAdminManagementComponent } from '../mobile/mobile-admin-managemen
 import { MobileManagementComponent } from '../mobile/mobile-management/mobile-management.component';
 import { ClusterAreaComponent } from './cluster-area/cluster-area.component';
 import { ManageClusterComponent } from './manage-cluster/manage-cluster.component';
+import { MobileAlarmComponent } from './mobile-alarm/mobile-alarm.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { ManageClusterComponent } from './manage-cluster/manage-cluster.componen
     MobileManagementComponent,
     ClusterAreaComponent,
     ManageClusterComponent,
+    MobileAlarmComponent,
   ],
   imports: [
     CommonModule,
