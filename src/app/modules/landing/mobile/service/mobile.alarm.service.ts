@@ -25,6 +25,11 @@ export class MobileAlarmService extends BaseService {
         return this.post(url,data);
     }
 
+    enableMobileAlarm(alarm_id: string, enable: number){
+        const url = `${environment.apiURL}/v1/mobile/alarm/enable-alarm/${alarm_id}`;
+        return this.post(url,{enable: enable});
+    }
+
     getMobileAlarm(alarm_id: string){
         const url = `${environment.apiURL}/v1/mobile/alarm/get-alarms-of-user/${alarm_id}`;
         return this.post(url,{});
@@ -38,11 +43,6 @@ export class MobileAlarmService extends BaseService {
     deleteMobileAlarm(alarm_id: string){
         const url = `${environment.apiURL}/v1/mobile/alarm/delete-alarm/${alarm_id}`;
         return this.delete(url);
-    }
-
-    enableMobileAlarm(alarm_id: string, status: number){
-        const url = `${environment.apiURL}/v1/mobile/alarm/enable-alarm/${alarm_id}`;
-        return this.post(url, { status });
     }
 
     // attach mobile user to alarm

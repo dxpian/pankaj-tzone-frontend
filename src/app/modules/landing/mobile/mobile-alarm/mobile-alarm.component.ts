@@ -38,6 +38,8 @@ const days = [
   { name: 'Saturday', value: 6 },
 ];
 
+
+
 @Component({
   selector: 'app-mobile-alarm',
   templateUrl: './mobile-alarm.component.html',
