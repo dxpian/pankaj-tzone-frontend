@@ -56,19 +56,23 @@ export interface Device{
 
 
 export interface DeviceState{
-    temperature?: String,
-    tempexternal?: String,
-    humidity?: String,
-    light?: Number,
-    battery?: Number,
-    vibration?: Number,
-    wifi?: String,
-    address?: String,
-    city?: String,
-    time?: String,
+    temperature?: string,
+    tempexternal?: string,
+    humidity?: string,
+    light?: number,
+    battery?: number,
+    vibration?: number,
+    wifi?: string,
+    address?: string,
+    city?: string,
+    time?: string,
     alarmType?:  number;        // alarm type
-    alarmTime?: String,         // alarm occured last
+    alarmTime?: string,         // alarm occured last
     isRecentAlarm?:Boolean;
+
+    alarm?:     string;         // last log alarm    
+    terminal?:  string;         // last log terminal information
+    netstatus?: string;         // last log network status
 }
 
 export interface DeviceRealTime{

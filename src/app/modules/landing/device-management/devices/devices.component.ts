@@ -38,7 +38,7 @@ interface DeviceExcel{
 })
 export class DevicesComponent implements OnInit {
     messages: any[] = [];
-    private messageSubscription: Subscription;
+    // private messageSubscription: Subscription;
     @ViewChild('addDevice') AddDevice: any;
     @ViewChild(GoogleMap) map!: GoogleMap;
 

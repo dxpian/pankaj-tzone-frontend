@@ -6,8 +6,8 @@ export const environment = {
     alfresaCodeMax: 6,
     googleMapsApiKey: 'AIzaSyBM12yh7DTTDShQJC9SsJoMmVHTn5zO51A',
 
-    // apiURL: 'http://localhost:9000/api',
-    // socketUrl:'ws://localhost:9000/'
-    apiURL: 'https://www.ibtrace.com/tzoneserver/api',
-    socketUrl:'wss://www.ibtrace.com/'
+    apiURL: 'http://localhost:9000/api',
+    socketUrl:'ws://localhost:9000/'
+    // apiURL: 'https://www.ibtrace.com/tzoneserver/api',
+    // socketUrl:'wss://www.ibtrace.com/'
 };
