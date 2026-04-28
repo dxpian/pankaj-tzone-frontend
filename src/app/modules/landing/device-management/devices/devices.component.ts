@@ -182,12 +182,12 @@ export class DevicesComponent implements OnInit {
     fetchPage(pageIndex: number, pageSize: number, keyword: string, keyChanged: boolean, total: number) {
         console.log(`original page query item: ${JSON.stringify(this._pageQuery)}`)
         const query: PageQuery = {
-        page: pageIndex + 1,
-        pagesize: pageSize,
-        keyword: keyword || '',
-        keyChanged: keyChanged !== undefined ? keyChanged : true,
-        total: total || 0, // Ensure `total` is always defined
-        filter: this.filter,
+            page: pageIndex + 1,
+            pagesize: pageSize,
+            keyword: keyword || '',
+            keyChanged: keyChanged !== undefined ? keyChanged : true,
+            total: total || 0, // Ensure `total` is always defined
+            filter: this.filter,
         }
         return this._serviceDevice.getUserDeviceWithPage(this.userInfo.id, query);
     }
@@ -197,11 +197,11 @@ export class DevicesComponent implements OnInit {
         const res = response as DB_RESULT
 
         if(res && !res.error_code){
-        const pageData = res.object as PageData
-        this.dataSource.data = pageData.data as Device[]
-        this._pageQuery.total = pageData.total
-        this._pageQuery.cursor = pageData.cursor
-        this._pageQuery.keyChanged = false
+            const pageData = res.object as PageData
+            this.dataSource.data = pageData.data as Device[]
+            this._pageQuery.total = pageData.total
+            this._pageQuery.cursor = pageData.cursor
+            this._pageQuery.keyChanged = false
         }
         else{
         console.log(`failed to get api response: ${res}`)

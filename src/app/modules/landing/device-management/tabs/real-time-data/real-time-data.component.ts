@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { DeviceState } from '../../../../../modules/landing/utils/typedef';
+import { DeviceState, PERMISSION } from '../../../../../modules/landing/utils/typedef';
 import { isNumber } from 'lodash';
+import { SharedService } from '../../../../../services/shared.service';
 
 interface DeviceStateDetail {
     label: string;
@@ -19,8 +20,12 @@ export class RealTimeDataComponent implements OnInit, OnChanges{
     public showStateDetails = false;
     public stateDetails: DeviceStateDetail[] = [];
     public hasStateDetails = false;
+    public isAdminUser = false;
+
+    constructor(private _serviceShared: SharedService) {}
 
     ngOnInit(): void {
+        this.isAdminUser = this._serviceShared.getPermission() >= PERMISSION.ADMIN;
         console.log(`input realtime data of tab: ${this.realTimeData}`)
     }
 
@@ -64,6 +69,12 @@ export class RealTimeDataComponent implements OnInit, OnChanges{
         let icon: DeviceStateDetail['icon'] = 'info';
 
         switch (code) {
+            case 'AA':
+                description = 'Interval GPRS data';
+                status = 'info';
+                icon = 'info';
+                break;
+
             case '10':
                 description = 'Low battery alarm';
                 status = 'error';
@@ -166,8 +177,8 @@ export class RealTimeDataComponent implements OnInit, OnChanges{
             {
                 label: 'Charging status',
                 value: charging ? 'Machine is charging' : 'Machine is not charging',
-                status: charging ? 'info' : 'warning',
-                icon: charging ? 'info' : 'error'
+                status: charging ? 'warning' : 'info',
+                icon: charging ? 'info' : 'info'
             }
         ];
     }
@@ -294,12 +305,12 @@ export class RealTimeDataComponent implements OnInit, OnChanges{
         return !isNaN(Number(value));
     }
 
-    findHighestDBValue(singal) {
+    findHighestDBValue(singal: string): number | string | undefined {
         if(singal) {
             const entries = singal.split(',');
             let highestDB = -Infinity;
 
-            entries.forEach(entry => {
+            entries.forEach((entry: string) => {
             const [, dBValue] = entry.split(' ');
 
             const dB = parseInt(dBValue, 10);
