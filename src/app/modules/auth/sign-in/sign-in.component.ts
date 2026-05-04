@@ -125,9 +125,10 @@ export class AuthSignInComponent implements OnInit {
         this._fuseLoadingService.show()
         if (!this.signInForm.invalid) {
             //   see user present in users
+            
              let obj =  {
-                email: this.signInForm.value.email,
-                password: this.signInForm.value.password
+                email: this.signInForm.value.email.trim(),
+                password: this.signInForm.value.password.trim()
              }
             this._signInService.login(obj).then((res:any) => {
                 if(res && res.error_code == 0) {
