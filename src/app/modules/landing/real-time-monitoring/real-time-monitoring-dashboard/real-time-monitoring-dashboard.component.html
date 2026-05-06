@@ -125,25 +125,21 @@
                                     </td>
                                 </tr>
 
-                                <ng-template #emptyRow>
-                                    <tr>
-                                      <th class="flex">&nbsp;</th>
-                                      <td colspan="2">&nbsp;</td>
-                                    </tr>
-                                  </ng-template>
-
-
                             </tbody>
                         </table>
                         <hr class="hr-color my-4">
-                        <div class="flex">
-                            <div class="flex-1">
-                                <p class="mb-0">{{item?.time}}</p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="mb-0" matTooltip="Last Log Time" >{{item?.time}}</p>
+                                <div class="mt-1" style="min-height: 1.0rem;">
+                                    <p *ngIf="hasHeartBitTime(item)" matTooltip="Last HeartBit Time" [style.color]="getHeartBitColor(item)" class="mb-0">{{item?.time_heart}}</p>
+                                </div>
                             </div>
-                            <div class="flex items-end">
-                                <p class="ml-auto cursor-pointer">
+                            
+                            <div class="flex items-center">
+                                <p class="cursor-pointer">
                                     <i class="lni lni-arrow-right"></i>&nbsp;
-                                    <a class="mb-0" (click)="navigateToDetail(item)">&rarr; View Details</a>
+                                    <a class="mb-0" (click)="navigateToDetail(item)">&rarr; Details</a>
                                 </p>
                             </div>
                         </div>

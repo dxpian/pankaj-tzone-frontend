@@ -50,12 +50,12 @@
                 </div>
                 <p class="card-text text-sm" id="labDescription">&nbsp;&nbsp;</p>
                 <!-- <hr> -->
-                <div class="hidden sm:flex items-center mb-2">
+                <div class="flex flex-col items-start mb-2">
                     <span class="inline-flex items-center text-secondary" id="labStatus">
                         <span class="bx bxs-circle me-1 chart-offline text-xs"></span>{{!this.isActive ? 'Offline': 'Online' }}
                     </span>
-                    <span class="mx-1">|</span>
-                    <span class="inline-flex items-center text-secondary" id="labUpdateTime">Last Active Time : {{getLastActiveTimeString()}}</span>
+                    <span class="inline-flex items-center text-secondary mt-1" id="labUpdateTime">Last Active Time : {{getLastActiveTimeString()}}</span>
+                    <span *ngIf="hasHeartBitTime()" class="inline-flex items-center text-secondary mt-1" id="labHeartBittime">Last HeartBit Time: {{getLastHeartBitTime()}}</span>
                 </div>
                 <div class="flex items-center text-xl">
                     <mat-icon svgIcon="heroicons_outline:bell"></mat-icon>

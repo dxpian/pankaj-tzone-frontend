@@ -220,25 +220,6 @@ export class RealTimeMonitoringDashboardComponent implements OnInit {
     })
   }
 
-
-  // initialize websocket connection
-  /*
-  establishedSocketConnection() {
-      // Initialize the WebSocket connection when the component is created
-      console.log(`subscribe  to socket-io  realtime-data event`)
-
-      this._webSocket.connect('realtime-data');
-      this._webSocket.getMessages().subscribe((message) => { // command is updated
-          const decoder = new TextDecoder('utf-8');
-          const serial = decoder.decode(new Uint8Array(message));
-          console.log(`Success to receive the downlink command updated message: ${serial}`);
-          // this.update_device_contents(this.cloneDeviceData, serial).then(()=>{
-          //   console.log(`Success to update device state by websocket`)
-          // });
-      });
-  }*/
-
-
   // update the data by device serial
   async update_device_contents(items, serial: string){
       for(var i = 0; i < this.deviceData.length; i ++){
@@ -379,6 +360,20 @@ export class RealTimeMonitoringDashboardComponent implements OnInit {
         return (item?.state?.alarmTime)?  item?.state?.alarmTime.slice(0, 16): '--'
       }
       return '--'
+  }
+
+
+  hasHeartBitTime(item: DeviceRealTime ): boolean{
+    return item.time_heart ? true: false
+  }
+
+  getHeartBitColor(item: DeviceRealTime): string {
+    if (!item.time_heart) return 'black';
+    const heartBitTime = new Date(item.time_heart);
+    const now = new Date();
+    const diffMs = now.getTime() - heartBitTime.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+    return diffHours <= 24 ? 'blue' : 'white';
   }
 
   // check if last laarm is occured in recent one day

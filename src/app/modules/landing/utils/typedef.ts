@@ -48,6 +48,7 @@ export interface Device{
   model?  :   String,
   groups?  :  String,
   time ?  :   string,
+  time_heart?: string,  // heartbit time
   status: number;
   gps_enabled?: boolean;
   gps_interval?: number;
@@ -73,6 +74,7 @@ export interface DeviceState{
     alarm?:     string;         // last log alarm    
     terminal?:  string;         // last log terminal information
     netstatus?: string;         // last log network status
+    timeHeartBit?: string;       // heartbit time of logger
 }
 
 export interface DeviceRealTime{
@@ -82,6 +84,7 @@ export interface DeviceRealTime{
     model?  :   String,
     groups?  :  String,
     time ?  :   string,
+    time_heart ?: string,
     simexpire?: string,
     state ? : DeviceState,
     cluster?:   string; // cluster 

@@ -62,14 +62,13 @@ export class ViewDevicesComponent implements OnInit {
           });
         // Access route parameters using ActivatedRoute
         this._route.paramMap.subscribe((params) => {
-            this.deviceId = this.realTimeData.id
-            // this.getdevicelogs(this.deviceId);
-            //this.getDeviceByID(this.deviceId);
+            this.deviceId = this.realTimeData.id            
         });
 
         this.searchInputControl.setValue(this.serialId.toString())
 
-        // console.log(`Current device status: ${JSON.stringify(this.realTimeData)}`)
+        console.log(`Current device status: ${JSON.stringify(this.realTimeData)}`)
+
         this.searchInputControl.valueChanges
         .pipe(
             takeUntil(this._unsubscribeAll),
@@ -242,6 +241,14 @@ export class ViewDevicesComponent implements OnInit {
 
     getLastActiveTimeString(){
         return this.realTimeData.time || '--'
+    }
+
+    getLastHeartBitTime(): string{
+        return this.realTimeData.state.timeHeartBit || '--'
+    }
+
+    hasHeartBitTime(): boolean{
+        return (this.realTimeData.state?.timeHeartBit)? true: false
     }
 
 

@@ -132,7 +132,7 @@ export class DevicesComponent implements OnInit {
 
         this.intervalId = setInterval(() => {
             this.refreshPageContent();
-        }, 60* 1000 * 5);
+        }, 60* 1000);
     }
 
     ngAfterViewInit(): void {
@@ -298,7 +298,19 @@ export class DevicesComponent implements OnInit {
             return 'Default'
         const group = this.groups.find(g=>g.id == groupid)
         return (group)? group.groupname: 'Default'
+    }
 
+    hasHeartBit(item: Device): boolean{
+        return (item.time_heart)? true: false
+    }
+
+    getHeartBitColor(item: Device): string {
+        if (!item.time_heart) return 'black';
+        const heartBitTime = new Date(item.time_heart);
+        const now = new Date();
+        const diffMs = now.getTime() - heartBitTime.getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+        return diffHours <= 24 ? 'blue' : 'black';
     }
 
     saveDeviceDetails() {
