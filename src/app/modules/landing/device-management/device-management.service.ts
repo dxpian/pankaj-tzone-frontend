@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '@kitkat/services/utils/base';
 import { environment } from '../../../enviroment/enviroment';
-import { PageQuery } from '../utils/typedef';
+import { LogModel, PageQuery } from '../utils/typedef';
 
 @Injectable({
     providedIn: 'root'
@@ -92,12 +92,94 @@ export class DeviceManagementService extends BaseService {
   // get All loggers
   getAllLoggers(object, did):any {
     const url = `${environment.apiURL}/v1/log/device/${did}/allFrontPagelimit`;
-    return this.post(url,object);
+    return this.post(url, object);
   }
 
   // get All loggers by page limit
   getAllLoggersByLimit(object, did):any {
     return this.getAllLoggers(object, did);
+  }
+
+  /**
+   * NDJSON stream: first line `{ error_code, meta }`, then one front log row JSON per line
+   * (Content-Type application/x-ndjson from server).
+   */
+  async streamAllFrontLogs(
+    did: string,
+    body: { from: string; to: string; page?: number; pageSize?: number },
+    handlers: {
+      onMeta?: (meta: { error_code: number; meta?: string }) => void;
+      onRow: (row: LogModel) => void;
+      onComplete?: () => void;
+    }
+  ): Promise<void> {
+    const url = `${environment.apiURL}/v1/log/device/${did}/allFrontStream`;
+    const token = localStorage.getItem('accesstoken') || '';
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        accesstoken: token,
+      },
+      credentials: 'include',
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      throw new Error(`allFrontStream failed: HTTP ${res.status}`);
+    }
+    if (!res.body) {
+      throw new Error('allFrontStream: response body is null');
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let expectHeader = true;
+
+    const processLine = (raw: string) => {
+      const trimmed = raw.replace(/\r$/, '').trim();
+      if (!trimmed) {
+        return;
+      }
+      let parsed: any;
+      try {
+        parsed = JSON.parse(trimmed);
+      } catch {
+        return;
+      }
+      if (expectHeader) {
+        expectHeader = false;
+        if (parsed.error_code !== 0) {
+          throw new Error(parsed.meta || 'Stream error');
+        }
+        handlers.onMeta?.(parsed);
+        return;
+      }
+      handlers.onRow(parsed as LogModel);
+    };
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+        for (const line of lines) {
+          processLine(line);
+        }
+      }
+      buffer += decoder.decode();
+      if (buffer.replace(/\r$/, '').trim()) {
+        processLine(buffer);
+      }
+    } finally {
+      reader.releaseLock?.();
+    }
+    handlers.onComplete?.();
   }
 
 

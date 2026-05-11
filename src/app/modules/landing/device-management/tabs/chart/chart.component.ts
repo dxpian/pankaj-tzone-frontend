@@ -234,7 +234,36 @@ export class ChartComponent implements OnInit, OnChanges {
         const from = new Date(this.currentTime)
         const to = new Date(this.currentTime2)
 
-        this.addLogWithPageUnit(from, to)
+        this.addLogWithPageUnit2(from, to)
+    }
+
+    /**
+     * Loads chart logs via NDJSON stream POST .../v1/log/device/:did/allFrontStream
+     * (first line envelope, then one log row per line). Same date range / page body as pagelimit API.
+     */
+    private addLogWithPageUnit2(from: Date, to: Date, page: number = 1): void {
+        if (!this.deviceId) {
+            console.log(`Invalid device id. clear graph`);
+            this.mapAllChart();
+            return;
+        }
+        const body = {
+            from: moment(from).format('YYYY-MM-DD HH:mm:ss'),
+            to: moment(to).format('YYYY-MM-DD HH:mm:ss')
+        };
+        this._deviceServices
+            .streamAllFrontLogs(this.deviceId, body, {
+                onRow: (row) => {
+                    this.dataProps.push(row);
+                },
+            })
+            .then(() => {
+                this.zone.run(() => this.mapAllChart());
+            })
+            .catch((err) => {
+                console.error('allFrontStream:', err);
+                this.zone.run(() => this.mapAllChart());
+            });
     }
 
 
