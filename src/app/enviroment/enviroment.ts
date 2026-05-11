@@ -10,4 +10,5 @@ export const environment = {
     // socketUrl:'ws://localhost:9000/'
     apiURL: 'https://www.ibtrace.com/tzoneserver/api',
     socketUrl:'wss://www.ibtrace.com/'
+    
 };

@@ -57,13 +57,15 @@ export class ReportingViewComponent implements OnInit {
     let endDate = moment(); // current date and time
     let startDate = moment().subtract(7, 'days'); // a  
     let object = {
-        from: startDate,
-        to: endDate,
+        from: startDate.format('YYYY-MM-DD HH:mm:ss'),
+        to: endDate.format('YYYY-MM-DD HH:mm:ss'),
+        page: 1,
+        pageSize: 2 * 12 * 24,
     }
     this._deviceServices.getAllLoggers(object, serial).then((res: any) => {
         if(res && !res.error_code) {
         console.log('loggers', res)
-        this.dataForChart = res?.object
+        this.dataForChart = Array.isArray(res?.object) ? res.object : (res?.object?.list || [])
         }
     })
     }

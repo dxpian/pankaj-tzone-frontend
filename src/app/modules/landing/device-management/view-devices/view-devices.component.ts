@@ -251,8 +251,6 @@ export class ViewDevicesComponent implements OnInit {
         return (this.realTimeData.state?.timeHeartBit)? true: false
     }
 
-
-
     // read sensor values
     getRealTimeData(dev_id) {
             if(this.realTimeData?.state){

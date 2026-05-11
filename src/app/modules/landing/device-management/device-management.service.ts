@@ -91,14 +91,13 @@ export class DeviceManagementService extends BaseService {
 
   // get All loggers
   getAllLoggers(object, did):any {
-    const url = `${environment.apiURL}/v1/log/device/${did}/allFront`;
+    const url = `${environment.apiURL}/v1/log/device/${did}/allFrontPagelimit`;
     return this.post(url,object);
   }
 
-  // get All loggers
+  // get All loggers by page limit
   getAllLoggersByLimit(object, did):any {
-    const url = `${environment.apiURL}/v1/log/device/${did}/allFrontPagelimit`;
-    return this.post(url,object);
+    return this.getAllLoggers(object, did);
   }
 
 

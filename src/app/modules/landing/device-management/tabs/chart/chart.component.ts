@@ -28,6 +28,7 @@ export enum ChartType  {
     styleUrls: ['./chart.component.scss']
 })
 export class ChartComponent implements OnInit, OnChanges {
+    private readonly LOG_PAGE_SIZE = 2 * 12 * 24;
     endDate = moment(); // current date and time
     startDate = moment().subtract(7, 'days'); // a
     temperatureHumdity = [];
@@ -237,7 +238,7 @@ export class ChartComponent implements OnInit, OnChanges {
     }
 
 
-    private addLogWithPageUnit(from: Date, to: Date){
+    private addLogWithPageUnit(from: Date, to: Date, page: number = 1){
         console.log(`fetch the chat data. current device ID: ${this.deviceId}/${this.deviceId.length}`)
 
         if(!this.deviceId)
@@ -247,17 +248,19 @@ export class ChartComponent implements OnInit, OnChanges {
             return
         }
         let params = {
-            from: from,
-            to: to
+            from: moment(from).format('YYYY-MM-DD HH:mm:ss'),
+            to: moment(to).format('YYYY-MM-DD HH:mm:ss'),
+            page: page,
+            pageSize: this.LOG_PAGE_SIZE
         }
         this._deviceServices.getAllLoggersByLimit(params, this.deviceId).then((res: any) => {
             if(res && res.error_code == 0) {
                 console.log(`Success to fetch chat data log of device: ${this.deviceId}`)
-                const pageData = res?.object as LogModel[]
+                const pageData = Array.isArray(res?.object) ? res.object : (res?.object?.list || []) as LogModel[]
                 this.dataProps.push(...pageData)
-                if(pageData.length > 0){ // check if time is reached to end time
-                    const fromNext = this.getLogTime(pageData.at(-1))
-                    this.addLogWithPageUnit(fromNext, to)
+                if(pageData.length === this.LOG_PAGE_SIZE){
+                    this.addLogWithPageUnit(from, to, page + 1)
+                    return
                 }
 
             }
