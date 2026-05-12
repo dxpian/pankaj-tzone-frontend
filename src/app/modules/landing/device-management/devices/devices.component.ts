@@ -14,14 +14,19 @@ import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunction
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FuseConfirmDialogComponent } from '@kitkat/components/confirm-dialog/confirm-dialog.component';
 import { Router } from '@angular/router';
-import { SocketService } from 'app/services/socket.service';
+import { SocketService } from '../../../../services/socket.service';
 import { DB_RESULT, PageData, PageQuery, Device, DeviceFilterType, PERMISSION } from '../../utils/typedef';
 import { identity } from 'lodash';
 import { GroupConfig, USER_ROLE } from '../../account/account.typedef';
-import { SharedService } from 'app/services/shared.service';
+import { SharedService } from '../../../../services/shared.service';
 import { Language } from '../../service/message-push-service/email/email.component';
 import { normalizeString } from '../../service/alfresa/alfresa.util';
 import { GoogleMap } from '@angular/google-maps';
+import {
+    LIST_BROWSE_DEVICE_MANAGEMENT_KEY,
+    readListBrowseState,
+    writeListBrowseState
+} from '../../utils/list-browse-state.storage';
 
 interface DeviceExcel{
     name: string;
@@ -136,8 +141,21 @@ export class DevicesComponent implements OnInit {
     }
 
     ngAfterViewInit(): void {
+        const saved = readListBrowseState(LIST_BROWSE_DEVICE_MANAGEMENT_KEY);
         this._pageQuery.pagesize = this.paginator.pageSize;
-        this._pageQuery.keyChanged = true
+        if (saved) {
+            this.filter = saved.filter as DeviceFilterType;
+            this._pageQuery.keyword = saved.keyword;
+            this.searchInputControl.setValue(saved.keyword, { emitEvent: false });
+            const allowedSizes = [20, 50, 100, 200];
+            const pageSize = allowedSizes.includes(saved.pageSize) ? saved.pageSize : this.paginator.pageSize;
+            this.paginator.pageSize = pageSize;
+            this._pageQuery.pagesize = pageSize;
+            this.paginator.pageIndex = Math.max(0, saved.pageIndex);
+            this._pageQuery.keyChanged = true;
+        } else {
+            this._pageQuery.keyChanged = true;
+        }
         this.getDevices(this.userInfo?.id);
     }
 
@@ -281,6 +299,14 @@ export class DevicesComponent implements OnInit {
     }
 
     viewDevice(item) {
+        const keyword = (this.searchInputControl.value ?? '').toString().trim()
+            || (this._pageQuery.keyword || '');
+        writeListBrowseState(LIST_BROWSE_DEVICE_MANAGEMENT_KEY, {
+            filter: this.filter,
+            keyword,
+            pageIndex: this.paginator?.pageIndex ?? 0,
+            pageSize: this.paginator?.pageSize ?? this._pageQuery.pagesize,
+        });
         this._route.navigate([`device/${item.id}`], { queryParams: { data: JSON.stringify(item) } });
     }
 

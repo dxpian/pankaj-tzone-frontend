@@ -13,6 +13,11 @@ import { forkJoin, map, catchError, of, retry, takeUntil, debounceTime, switchMa
 import { SocketRealTimeDataService } from '../../../../services/socketRealtimeData.service';
 import { FormControl } from '@angular/forms';
 import { DB_RESULT, DeviceFilterType, DeviceRealTime, DeviceState, PageData, PageQuery } from '../../utils/typedef';
+import {
+    LIST_BROWSE_REAL_TIME_MONITORING_KEY,
+    readListBrowseState,
+    writeListBrowseState
+} from '../../utils/list-browse-state.storage';
 import { AlarmType } from '../../alarm-settings/alarm-listing/alarm-listing.component';
 
 
@@ -134,8 +139,21 @@ export class RealTimeMonitoringDashboardComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
+    const saved = readListBrowseState(LIST_BROWSE_REAL_TIME_MONITORING_KEY);
     this._pageQuery.pagesize = this.paginator.pageSize;
-    this._pageQuery.keyChanged = true
+    if (saved) {
+      this.filter = saved.filter as DeviceFilterType;
+      this._pageQuery.keyword = saved.keyword;
+      this.searchInputControl.setValue(saved.keyword, { emitEvent: false });
+      const allowedSizes = [20, 40, 60, 80, 100];
+      const pageSize = allowedSizes.includes(saved.pageSize) ? saved.pageSize : this.paginator.pageSize;
+      this.paginator.pageSize = pageSize;
+      this._pageQuery.pagesize = pageSize;
+      this.paginator.pageIndex = Math.max(0, saved.pageIndex);
+      this._pageQuery.keyChanged = true;
+    } else {
+      this._pageQuery.keyChanged = true;
+    }
     this.getDevices(this.userInfo?.id);
   }
 
@@ -273,6 +291,14 @@ export class RealTimeMonitoringDashboardComponent implements OnInit {
 
 
   navigateToDetail(item) {
+    const keyword = (this.searchInputControl.value ?? '').toString().trim()
+      || (this._pageQuery.keyword || '');
+    writeListBrowseState(LIST_BROWSE_REAL_TIME_MONITORING_KEY, {
+      filter: this.filter,
+      keyword,
+      pageIndex: this.paginator?.pageIndex ?? 0,
+      pageSize: this.paginator?.pageSize ?? this._pageQuery.pagesize,
+    });
     this._route.navigate([`device/${item.id}`], { queryParams: { data: JSON.stringify(item) } });
   }
 

@@ -234,7 +234,7 @@ export class ChartComponent implements OnInit, OnChanges {
         const from = new Date(this.currentTime)
         const to = new Date(this.currentTime2)
 
-        this.addLogWithPageUnit2(from, to)
+        this.addLogWithPageUnit(from, to)
     }
 
     /**
