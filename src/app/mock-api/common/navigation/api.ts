@@ -4,7 +4,7 @@ import { FuseNavigationItem } from '@kitkat/components/navigation';
 import { FuseMockApiService } from '@kitkat/lib/mock-api';
 import { defaultNavigation} from 'app/mock-api/common/navigation/data';
 import { SharedService } from 'app/services/shared.service';
-import { ACCOUNT_TYPE, PERMISSION } from 'app/modules/landing/utils/typedef';
+import { ACCOUNT_TYPE, isWebAdminPermission, PERMISSION } from 'app/modules/landing/utils/typedef';
 import { USER_ROLE } from 'app/modules/landing/account/account.typedef';
 
 @Injectable({

@@ -15,7 +15,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { FuseConfirmDialogComponent } from '@kitkat/components/confirm-dialog/confirm-dialog.component';
 import { Router } from '@angular/router';
 import { SocketService } from '../../../../services/socket.service';
-import { DB_RESULT, PageData, PageQuery, Device, DeviceFilterType, PERMISSION } from '../../utils/typedef';
+import { DB_RESULT, PageData, PageQuery, Device, DeviceFilterType, isWebAdminPermission, PERMISSION } from '../../utils/typedef';
 import { identity } from 'lodash';
 import { GroupConfig, USER_ROLE } from '../../account/account.typedef';
 import { SharedService } from '../../../../services/shared.service';
@@ -311,7 +311,8 @@ export class DevicesComponent implements OnInit {
     }
 
     isAdmin(): boolean{
-            return (this._serviceShared.getPermission() >= PERMISSION.ADMIN)? true: false
+            const p = this._serviceShared.getPermission();
+            return isWebAdminPermission(p) || p >= PERMISSION.DEVELOPER;
     }
 
 

@@ -9,7 +9,7 @@ import { DeviceManagementService } from '../../device-management.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
 import { SocketCommandService } from 'app/services/socketCommand.service';
-import { DownlinkCommand, PERMISSION } from 'app/modules/landing/utils/typedef';
+import { DownlinkCommand, isWebAdminPermission, PERMISSION } from 'app/modules/landing/utils/typedef';
 import { Language } from 'app/modules/landing/service/message-push-service/email/email.component';
 import { SharedService } from 'app/services/shared.service';
 
@@ -564,7 +564,7 @@ export class SetUpComponent implements OnInit, OnChanges {
     copyAvailable(response?: string): Boolean{
         if(!response)
             return false;
-        if(this.permission == PERMISSION.ADMIN || this.permission == PERMISSION.DEVELOPER)
+        if(isWebAdminPermission(this.permission) || this.permission == PERMISSION.DEVELOPER)
             return true;
         return false
 

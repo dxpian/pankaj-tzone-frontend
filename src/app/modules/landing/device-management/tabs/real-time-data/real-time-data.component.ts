@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { DeviceState, PERMISSION } from '../../../../../modules/landing/utils/typedef';
+import { DeviceState, isWebAdminPermission, PERMISSION } from '../../../../../modules/landing/utils/typedef';
 import { isNumber } from 'lodash';
 import { SharedService } from '../../../../../services/shared.service';
 
@@ -25,7 +25,8 @@ export class RealTimeDataComponent implements OnInit, OnChanges{
     constructor(private _serviceShared: SharedService) {}
 
     ngOnInit(): void {
-        this.isAdminUser = this._serviceShared.getPermission() >= PERMISSION.ADMIN;
+        const p = this._serviceShared.getPermission();
+        this.isAdminUser = isWebAdminPermission(p) || p >= PERMISSION.DEVELOPER;
         console.log(`input realtime data of tab: ${this.realTimeData}`)
     }
 

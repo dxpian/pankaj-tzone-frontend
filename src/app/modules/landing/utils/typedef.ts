@@ -228,6 +228,11 @@ export const PERMISSION = {
   PMS_CNT: 6,             // total count for permission
 }
 
+/** ADMIN and WEB_MOB_ADMIN are equivalent for Angular web app privilege checks. */
+export function isWebAdminPermission(permission: number): boolean {
+  return permission === PERMISSION.ADMIN || permission === PERMISSION.WEB_MOB_ADMIN;
+}
+
 export const ACCOUNT_TYPE = {
   NORMAL: 0,
   ALFRESA: 1,

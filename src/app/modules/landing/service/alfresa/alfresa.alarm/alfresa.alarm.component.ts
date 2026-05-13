@@ -9,7 +9,7 @@ import { DatePipe } from '@angular/common';
 import { SharedService } from 'app/services/shared.service';
 import { AlfresaCenterService } from '../service.center';
 import { ALFALARM_STATUS, AlfCalibResult, ALFLOC, AlfresaAlarms, AlfresaBranch, AlfresaCalibrationConfig, AlfresaCenter, CALIB_STATUS, CalibrationSchedule } from '../alfresa.type';
-import { DB_RESULT, PageData, PageQuery, PERMISSION } from 'app/modules/landing/utils/typedef';
+import { DB_RESULT, PageData, PageQuery, isWebAdminPermission } from 'app/modules/landing/utils/typedef';
 import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
 import { Language } from '../../message-push-service/email/email.component';
 import { MSG } from 'app/modules/landing/utils/message.def';
@@ -803,6 +803,7 @@ export class AlfresaAlarmComponent {
 
     }
     resetAlarmDialog(){
+        this.alarmForm.get('serial')?.enable();
         this.alarmForm.reset({
           "id":[''],
           "serial": ['',],
@@ -830,6 +831,7 @@ export class AlfresaAlarmComponent {
         this.alarmForm.patchValue(this.alarmSelected)
         const enabled = (this.alarmSelected.alarm_status == ALFALARM_STATUS.ENABLE)?true:false
         this.alarmForm.get('alarm_status')?.setValue(enabled);
+        this.alarmForm.get('serial')?.enable();
         var centerId = ''
         if(this.alarmSelected.center){
             this.alarmForm.get('location').setValue(false)
@@ -988,6 +990,10 @@ export class AlfresaAlarmComponent {
     }
 
     onWheelScroll(event: WheelEvent) {
+        if (this.editState) {
+            event.preventDefault();
+            return;
+        }
         const input = event.target as HTMLInputElement;
 
         if (document.activeElement !== input) return; // Avoid accidental scroll
@@ -1007,7 +1013,8 @@ export class AlfresaAlarmComponent {
     }
 
     saveAlarm(){
-        const serial = normalizeString(this.alarmForm.value.serial.toString())
+        const serialRaw = this.alarmForm.get('serial')?.value;
+        const serial = normalizeString(serialRaw != null && serialRaw !== '' ? String(serialRaw) : '')
         const al = parseFloat(this.alarmForm.value.alarm_l.toString())
         const ah = parseFloat(this.alarmForm.value.alarm_h.toString())
         const wl = parseFloat(this.alarmForm.value.warn_l.toString())
@@ -1233,7 +1240,7 @@ export class AlfresaAlarmComponent {
     }
 
     isAdmin(): boolean{
-        return this._serivceShared.getPermission() == PERMISSION.ADMIN
+        return isWebAdminPermission(this._serivceShared.getPermission());
     }
 
     onSelectSchduleFile(event){

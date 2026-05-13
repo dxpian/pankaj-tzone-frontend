@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { HolidayConfig, PERMISSION } from '../../utils/typedef';
+import { HolidayConfig, isWebAdminPermission, PERMISSION } from '../../utils/typedef';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -234,7 +234,7 @@ export class HolidayComponent {
     }
 
     hasAdminPermission(): boolean{
-        return (this.permission == PERMISSION.ADMIN || this.permission == PERMISSION.DEVELOPER)? true: false
+        return isWebAdminPermission(this.permission) || this.permission == PERMISSION.DEVELOPER;
     }
 
 }
