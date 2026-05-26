@@ -256,6 +256,7 @@ export interface MobileAdmin{
     id?: string; 
     name: string; 
     email: string; 
+    clusters?: string[];
     permission: number; 
     password?:string; 
     created?: string; 
@@ -267,7 +268,7 @@ export interface MobileUser{
     id?: string; 
     name: string; 
     email: string; 
-    cluster?: string; // cluster name. not cluster-id
+    clusters?: string[]; // cluster name. not cluster-id
     permission: number;
     password?:string; 
     created?: string; 

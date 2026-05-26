@@ -68,6 +68,9 @@ export class NavigationMockApi
                   
 
                     if(isDeveloper){
+                        if(item.id === 'Mobile')    // show service for developer
+                            return null; 
+
                         if(item.id === 'Service')    // show service for developer
                             return null; 
                         if(item.id == 'User Management')

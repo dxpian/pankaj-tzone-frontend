@@ -36,7 +36,7 @@
         </div>
 
 
-        <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceAdmin">
+        <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceAdmin" matSort #adminSort="matSort">
             <!-- id -->
             <ng-container matColumnDef="id">
                 <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
@@ -54,7 +54,7 @@
 
             <!-- User name -->
             <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
                     Name
                 </th>
                 <td mat-cell *matCellDef="let item" class="tab-row text-left">
@@ -66,7 +66,7 @@
 
             <!-- Email address -->
             <ng-container matColumnDef="email">
-                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
                     Email
                 </th>
                 <td mat-cell *matCellDef="let item" class="tab-row text-left">
@@ -78,7 +78,7 @@
 
             <!-- User permission -->
             <ng-container matColumnDef="users">
-                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Mobile Users</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Mobile Users</th>
                 <td mat-cell *matCellDef="let item" class="tab-row text-left">
                     <div class="column-text">
                         <p>{{getUsercntOfAdmin(item)}}</p>
@@ -86,9 +86,19 @@
                 </td>
             </ng-container>
 
+            <!-- bound clusters -->
+            <ng-container matColumnDef="clusters">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Clusters</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{getClusterCountOfAdmin(item)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
             <!-- created time -->
             <ng-container matColumnDef="created">
-                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Created</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Created</th>
                 <td mat-cell *matCellDef="let item" class="tab-row text-left">
                     <div class="column-text">
                         <p>{{removeTime(item.created)}}</p>
@@ -169,7 +179,7 @@
     <hr style="margin-top: 0px !important;">
 
     <!-- Mobile admin listing -->
-    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceUser" matSort>
+    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceUser" matSort #userSort="matSort">
       <!-- id -->
         <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
@@ -187,7 +197,7 @@
 
         <!-- User name -->
         <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
                 Name
             </th>
             <td mat-cell *matCellDef="let item" class="tab-row text-left">
@@ -199,7 +209,7 @@
 
         <!-- Email address -->
         <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
                 Email
             </th>
             <td mat-cell *matCellDef="let item" class="tab-row text-left">
@@ -209,19 +219,19 @@
             </td>
         </ng-container>
 
-       <!-- Cluster -->
+       <!-- Clusters -->
         <ng-container matColumnDef="cluster">
-            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Cluster</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Clusters</th>
             <td mat-cell *matCellDef="let item" class="tab-row text-left">
                 <div class="column-text">
-                    <p>{{getClusterName(item.cluster)}}</p>
+                    <p>{{getClusterCountOfUser(item)}}</p>
                 </div>
             </td>
         </ng-container>
 
         <!-- created time -->
         <ng-container matColumnDef="created">
-            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Created</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Created</th>
             <td mat-cell *matCellDef="let item" class="tab-row text-left">
                 <div class="column-text">
                     <p>{{removeTime(item.created)}}</p>
@@ -311,6 +321,40 @@
                     <mat-label>Confirm password:</mat-label>
                     <input matInput formControlName="password_confirm" placeholder="Confirm password" type="password">
                 </mat-form-field>
+
+                <!-- cluster selection (all clusters) -->
+                <div class="gt-xs:pr-3 mb-2 w-full cluster-dialog-checkboxes">
+                    <label class="form-label">{{ getAdminClusterDialogLabel() }}</label>
+                    <input
+                        class="searchbox cluster-search-input w-full"
+                        matInput
+                        type="search"
+                        [value]="adminClusterSearch"
+                        (input)="onAdminClusterSearchInput($event)"
+                        placeholder="Filter clusters">
+                    <mat-checkbox
+                        class="cluster-select-all mt-1 mb-1"
+                        color="primary"
+                        [checked]="areAllVisibleAdminClustersSelected()"
+                        [indeterminate]="isSomeVisibleAdminClustersSelected()"
+                        (change)="onAdminSelectAllChange($event)"
+                        (click)="$event.stopPropagation()">
+                        {{ getAdminSelectAllLabel() }}
+                    </mat-checkbox>
+                    <div class="cluster-checkbox-panel">
+                        <div class="cluster-checkbox-grid">
+                            <mat-checkbox
+                                *ngFor="let cluster of getVisibleAdminDialogClusters()"
+                                class="cluster-checkbox-item"
+                                color="primary"
+                                [checked]="isAdminClusterSelected(cluster.id)"
+                                (change)="onAdminClusterSelectionChange(cluster.id, $event)"
+                                (click)="$event.stopPropagation()">
+                                {{ cluster.name }}
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </section>
@@ -345,15 +389,39 @@
                     <input matInput formControlName="email" placeholder="User email">
                 </mat-form-field>
 
-                <!-- select cluster -->
-                <mat-form-field class="gt-xs:pr-3" appearance="fill">
-                    <mat-label>Cluster:</mat-label>
-                    <mat-select formControlName="cluster">
-                        <mat-option *ngFor="let cluster of clusters" [value]="cluster.id">
-                            {{ cluster.name }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <!-- cluster selection (parent mobile admin clusters) -->
+                <div *ngIf="showUserDialogClusters" class="gt-xs:pr-3 mb-2 w-full cluster-dialog-checkboxes">
+                    <label class="form-label">{{ getUserClusterDialogLabel() }}</label>
+                    <input
+                        class="searchbox cluster-search-input w-full"
+                        matInput
+                        type="search"
+                        [value]="userClusterSearch"
+                        (input)="onUserClusterSearchInput($event)"
+                        placeholder="Filter clusters">
+                    <mat-checkbox
+                        class="cluster-select-all mt-1 mb-1"
+                        color="primary"
+                        [checked]="areAllVisibleUserClustersSelected()"
+                        [indeterminate]="isSomeVisibleUserClustersSelected()"
+                        (change)="onUserSelectAllChange($event)"
+                        (click)="$event.stopPropagation()">
+                        {{ getUserSelectAllLabel() }}
+                    </mat-checkbox>
+                    <div class="cluster-checkbox-panel">
+                        <div class="cluster-checkbox-grid">
+                            <mat-checkbox
+                                *ngFor="let cluster of getVisibleUserDialogClusters()"
+                                class="cluster-checkbox-item"
+                                color="primary"
+                                [checked]="isUserClusterSelected(cluster.id)"
+                                (change)="onUserClusterSelectionChange(cluster.id, $event)"
+                                (click)="$event.stopPropagation()">
+                                {{ cluster.name }}
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- checkbox for password -->
                 <mat-checkbox

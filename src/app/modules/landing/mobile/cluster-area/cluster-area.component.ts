@@ -169,8 +169,8 @@ export class ClusterAreaComponent implements AfterViewInit {
     loadClusters(){
       console.log(`download areas`)
       this.dataSrcClst = new MatTableDataSource<MobileCluster>();
-      const userId = this._sharedService.getId()
-      this._mobileService.getClusters(userId).then((response: DB_RESULT)=>{
+      
+      this._mobileService.getClusters().then((response: DB_RESULT)=>{
           if(response && response.error_code == 0){
               this.clusters = response.object as MobileCluster[]
               this.onUpdateClusterData()

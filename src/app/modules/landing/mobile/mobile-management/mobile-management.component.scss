@@ -7,3 +7,71 @@
     border-radius: 5px !important;
     padding-left: 12px !important;
 }
+
+.cluster-search-input {
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-height: 2.75rem;
+    height: 2.75rem;
+    margin-right: 0 !important;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    box-sizing: border-box;
+}
+
+.cluster-checkbox-panel {
+    max-height: 12rem;
+    overflow-y: auto;
+    margin-top: 0.25rem;
+    padding-right: 0.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+}
+
+.cluster-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1rem;
+    row-gap: 0.25rem;
+}
+
+@media (min-width: 640px) {
+    .cluster-checkbox-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.cluster-checkbox-item {
+    display: block;
+    min-width: 0;
+}
+
+.cluster-select-all {
+    display: block;
+}
+
+/* RTM green (#14a73c) — matches Save / RTM-button-color in dialogs */
+$cluster-checkbox-green: #14a73c;
+
+.cluster-dialog-checkboxes {
+    .mat-mdc-checkbox {
+        --mdc-checkbox-selected-checkmark-color: #fff;
+        --mdc-checkbox-selected-focus-icon-color: #{$cluster-checkbox-green};
+        --mdc-checkbox-selected-hover-icon-color: #{$cluster-checkbox-green};
+        --mdc-checkbox-selected-icon-color: #{$cluster-checkbox-green};
+        --mdc-checkbox-selected-pressed-icon-color: #{$cluster-checkbox-green};
+        --mdc-checkbox-unselected-hover-icon-color: #{$cluster-checkbox-green};
+        --mdc-checkbox-unselected-focus-icon-color: #{$cluster-checkbox-green};
+        --mat-checkbox-checked-ripple-color: rgba(20, 167, 60, 0.2);
+    }
+
+    .mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background,
+    .mat-mdc-checkbox.mat-mdc-checkbox-indeterminate .mdc-checkbox__background {
+        border-color: #{$cluster-checkbox-green} !important;
+        background-color: #{$cluster-checkbox-green} !important;
+    }
+}

@@ -119,10 +119,17 @@ export class MobileUserService extends BaseService {
         return this.delete(url)
     }
 
-    getClusters(user_id: string){
-        const url = `${environment.apiURL}/v1/mobile/cluster/get-cluster-of-webadmin/${user_id}`;
+    getClusters(){
+        const url = `${environment.apiURL}/v1/mobile/cluster/get-clusters-web-admin`;
         return this.post(url, {})
     }
+
+    getClustersOfSubUser(user_id: string){
+        const url = `${environment.apiURL}/v1/mobile/cluster/get-cluster-of-mobile/${user_id}`;
+        return this.post(url, {})
+    }
+
+
 
     getAllClustersBySuper(user_id: string){
         const url = `${environment.apiURL}/v1/mobile/cluster/get-cluster-of-superadmin`;
