@@ -1,7 +1,7 @@
 import { MatIconModule } from '@angular/material/icon';
 import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DB_RESULT, PERMISSION, UserDetails } from '../../utils/typedef';
+import { ACCOUNT_TYPE, DB_RESULT, PERMISSION, UserDetails } from '../../utils/typedef';
 import { Language } from '../../service/message-push-service/email/email.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -30,7 +30,7 @@ export class AdminUserManagementComponent {
     apkForm!: FormGroup;
     private dialogRef: any;
 
-    displayedColumns: string[] = ['id', 'name', 'email', 'permission', 'devices', 'description', 'created', 'parent_account', 'action'];
+    displayedColumns: string[] = ['id', 'name', 'email', 'permission', 'account_type', 'devices', 'description', 'created', 'parent_account', 'action'];
     public apkSources: UserDetails[] = []
     totalRecords: number;
 
@@ -46,7 +46,12 @@ export class AdminUserManagementComponent {
     searchkeyword = ''
     searchInputControl = new FormControl();
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-    public PERMISSION =  PERMISSION
+    public PERMISSION = PERMISSION
+    public ACCOUNT_TYPE = ACCOUNT_TYPE
+    readonly accountTypeOptions = [
+      { value: ACCOUNT_TYPE.NORMAL, label: 'Normal' },
+      { value: ACCOUNT_TYPE.ALFRESA, label: 'Alfresa' },
+    ]
     constructor(
         public dialog: MatDialog,
         private fb: FormBuilder,
@@ -121,17 +126,56 @@ export class AdminUserManagementComponent {
         return 'Invalid'
     }
 
+    getAccountTypeName(user: UserDetails): string {
+      if (!this.isAdminOrWebMobAdminPermission(user.permission)) {
+        return '--'
+      }
+      const type = this.resolveAccountType(user)
+      const option = this.accountTypeOptions.find((o) => o.value === type)
+      return option?.label ?? 'Invalid'
+    }
+
     resetFormdata(){
       this.apkForm = this.fb.group({
           name: ['user-name', Validators.required],
           email:['sample.user@example.com', Validators.required],
           update_password: [false],
           permission: [PERMISSION.NORMAL],
+          account_type: [ACCOUNT_TYPE.NORMAL],
           password: ['', [Validators.required, Validators.minLength(6)]],
           password_confirm: ['', [Validators.required, Validators.minLength(6)]],
           description: ['',],
           created: [null]
         })
+    }
+
+    isAdminOrWebMobAdminPermission(permission: number): boolean {
+      return permission === PERMISSION.ADMIN || permission === PERMISSION.WEB_MOB_ADMIN
+    }
+
+    showAccountTypeField(): boolean {
+      const permission = this.apkForm?.get('permission')?.value
+      return this.isAdminOrWebMobAdminPermission(permission)
+    }
+
+    onPermissionChange(): void {
+      if (!this.showAccountTypeField()) {
+        this.apkForm.patchValue({ account_type: ACCOUNT_TYPE.NORMAL }, { emitEvent: false })
+      }
+      this._cdr.detectChanges()
+    }
+
+    private resolveAccountType(user?: UserDetails): number {
+      if (!user) {
+        return ACCOUNT_TYPE.NORMAL
+      }
+      if (user.account_type != null && !isNaN(user.account_type)) {
+        return user.account_type
+      }
+      if (user.type != null && !isNaN(user.type)) {
+        return user.type
+      }
+      return ACCOUNT_TYPE.NORMAL
     }
 
     openUserModal(action: string, data?: any){
@@ -148,8 +192,10 @@ export class AdminUserManagementComponent {
           this.userTemp = data
           this.resetFormdata()
           if (this.userTemp){
-            this.apkForm.patchValue(this.userTemp);
-
+            this.apkForm.patchValue({
+              ...this.userTemp,
+              account_type: this.resolveAccountType(this.userTemp),
+            })
           }
           this.dialog.open(this.add, { width: '800px', panelClass: 'custom-modalbox', disableClose: true });
           break;
@@ -209,9 +255,11 @@ export class AdminUserManagementComponent {
       const formdata : UserDetails = {
         name: this.apkForm.value.name,
         email: this.apkForm.value.email,
-        permission: this.apkForm.value.permission ,
+        permission: this.apkForm.value.permission,
         description: this.apkForm.value.description,
-
+      }
+      if (this.isAdminOrWebMobAdminPermission(formdata.permission)) {
+        formdata.account_type = this.apkForm.value.account_type ?? ACCOUNT_TYPE.NORMAL
       }
       if(passwordRes){
         formdata.password = passwordRes
@@ -221,7 +269,10 @@ export class AdminUserManagementComponent {
       if(!this.editMode){ // create new user
         this._serviceAuth.createUserDetials(formdata).then((res: DB_RESULT)=>{
           if(res && res.error_code == 0){
-            const newUser: UserDetails = res.object as UserDetails
+            const newUser: UserDetails = {
+              ...(res.object as UserDetails),
+              account_type: formdata.account_type,
+            }
             this.apkSources.push(newUser)
             this.onUpdateVisibeData()
             this.notify('Usccess to save changes')
@@ -240,7 +291,10 @@ export class AdminUserManagementComponent {
         this._serviceAuth.updateUserDetials(this.userTemp.id, formdata).then((res: DB_RESULT)=>{
           if(res && res.error_code== 0){
             const newUser = res.object as UserDetails
-            Object.assign(this.userTemp, newUser)
+            Object.assign(this.userTemp, newUser, {
+              account_type: formdata.account_type ?? this.resolveAccountType(this.userTemp),
+            })
+            this.onUpdateVisibeData()
             this.notify('Success to save changes')
             this.closeDialog()
             this._cdr.detectChanges()

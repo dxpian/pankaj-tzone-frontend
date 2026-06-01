@@ -91,6 +91,16 @@
                 </td>
             </ng-container>
 
+            <!-- Account type -->
+            <ng-container matColumnDef="account_type">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Account type</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{getAccountTypeName(item)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
             <ng-container matColumnDef="devices">
                 <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
                     Loggers
@@ -189,15 +199,31 @@
                     <input matInput formControlName="email" placeholder="User email">
                 </mat-form-field>
 
-                <!-- permission -->
-                <mat-form-field appearance="fill" class="accent-fg">
-                    <mat-label>Permission</mat-label>
-                    <mat-select formControlName="permission">
-                        <mat-option [value]="PERMISSION.NORMAL">Normal</mat-option>
-                        <mat-option [value]="PERMISSION.ADMIN">Admin</mat-option>
-                        <mat-option [value]="PERMISSION.WEB_MOB_ADMIN">Web-Mobile Admin</mat-option>
-                    </mat-select>
-                 </mat-form-field>
+                <!-- permission + account type -->
+                <div class="permission-account-type-row w-full flex flex-row flex-wrap gap-2">
+                    <mat-form-field appearance="fill" class="accent-fg flex-1 min-w-0">
+                        <mat-label>Permission</mat-label>
+                        <mat-select formControlName="permission" (selectionChange)="onPermissionChange()">
+                            <mat-option [value]="PERMISSION.NORMAL">Normal</mat-option>
+                            <mat-option [value]="PERMISSION.ADMIN">Admin</mat-option>
+                            <mat-option [value]="PERMISSION.WEB_MOB_ADMIN">Web-Mobile Admin</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field
+                        *ngIf="showAccountTypeField()"
+                        appearance="fill"
+                        class="accent-fg flex-1 min-w-0">
+                        <mat-label>Account type</mat-label>
+                        <mat-select formControlName="account_type">
+                            <mat-option
+                                *ngFor="let option of accountTypeOptions"
+                                [value]="option.value">
+                                {{ option.label }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
 
                 <!-- checkbox for password -->
                 <mat-checkbox

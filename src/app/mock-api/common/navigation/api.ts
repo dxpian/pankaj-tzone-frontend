@@ -99,7 +99,10 @@ export class NavigationMockApi
                         }
                         if(item.id == 'MobileAdminUser')
                             return null;
+
                         if(item.id == 'ManageCluster')
+                            return null;
+                        if(isAlfres && (item.id == 'MobileAlarm' || item.id == 'AreaCluster')) // show mobile alarm for Alfresa account
                             return null;
                     }
                     else if(isNormalUser){  // hide mobile option

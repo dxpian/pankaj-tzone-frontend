@@ -246,6 +246,8 @@ export interface UserDetails{
   email: string;
   password?:string;
   permission: number;
+  account_type?: number;
+  type?: number;
   description?: string;
   devices?: number;     // number of devices
   nameParent?:string;   // parent user name. used for sub-account
