@@ -81,6 +81,28 @@ export const defaultNavigation: FuseNavigationItem[] = [
         ]
     },
     {
+        id: 'License',
+        title: 'License',
+        type: 'collapsable',
+        icon: 'heroicons_outline:key',
+        children: [
+            {
+                id: 'LicenseModels',
+                title: 'License Models',
+                type: 'basic',
+                icon: 'heroicons_outline:document-text',
+                link: '/license/models'
+            },
+            {
+                id: 'LicenseAllocation',
+                title: 'License Allocation',
+                type: 'basic',
+                icon: 'heroicons_outline:user-circle',
+                link: '/license/allocation'
+            }
+        ]
+    },
+    {
         id: 'Message Center',
         title: 'Message Center',
         type: 'collapsable',

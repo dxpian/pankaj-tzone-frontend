@@ -1,0 +1,21 @@
+.searchbox {
+    border: 1px solid #ccc;
+    width: 320px !important;
+    max-height: 40px !important;
+    border-radius: 5px !important;
+    padding-left: 12px !important;
+}
+
+.icon-edit-copy {
+    color: #14a73c !important;
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.icon-edit-copy:hover {
+    transform: scale(1.15);
+    filter: brightness(1.08);
+}
+
+.icon-trash {
+    color: #ef4444 !important;
+}

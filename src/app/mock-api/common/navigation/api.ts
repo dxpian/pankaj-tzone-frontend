@@ -110,6 +110,10 @@ export class NavigationMockApi
                             return null; 
                     }
 
+                    if (item.id === 'License' && !isDeveloper) {
+                        return null;
+                    }
+
                     // Filter based on your permission logic
                     if (item.id === 'Holiday' && !isAlfres) { // hide holiday for non-Alfresa account
                         return null;

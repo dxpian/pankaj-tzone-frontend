@@ -1,0 +1,84 @@
+.searchbox {
+    border: 1px solid #ccc;
+    width: 320px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    border-radius: 5px !important;
+    padding-left: 12px !important;
+    box-sizing: border-box;
+}
+
+.license-chip {
+    display: inline-block;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    padding: 2px 8px;
+    font-size: 12px;
+}
+
+.icon-edit-copy {
+    color: #14a73c !important;
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.icon-edit-copy:hover {
+    transform: scale(1.15);
+    filter: brightness(1.08);
+}
+
+.icon-trash {
+    color: #ef4444 !important;
+}
+
+.dialog-title-large {
+    font-size: 28px !important;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.feature-table {
+    border-collapse: collapse;
+}
+
+.feature-table th,
+.feature-table td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 8px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.user-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.user-field {
+    width: 100%;
+}
+
+.section-box {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+::ng-deep .multiline-tooltip {
+    white-space: pre-line !important;
+    text-align: left !important;
+}
+
+::ng-deep .multiline-tooltip .mdc-tooltip__surface {
+    text-align: left !important;
+}
