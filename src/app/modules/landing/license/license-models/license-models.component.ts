@@ -128,6 +128,18 @@ export class LicenseModelsComponent implements OnInit {
         else this.selectedFeatureIds.delete(id);
     }
 
+    isAllCategorySelected(features: FeatureModel[]): boolean {
+        if (!features || features.length === 0) return false;
+        return features.every((f) => this.selectedFeatureIds.has(f.id));
+    }
+
+    toggleCategory(features: FeatureModel[], checked: boolean): void {
+        for (const feature of features) {
+            if (checked) this.selectedFeatureIds.add(feature.id);
+            else this.selectedFeatureIds.delete(feature.id);
+        }
+    }
+
     async save(): Promise<void> {
         const name = this.form.value.name?.trim();
         const code = this.form.value.code?.trim();

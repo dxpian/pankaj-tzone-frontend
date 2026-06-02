@@ -96,7 +96,11 @@
                         </td>
                         <td>{{f.name}}</td>
                         <td>{{f.code}}</td>
-                        <td>{{f.description || '-'}}</td>
+                        <td>
+                            <div class="one-line-desc" [matTooltip]="f.description || '-'" matTooltipPosition="above">
+                                {{f.description || '-'}}
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>

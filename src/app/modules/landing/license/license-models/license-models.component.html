@@ -33,16 +33,24 @@
 </section>
 
 <ng-template #licenseDialog>
-    <h2 mat-dialog-title>{{ editId ? 'Update License' : 'Create License' }}</h2>
+    <h2 mat-dialog-title class="dialog-title-large">{{ editId ? 'Update License' : 'Create License' }}</h2>
     <mat-dialog-content>
         <div class="grid grid-cols-1 gap-2">
             <mat-form-field><mat-label>Name</mat-label><input matInput [formControl]="form.controls.name"></mat-form-field>
             <mat-form-field><mat-label>Code</mat-label><input matInput [formControl]="form.controls.code" [readonly]="!!editId"></mat-form-field>
-            <mat-form-field><mat-label>Description</mat-label><textarea matInput [formControl]="form.controls.description"></textarea></mat-form-field>
+            <mat-form-field><mat-label>Description</mat-label><input matInput [formControl]="form.controls.description"></mat-form-field>
         </div>
         <div class="mt-2">
             <div *ngFor="let grp of groupedFeatures" class="mb-3">
-                <div class="font-semibold mb-1">{{getCategoryName(grp.category)}}</div>
+                <div class="feature-cat-header">
+                    <div class="font-semibold mb-1">{{getCategoryName(grp.category)}}</div>
+                    <mat-checkbox
+                        class="feature-cat-toggle"
+                        [checked]="isAllCategorySelected(grp.list)"
+                        (change)="toggleCategory(grp.list, $event.checked)">
+                        {{ isAllCategorySelected(grp.list) ? 'Uncheck all' : 'Check all' }}
+                    </mat-checkbox>
+                </div>
                 <div class="grid grid-cols-2 gap-2">
                     <mat-checkbox *ngFor="let f of grp.list" [checked]="selectedFeatureIds.has(f.id)"
                         (change)="toggleFeature(f.id, $event.checked)"

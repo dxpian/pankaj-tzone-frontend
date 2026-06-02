@@ -19,3 +19,20 @@
 .icon-trash {
     color: #ef4444 !important;
 }
+
+.dialog-title-large {
+    font-size: 28px !important;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.feature-cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.feature-cat-toggle {
+    font-size: 12px;
+}
