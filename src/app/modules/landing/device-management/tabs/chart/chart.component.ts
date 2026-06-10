@@ -29,6 +29,7 @@ export enum ChartType  {
 })
 export class ChartComponent implements OnInit, OnChanges {
     private readonly LOG_PAGE_SIZE = 2 * 12 * 24;
+    private logFetchGeneration = 0;
     endDate = moment(); // current date and time
     startDate = moment().subtract(7, 'days'); // a
     temperatureHumdity = [];
@@ -221,8 +222,24 @@ export class ChartComponent implements OnInit, OnChanges {
 
     }
 
+    /**
+     * Server pages on raw DB rows but returns a filtered array, so row count alone is not
+     * a reliable "has more" signal. Keep fetching while the last row is still before range end.
+     */
+    private shouldFetchNextLogPage(pageData: LogModel[], rangeEnd: Date): boolean {
+        if (pageData.length === 0) {
+            return false;
+        }
+        if (pageData.length >= this.LOG_PAGE_SIZE) {
+            return true;
+        }
+        const lastTime = this.getLogTime(pageData[pageData.length - 1]).getTime();
+        return lastTime < rangeEnd.getTime() - 60_000;
+    }
+
     private fetchLoggers() {
         console.log(`fetch the chat data. current device ID: ${this.deviceId}/${this.deviceId.length}`)
+        this.logFetchGeneration++
         this.dataProps = []
         if(!this.deviceId)
         {
@@ -234,7 +251,7 @@ export class ChartComponent implements OnInit, OnChanges {
         const from = new Date(this.currentTime)
         const to = new Date(this.currentTime2)
 
-        this.addLogWithPageUnit(from, to)
+        this.addLogWithPageUnit(from, to, 1, this.logFetchGeneration)
     }
 
     /**
@@ -267,8 +284,9 @@ export class ChartComponent implements OnInit, OnChanges {
     }
 
 
-    private addLogWithPageUnit(from: Date, to: Date, page: number = 1){
-        console.log(`fetch the chat data. current device ID: ${this.deviceId}/${this.deviceId.length}`)
+    private addLogWithPageUnit(from: Date, to: Date, page: number = 1, fetchGeneration?: number){
+        const generation = fetchGeneration ?? this.logFetchGeneration;
+        console.log(`fetch chart page ${page}. device ID: ${this.deviceId}`)
 
         if(!this.deviceId)
         {
@@ -283,17 +301,28 @@ export class ChartComponent implements OnInit, OnChanges {
             pageSize: this.LOG_PAGE_SIZE
         }
         this._deviceServices.getAllLoggersByLimit(params, this.deviceId).then((res: any) => {
+            if (generation !== this.logFetchGeneration) {
+                return;
+            }
             if(res && res.error_code == 0) {
-                console.log(`Success to fetch chat data log of device: ${this.deviceId}`)
-                const pageData = Array.isArray(res?.object) ? res.object : (res?.object?.list || []) as LogModel[]
+                console.log(`Success to fetch chart page ${page} for device: ${this.deviceId}`)
+                const pageData = (Array.isArray(res.object) ? res.object : []) as LogModel[];
                 this.dataProps.push(...pageData)
-                if(pageData.length === this.LOG_PAGE_SIZE){
-                    this.addLogWithPageUnit(from, to, page + 1)
+                if(this.shouldFetchNextLogPage(pageData, to)){
+                    this.addLogWithPageUnit(from, to, page + 1, generation)
                     return
                 }
 
+            } else if (res?.meta) {
+                console.warn(`Chart log page ${page} failed: ${res.meta}`)
             }
-            this.mapAllChart()
+            this.zone.run(() => this.mapAllChart())
+        }).catch((err) => {
+            if (generation !== this.logFetchGeneration) {
+                return;
+            }
+            console.error(`Chart log page ${page} request failed:`, err)
+            this.zone.run(() => this.mapAllChart())
         })
     }
 
