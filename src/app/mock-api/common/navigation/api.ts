@@ -132,6 +132,11 @@ export class NavigationMockApi
                             return null
                     }
 
+                    if ((item.id === 'SIM Management' || item.id === 'Device Register')
+                        && !isWebAdminPermission(permission)) {
+                        return null;
+                    }
+
                     return item;
                 })
                 .filter((item): item is FuseNavigationItem => item !== null);

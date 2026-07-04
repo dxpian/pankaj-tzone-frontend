@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '@kitkat/services/utils/base';
 import { environment } from '../../../enviroment/enviroment';
-import { LogModel, PageQuery } from '../utils/typedef';
+import { ExpiredDevicePageQuery, LogModel, PageQuery, SetExpireDateOfLoggersResult, DeviceBatchExportPayload } from '../utils/typedef';
 
 @Injectable({
     providedIn: 'root'
@@ -22,6 +22,11 @@ export class DeviceManagementService extends BaseService {
   saveDevices(object: any): any {
     const url = `${environment.apiURL}/v1/device/add`;
     return this.post(url, object);// {withCredentials: true}
+  }
+
+  addDevicesBatch(devices: DeviceBatchExportPayload[]): Promise<any> {
+    const url = `${environment.apiURL}/v1/device/add-batch`;
+    return this.post(url, devices);
   }
 
   // edit device property
@@ -340,5 +345,18 @@ export class DeviceManagementService extends BaseService {
         const url = `${environment.apiURL}/v1/device/download_register_template`;
         return this.post(url,{}, { responseType: 'blob' });
     }
+
+  getExpiredDeviceWithPagination(pageRequest: ExpiredDevicePageQuery): any {
+    const url = `${environment.apiURL}/v1/device/expiredDeviceWithPagination`;
+    return this.post(url, pageRequest);
+  }
+
+  setExpireDateOfLoggers(body: {
+    loggers: Array<{ serial: string; expire?: string }>;
+    expire_global?: string;
+  }): Promise<{ error_code: number; meta?: string; object?: SetExpireDateOfLoggersResult }> {
+    const url = `${environment.apiURL}/v1/device/setExpireDateofLoggers`;
+    return this.post(url, body);
+  }
 }
 

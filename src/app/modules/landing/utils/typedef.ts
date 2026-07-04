@@ -22,6 +22,38 @@ export interface PageQuery{
     filter?: number;     // DeviceFilterType
 }
 
+/** Paginated query for SIM-expiring devices (allFrontPagelimit-style value1/value2). */
+export interface ExpiredDevicePageQuery extends PageQuery {
+    value1: string;
+    value2?: string;
+}
+
+export interface SetExpireDateOfLoggersResult {
+    updated: number;
+    not_found: string[];
+    invalid: string[];
+    missing_expire: string[];
+}
+
+export interface AddDeviceBatchResult {
+    created: unknown[];
+    duplicate_serial: string[];
+    existing_serial: string[];
+    duplicate_alfresa_id: string[];
+    invalid: string[];
+    invalid_group: string[];
+}
+
+export interface DeviceBatchExportPayload {
+    name: string;
+    serial: string;
+    model: string;
+    groups?: string;
+    simexpire?: string;
+    gps_enabled?: boolean;
+    gps_interval?: number;
+}
+
 
 export interface PageRangeQuery{
     page: number;

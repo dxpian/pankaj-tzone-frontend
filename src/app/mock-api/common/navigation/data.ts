@@ -12,9 +12,35 @@ export const defaultNavigation: FuseNavigationItem[] = [
     {
         id: 'Device Management',
         title: 'Device Management',
-        type: 'basic',
+        type: 'collapsable',
         icon: 'heroicons_outline:chart-pie',
-        link: '/device'
+        link: '/device',
+        children: [
+            {
+                id: 'Device List',
+                title: 'Loggers',
+                type: 'basic',
+                icon: 'heroicons_outline:server',
+                link: '/device',
+                exactMatch: true,
+            },
+            {
+                id: 'SIM Management',
+                title: 'SIM Management',
+                type: 'basic',
+                icon: 'heroicons_outline:credit-card',
+                link: '/device/sim',
+                exactMatch: true,
+            },
+            {
+                id: 'Device Register',
+                title: 'Register',
+                type: 'basic',
+                icon: 'heroicons_outline:document-add',
+                link: '/device/register',
+                exactMatch: true,
+            },
+        ]
     },
     {
         id: 'Real Time Monitoring',

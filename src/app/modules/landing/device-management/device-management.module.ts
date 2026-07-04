@@ -4,7 +4,7 @@ import { DeviceManagementRoutingModule } from './device-management-routing.modul
 import { ViewDevicesComponent } from './view-devices/view-devices.component';
 import { DevicesComponent } from './devices/devices.component';
 import { CreateDevicesComponent } from './create-devices/create-devices.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -39,11 +40,15 @@ import { DataReportComponent } from './tabs/data-report/data-report.component';
 import { SetUpComponent } from './tabs/set-up/set-up.component';
 import { AlarmSettingsModule } from '../alarm-settings/alarm-settings.module';
 import { LoadingOverlayComponent } from './tabs/overlay/loading-overlay.component';
+import { SimManagementComponent } from './sim-management/sim-management.component';
+import { RegisterFromFileComponent } from './register-from-file/register-from-file.component';
 @NgModule({
   declarations: [
     ViewDevicesComponent,
     DevicesComponent,
     CreateDevicesComponent,
+    SimManagementComponent,
+    RegisterFromFileComponent,
     RealTimeDataComponent,
     ChartComponent,
     ListComponent,
@@ -65,9 +70,11 @@ import { LoadingOverlayComponent } from './tabs/overlay/loading-overlay.componen
     MatTooltipModule,
     MatSelectModule,
     ReactiveFormsModule,
+    FormsModule,
     SharedModule,
     MatFormFieldModule,
     MatSnackBarModule,
+    MatProgressBarModule,
     MatSlideToggleModule,
     GoogleMapsModule,
     ReactiveFormsModule,

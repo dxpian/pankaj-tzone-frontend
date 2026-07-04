@@ -246,6 +246,12 @@ export class FuseVerticalNavigationCollapsableItemComponent implements OnInit, O
      */
     toggleCollapsable(): void
     {
+        // Navigate to default route when expanding a collapsable that defines a link
+        if ( this.isCollapsed && this.item.link )
+        {
+            this._router.navigate([this.item.link]);
+        }
+
         // Toggle collapse/expand
         if ( this.isCollapsed )
         {

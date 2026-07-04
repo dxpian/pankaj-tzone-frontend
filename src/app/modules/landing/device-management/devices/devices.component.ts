@@ -4,9 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Subject, Subscription, debounceTime, switchMap, takeUntil,from, concatMap, finalize} from 'rxjs';
-import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
+import { Subject, Subscription, debounceTime, switchMap, takeUntil} from 'rxjs';
  import { DeviceManagementService } from '../device-management.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
@@ -27,14 +25,6 @@ import {
     readListBrowseState,
     writeListBrowseState
 } from '../../utils/list-browse-state.storage';
-
-interface DeviceExcel{
-    name: string;
-    serial: string;
-    enable_gps: boolean;
-    group: string;
-    sim_expire: Date;
-}
 
 @Component({
   selector: 'app-devices',
@@ -94,9 +84,6 @@ export class DevicesComponent implements OnInit {
     intervalId: any;
     USER_ROLE = USER_ROLE
     lng = Language.ENG
-
-    ////////////////////////////
-    devicesExcel: DeviceExcel[] = []
 
     constructor(private _serviceDevice: DeviceManagementService, public dialog: MatDialog,
         private _formBuilder:FormBuilder,
@@ -222,9 +209,9 @@ export class DevicesComponent implements OnInit {
             this._pageQuery.keyChanged = false
         }
         else{
-        console.log(`failed to get api response: ${res}`)
-        this.dataSource.data = []
-        this._pageQuery.total = 0
+            console.log(`failed to get api response: ${res}`)
+            this.dataSource.data = []
+            this._pageQuery.total = 0
         }
     }
 
@@ -284,17 +271,17 @@ export class DevicesComponent implements OnInit {
         if(device.status == DeviceFilterType.Online)
             return "Online"
         if(device.status == DeviceFilterType.BatteryDead)
-        return "Battery dead"
+            return "Battery dead"
         if(device.status == DeviceFilterType.BatteryLow)
-        return "Low battery"
+            return "Low battery"
         if(device.status == DeviceFilterType.Offline)
-        return "Offline"
+            return "Offline"
         if(device.status == DeviceFilterType.Flight)
-        return "Sleep"
+            return "Sleep"
         if(device.status == DeviceFilterType.UserAlarm)
-        return "Alarm"
+            return "Alarm"
         if(device.status == DeviceFilterType.SimExpire)
-        return "SIM expired"
+            return "SIM expired"
         return "Unknown"
     }
 
@@ -429,189 +416,11 @@ export class DevicesComponent implements OnInit {
                         this.ConfirmdeleteDevice(item)
                     }
                 })
-            case 'register_batch':
-                console.log(`Register multiple loggers `)
-                this.registerLoggersUploaded()
-                break
-            case 'download_template':
-                this.downloadScheduleTemplate()
-                break
+                break;
             default:
                 break;
         }
     }
-
-    // upload multiple loggers uploaded from excel file
-    private registerLoggersUploaded(){
-        console.log(`register multiple loggers: ${this.devicesExcel.length}`)
-        if(this.devicesExcel.length <= 0){
-            this.warning(`No loggers upload`)
-            return
-        }
-        var errors: string[] = []
-        from(this.devicesExcel).pipe(
-            concatMap((data, index) =>{
-                const cfg=
-                {
-                    user: this.userInfo?.id,
-                    name: data.name,
-                    serial: data.serial,
-                    groups: data.group,
-                    model: 'TT19',
-                    simexpire: data.sim_expire,
-                    time: this.currentTime,
-                    cond: 1,
-                    gps_enabled: data.enable_gps,   // gps enabled?
-                    gps_interval: 360,      // gps interval time
-                }
-                return this._serviceDevice.saveDevices(cfg).then((response: DB_RESULT)=>{
-                    if(response && response.error_code == 0){
-                        const devNew = response.object as Device
-                        console.log(`Success to add new device: ${data.serial}`)
-                    }else{
-                        console.log(`Failed to create schedule: ${response.meta}`)
-                        if(response.meta.length <= 128)
-                            errors.push(response.meta)
-                    }
-                })}
-            ),
-            finalize(() => {
-                // console.log('✅ All schedules processed');
-                if(errors.length > 0){
-                    const message = `Error occured in processing ${errors.length} loggers`
-                    this.notifyDialog(message)
-                }
-                else{
-                    this.notifyDialog(`All schedules are processed`)
-                }
-                this.devicesExcel = []
-            })
-        )
-        .subscribe({
-            error: (err) => {
-                console.log('❌ Error occurred during batch processing', err);
-            }
-        });
-    }
-
-    private downloadScheduleTemplate(){
-        console.log(`Download an template excel file to create calibration schedule from excel file`)
-        this._serviceDevice.downloadRegisterTemplateFile().then((res: Blob)=>{
-            if (res.type === 'application/json') {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const errorText = reader.result as string;
-                    try {
-                        const errorJson = JSON.parse(errorText);
-                        console.error('Server returned error:', errorJson);
-                        // Show the error to user
-                        this.warning('Failed to download template');
-                    } catch (e) {
-                        console.error('Unknown error format:', errorText);
-                        this.warning('Unknown error occurred while downloading template');
-                    }
-                };
-                reader.readAsText(res);
-            } else {
-                // Valid Excel file - save it
-                saveAs(res, `schedule_template.xlsx`);
-                this.notify('Success to download shcedule template file')
-            }
-        })
-    }
-
-
-    private parseLoggerExcelfile(file: File): Promise<DeviceExcel[]> {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          try {
-            const binaryStr: string = e.target.result;
-            const workbook: XLSX.WorkBook = XLSX.read(binaryStr, { type: 'binary' });
-
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rawData: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
-
-            const result: DeviceExcel[] = [];
-
-            for (let i = 0; i < rawData.length; i++) {
-              const row = rawData[i];
-              const rowNum = i + 2; // +2 to reflect real Excel row (header is row 1)
-
-              // Validate and parse each field
-              const name = String(row['logger_name']).trim()
-              const serial = String(row['serial']).trim();
-              const enable_gps = String(row['enable_gps']).trim()
-              const group = String(row['group_name']).trim()
-              const dateExpire = new Date(row['sim_expired']);
-
-
-              // Validation
-              if (!/^.+$/.test(name)) {
-                throw `Row ${rowNum}: Invalid logger name: ${name}`;
-              }
-              if (!/^\d{15}$/.test(serial)) {
-                throw `Row ${rowNum}: Invalid serial number: ${serial}`;
-              }
-              if (!/^[01]$/.test(enable_gps)) {
-                throw `Row ${rowNum}: Invalid value for enable gps status: ${enable_gps}`;
-              }
-
-              if (isNaN(dateExpire.getTime())) {
-                throw `Row ${rowNum}: Invalid sim-expiration date: ${row['sim_expired']}`;
-              }
-              if (!/^.+$/.test(group)) {
-                throw `Row ${rowNum}: Invalid group name: ${group}`;
-              }
-
-              console.log(`valid groups: ${JSON.stringify(this.groups)}`)
-
-              // check if this group name exists
-              const foundGroup = this.groups.find(
-                g => g.groupname?.toLowerCase() === group.toLowerCase()
-              );
-
-
-              result.push({
-                name: name,
-                serial: serial,
-                enable_gps: parseInt(enable_gps) > 0? true: false,
-                group: foundGroup?.id || '',
-                sim_expire: dateExpire
-              });
-            }
-            resolve(result);
-          } catch (err) {
-            reject(err);
-          }
-        };
-
-        reader.onerror = () => {
-          reject('Failed to read the file.');
-        };
-
-        reader.readAsBinaryString(file);
-      });
-    }
-
-    onSelectSchduleFile(event){
-        const file: File = event.target.files[0];
-        this.devicesExcel = []
-        if (!file) return;
-        this.parseLoggerExcelfile(file)
-            .then((data: DeviceExcel[]) => {
-            this.devicesExcel = [...data]
-            console.log(`Success to parse excel file: ${data.length}`)
-            const message = `${data.length} loggers detected for registration from this file.`
-            this.notifyDialog(message)
-
-        })
-        .catch((err) => {
-            console.error('Parsing error:', err);
-            this.notifyDialog(`Error in Excel file: ${err}`);
-        });
-    }
-
 
     ConfirmdeleteDevice(item) {
         this._serviceDevice.deleteDevicebyId(item.id).then((res:any) => {
