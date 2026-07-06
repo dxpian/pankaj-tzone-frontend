@@ -22,22 +22,22 @@ $register-green-border: #a5d6a7;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    gap: 4px;
     margin-bottom: 12px;
 }
 
-.register-btn {
+.register-icon-btn {
+    color: $register-green !important;
+
     .mat-icon {
-        vertical-align: middle;
+        color: $register-green !important;
     }
 
-    &--upload,
-    &--download {
-        border-color: $register-green-border;
-        color: $register-green;
+    &:disabled {
+        opacity: 0.55;
 
         .mat-icon {
-            color: $register-green;
+            color: $register-green !important;
         }
     }
 }

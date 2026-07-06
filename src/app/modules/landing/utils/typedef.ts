@@ -55,6 +55,36 @@ export interface DeviceBatchExportPayload {
 }
 
 
+export interface DownloadSerialsRequest {
+    keyword?: string;
+    filter?: number;
+}
+
+export interface DownloadDeviceListItem {
+    id: string;
+    name: string;
+    serial: string;
+}
+
+export interface DeviceStatusOverview {
+    total: number;
+    online: number;
+    offline: number;
+    userAlarm: number;
+    batteryLow: number;
+    batteryDead: number;
+    airplane: number;
+    simExpire: number;
+}
+
+export interface LoggerStatusFilterItem {
+    filter: DeviceFilterType;
+    label: string;
+    countKey: keyof DeviceStatusOverview;
+    color: string;
+    tooltip: string;
+}
+
 export interface PageRangeQuery{
     page: number;
     pagesize: number;

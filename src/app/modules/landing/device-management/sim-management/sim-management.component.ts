@@ -20,7 +20,7 @@ import {
     PERMISSION,
 } from '../../utils/typedef';
 import { GroupConfig } from '../../account/account.typedef';
-import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
+import { snackBarConfig, snackBarConfigWarn, resolveRequestError } from 'app/constants/globalFunctions';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FuseConfirmDialogComponent } from '@kitkat/components/confirm-dialog/confirm-dialog.component';
 import {
@@ -70,6 +70,7 @@ export class SimManagementComponent implements OnInit, AfterViewInit, OnDestroy 
     parseErrors: string[] = [];
     applyResultText = '';
     uploadedFileName = '';
+    loadErrorMessage = '';
 
     userInfo: any;
     private _unsubscribeAll = new Subject<void>();
@@ -364,9 +365,8 @@ export class SimManagementComponent implements OnInit, AfterViewInit, OnDestroy 
 
     private handleLoadError(err: unknown): void {
         console.error('SIM management load failed:', err);
-        const message = (err as { error?: string; message?: string })?.error
-            || (err as { message?: string })?.message
-            || 'Failed to load SIM expiry data';
+        const message = resolveRequestError(err, 'Unable to load SIM expiry data');
+        this.loadErrorMessage = message;
         this._snackBar.open(message, '', snackBarConfigWarn);
         this.dataSource.data = [];
         this._pageQuery.total = 0;
@@ -476,6 +476,7 @@ export class SimManagementComponent implements OnInit, AfterViewInit, OnDestroy 
 
     updateDataSource(response: DB_RESULT): void {
         if (response && !response.error_code) {
+            this.loadErrorMessage = '';
             const pageData = response.object as PageData;
             this.dataSource.data = (pageData.data || []) as Device[];
             this._pageQuery.total = pageData.total;
@@ -484,6 +485,7 @@ export class SimManagementComponent implements OnInit, AfterViewInit, OnDestroy 
             this.cacheDevices(this.dataSource.data);
             this.syncDeviceCacheInBackground();
         } else {
+            this.loadErrorMessage = '';
             this.dataSource.data = [];
             this._pageQuery.total = 0;
             if (response?.meta) {
@@ -565,7 +567,8 @@ export class SimManagementComponent implements OnInit, AfterViewInit, OnDestroy 
             this._snackBar.open(`Downloaded ${checked.length} logger(s)`, '', snackBarConfig);
         } catch (err) {
             console.error('Export failed:', err);
-            this._snackBar.open('Failed to download selected loggers', '', snackBarConfigWarn);
+            const message = resolveRequestError(err, 'Unable to download loggers');
+            this._snackBar.open(message, '', snackBarConfigWarn);
         } finally {
             this.exporting = false;
             this._cdr.detectChanges();
@@ -836,7 +839,7 @@ export class SimManagementComponent implements OnInit, AfterViewInit, OnDestroy 
                 }
             })
             .catch((err) => {
-                const msg = err?.message || 'Request failed';
+                const msg = resolveRequestError(err, 'Unable to apply renewal plan');
                 this.applyResultText = `Error:\n${msg}`;
                 this.persistBrowseState();
                 this._snackBar.open(msg, '', snackBarConfigWarn);

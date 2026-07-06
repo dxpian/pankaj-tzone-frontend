@@ -23,6 +23,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon: 'heroicons_outline:server',
                 link: '/device',
                 exactMatch: true,
+            },            
+            {
+                id: 'Device Register',
+                title: 'Register',
+                type: 'basic',
+                icon: 'heroicons_outline:document-add',
+                link: '/device/register',
+                exactMatch: true,
             },
             {
                 id: 'SIM Management',
@@ -30,14 +38,6 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type: 'basic',
                 icon: 'heroicons_outline:credit-card',
                 link: '/device/sim',
-                exactMatch: true,
-            },
-            {
-                id: 'Device Register',
-                title: 'Register',
-                type: 'basic',
-                icon: 'heroicons_outline:document-add',
-                link: '/device/register',
                 exactMatch: true,
             },
         ]

@@ -38,6 +38,38 @@ export const snackBarConfiglogin = {
   ...snackBarConfig,
   panelClass: "fuse-navy-50",
 };
+
+/** User-facing message for failed HTTP/API requests (network down, 5xx, API meta, etc.). */
+export function resolveRequestError(err: unknown, fallback = 'Request failed'): string {
+  const httpErr = err as { status?: number; error?: unknown; message?: string };
+  const status = httpErr?.status;
+
+  if (status === 0 || status === 502 || status === 503 || status === 504) {
+    return fallback;
+  }
+
+  const body = httpErr?.error;
+  if (typeof body === 'string' && body.trim() && !/^Http failure response/i.test(body)) {
+    return body;
+  }
+  if (body && typeof body === 'object') {
+    const apiResult = body as { meta?: string; message?: string };
+    if (typeof apiResult.meta === 'string' && apiResult.meta.trim()) {
+      return apiResult.meta;
+    }
+    if (typeof apiResult.message === 'string' && apiResult.message.trim()) {
+      return apiResult.message;
+    }
+  }
+
+  const rawMessage = httpErr?.message || (err as { message?: string })?.message;
+  if (rawMessage && /^Http failure response/i.test(rawMessage)) {
+    return fallback;
+  }
+
+  return rawMessage || fallback;
+}
+
 export function validateRequiredControl(
   control: AbstractControl,
   isRequired: boolean

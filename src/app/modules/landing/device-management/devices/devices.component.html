@@ -23,44 +23,61 @@
   <!-- device listing -->
   <div class="w-full bg-card">
 
-    <div class="flex flex-row">
-      <div class="w-full flex-col mt-3 p-4">
-        <div class="flex">
-          <label class="form-label">Keywords:</label>
+    <div class="logger-status-panel">
+      <div class="logger-status-panel__toolbar">
+        <div class="logger-status-panel__intro">
+          <span class="logger-status-panel__title">Status overview</span>
+          <span class="logger-status-panel__subtitle">
+            {{ statusOverview.total }} logger(s) match your search — select a status to filter
+          </span>
         </div>
-        <div class="w-full flex flex-row mt-2">
-          <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchInputControl"
-            placeholder="Device Name/Device ID" matTooltip="Search by device name or serial number">
-
-          <div class="ml-6 justify-end items-end">
-            <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
-              class="kitkat-mat-button RTM-button-color Querybutton" (click)="openDialog('add')"
-              matTooltip="Add a new device">
-              Add</button>
-          </div>
+        <div class="logger-status-panel__header-actions">
+          <button mat-flat-button type="button" color="primary" id="btnSearch"
+            class="kitkat-mat-button RTM-button-color logger-add-btn"
+            (click)="openDialog('add')"
+            matTooltip="Register a new logger with name, serial number, and group">
+            <mat-icon class="icon-size-4" svgIcon="heroicons_outline:plus"></mat-icon>
+            <span>Add</span>
+          </button>
+          <button *ngIf="isAdmin()" mat-stroked-button type="button" class="logger-export-btn"
+            (click)="downloadLoggersCsv()" [disabled]="downloadingLoggers"
+            matTooltip="Download all loggers matching the current keyword and filter as CSV">
+            <mat-icon class="icon-size-4" [class.animate-spin]="downloadingLoggers"
+              [svgIcon]="downloadingLoggers ? 'heroicons_outline:refresh' : 'heroicons_outline:arrow-down-tray'"></mat-icon>
+            <span>Export CSV</span>
+          </button>
         </div>
       </div>
 
-      <div class="w-full flex-row mt-3 p-4 ">
-        <div class="flex">
-          <label class="form-label mt-3 mb-2">Filter by condition:</label>
-        </div>
-        <mat-form-field matTooltip="Filter devices by connection or alarm condition">
-          <mat-select [(value)]="filter" class="accent-fg" matInput (selectionChange)="onFilterChange($event)" >
-            <mat-option [value]="FilterType.Online">Online</mat-option>
-            <mat-option [value]="FilterType.UserAlarm">Alarm</mat-option>
-            <mat-option [value]="FilterType.BatteryLow">Low Battery</mat-option>
-            <mat-option [value]="FilterType.BatteryDead">Battery Dead</mat-option>
-            <mat-option [value]="FilterType.Flight">Flight</mat-option>
-            <mat-option [value]="FilterType.Offline">Offline</mat-option>
-            <mat-option [value]="FilterType.SimExpire">SIM Expired</mat-option>
-            <mat-option [value]="FilterType.All">All</mat-option>
-          </mat-select>
+      <div class="logger-status-panel__search">
+        <mat-form-field appearance="outline" class="logger-search-field">
+          <mat-label>Keywords</mat-label>
+          <input matInput type="search" id="searchID" [formControl]="searchInputControl"
+            placeholder="Device name or serial number"
+            matTooltip="Filter loggers and status counts by device name or serial number">
+          <mat-icon matPrefix class="icon-size-4 text-secondary" svgIcon="heroicons_outline:magnifying-glass"></mat-icon>
         </mat-form-field>
-
       </div>
 
-
+      <div class="logger-status-metrics logger-status-metrics--filtered">
+        <button type="button" class="logger-status-card"
+          *ngFor="let item of statusFilterItems"
+          [class.logger-status-card--active]="filter === item.filter"
+          [class.logger-status-card--inactive]="filter !== item.filter"
+          [style.--status-color]="item.color"
+          (click)="selectFilter(item.filter)"
+          [matTooltip]="item.tooltip"
+          [attr.aria-pressed]="filter === item.filter">
+          <span class="logger-status-card__accent" [style.background-color]="item.color"></span>
+          <span class="logger-status-card__content">
+            <span class="logger-status-card__label">{{ item.label }}</span>
+            <span class="logger-status-card__value">{{ getStatusCount(item) }}</span>
+          </span>
+          <span class="logger-status-card__check" *ngIf="filter === item.filter" aria-hidden="true">
+            <mat-icon svgIcon="heroicons_solid:check-circle"></mat-icon>
+          </span>
+        </button>
+      </div>
     </div>
     <hr style="margin-top: 0px !important;">
 

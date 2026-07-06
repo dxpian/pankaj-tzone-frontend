@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseAlertType } from '@kitkat/components/alert';
 import { FuseLoadingService } from '@kitkat/services/loading';
-import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
+import { snackBarConfig, snackBarConfigWarn, resolveRequestError } from 'app/constants/globalFunctions';
 import { AuthService } from 'app/core/auth/auth.service';
 import { SignInService } from '../sign-in/sign-in.service';
 import { fuseAnimations } from '@kitkat/animations'; 
@@ -102,7 +102,7 @@ export class SignUpComponent implements OnInit {
           // Set the alert
           this.alert = {
             type: 'error',
-            message: 'Wrong email or password'
+            message: resolveRequestError(response, 'Wrong email or password')
           };
 
           // Show the alert
@@ -130,13 +130,13 @@ export class SignUpComponent implements OnInit {
           this.signInForm.reset();    
         }
       })
-      .catch(error=>{
-          console.log(`failed to sign in xxxx: ${error.meta}`); 
-          this.signInForm.enable(); 
-          this._fuseLoadingService.hide(); 
-          this.signInForm.reset();                     
-          }
-      )
+      .catch(error => {
+          const message = resolveRequestError(error, 'Unable to create account');
+          this._snackBar.open(message, '', snackBarConfigWarn);
+          this.signInForm.enable();
+          this._fuseLoadingService.hide();
+          this.signInForm.reset();
+      })
       
     }
   }

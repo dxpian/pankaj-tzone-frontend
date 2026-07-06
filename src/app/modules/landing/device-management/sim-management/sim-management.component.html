@@ -176,8 +176,9 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell p-4 text-secondary" [attr.colspan]="displayedColumns.length">
-          <span *ngIf="!loading">No loggers found for the selected SIM expiry criteria.</span>
+        <td class="mat-cell p-4" [attr.colspan]="displayedColumns.length">
+          <span *ngIf="!loading && loadErrorMessage" class="text-red-600">{{ loadErrorMessage }}</span>
+          <span *ngIf="!loading && !loadErrorMessage" class="text-secondary">No loggers found for the selected SIM expiry criteria.</span>
         </td>
       </tr>
     </table>

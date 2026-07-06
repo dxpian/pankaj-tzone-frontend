@@ -27,7 +27,7 @@ export class BaseService {
         .then(
           res => resolve(res)
         )
-        .catch((err: any) => reject(err));
+        .catch((err: unknown) => reject(err));
     });
     return promise;
   }
@@ -39,7 +39,7 @@ export class BaseService {
         .then(
           res => resolve(res)
         )
-        .catch((err: any) => reject(err));
+        .catch((err: unknown) => reject(err));
     });
     return promise;
   }
@@ -51,7 +51,7 @@ export class BaseService {
         .then(
           res => resolve(res)
         )
-        .catch((err: any) => reject(err));
+        .catch((err: unknown) => reject(err));
     });
     return promise;
   }

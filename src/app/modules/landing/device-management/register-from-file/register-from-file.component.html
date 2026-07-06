@@ -35,15 +35,15 @@
       </div>
 
       <div class="register-actions">
-        <button mat-stroked-button type="button" class="register-btn register-btn--upload" (click)="triggerUpload()"
-          matTooltip="Choose a filled registration Excel file (.xlsx)">
-          <mat-icon class="icon-size-4 mr-1" svgIcon="heroicons_outline:upload"></mat-icon>
-          Upload Excel file
-        </button>
-        <button mat-stroked-button type="button" class="register-btn register-btn--download" (click)="downloadScheduleTemplate()"
+        <button mat-icon-button type="button" class="register-icon-btn"
+          (click)="downloadScheduleTemplate()"
           matTooltip="Download the Excel registration template from server">
-          <mat-icon class="icon-size-4 mr-1" svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
-          Download template
+          <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
+        </button>
+        <button mat-icon-button type="button" class="register-icon-btn"
+          (click)="triggerUpload()"
+          matTooltip="Choose a filled registration Excel file (.xlsx)">
+          <mat-icon svgIcon="heroicons_outline:upload"></mat-icon>
         </button>
         <input #fileInput type="file" accept=".xlsx" class="hidden" (change)="onSelectScheduleFile($event)">
       </div>

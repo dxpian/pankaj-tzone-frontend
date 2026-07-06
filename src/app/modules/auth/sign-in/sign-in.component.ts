@@ -6,7 +6,7 @@ import { FuseAlertType } from '@kitkat/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
 import { SignInService } from './sign-in.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
+import { snackBarConfig, snackBarConfigWarn, resolveRequestError } from 'app/constants/globalFunctions';
 import { FuseLoadingService } from '@kitkat/services/loading';
 import { CookieService } from 'ngx-cookie-service';
 import { SharedService } from 'app/services/shared.service';
@@ -111,7 +111,7 @@ export class AuthSignInComponent implements OnInit {
                     // Set the alert
                     this.alert = {
                         type: 'error',
-                        message: 'Wrong email or password'
+                        message: resolveRequestError(response, 'Failed to login')
                     };
 
                     // Show the alert
@@ -157,6 +157,14 @@ export class AuthSignInComponent implements OnInit {
                 }
             }).catch(err => {
                 this.signInForm.enable();
+                this._fuseLoadingService.hide();
+                const message = resolveRequestError(err, 'Failed to login');
+                this._snackBar.open(message, '', snackBarConfigWarn);
+                this.alert = {
+                    type: 'error',
+                    message,
+                };
+                this.showAlert = true;
             })
             /*
             let isUser = this.users.filter(x => x.name == this.signInForm.value.email || x.email == this.signInForm.value.email)

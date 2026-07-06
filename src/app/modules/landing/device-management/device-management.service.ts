@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '@kitkat/services/utils/base';
 import { environment } from '../../../enviroment/enviroment';
-import { ExpiredDevicePageQuery, LogModel, PageQuery, SetExpireDateOfLoggersResult, DeviceBatchExportPayload } from '../utils/typedef';
+import { ExpiredDevicePageQuery, LogModel, PageQuery, SetExpireDateOfLoggersResult, DeviceBatchExportPayload, DownloadSerialsRequest } from '../utils/typedef';
 
 @Injectable({
     providedIn: 'root'
@@ -357,6 +357,16 @@ export class DeviceManagementService extends BaseService {
   }): Promise<{ error_code: number; meta?: string; object?: SetExpireDateOfLoggersResult }> {
     const url = `${environment.apiURL}/v1/device/setExpireDateofLoggers`;
     return this.post(url, body);
+  }
+
+  downloadDeviceLists(query: DownloadSerialsRequest): Promise<any> {
+    const url = `${environment.apiURL}/v1/device/downloadSerials`;
+    return this.post(url, query);
+  }
+
+  getOverviewDeviceLists(query: DownloadSerialsRequest): Promise<any> {
+    const url = `${environment.apiURL}/v1/device/overviewDeviceLists`;
+    return this.post(url, query);
   }
 }
 

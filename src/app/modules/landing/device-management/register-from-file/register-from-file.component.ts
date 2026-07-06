@@ -13,7 +13,7 @@ import {
     PERMISSION,
 } from '../../utils/typedef';
 import { GroupConfig } from '../../account/account.typedef';
-import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
+import { snackBarConfig, snackBarConfigWarn, resolveRequestError } from 'app/constants/globalFunctions';
 import { FuseConfirmDialogComponent } from '@kitkat/components/confirm-dialog/confirm-dialog.component';
 import { normalizeString } from '../../service/alfresa/alfresa.util';
 
@@ -99,7 +99,7 @@ export class RegisterFromFileComponent implements OnInit {
                 this.devicesExcel = [];
                 const messages = Array.isArray(err)
                     ? err
-                    : [typeof err === 'string' ? err : 'Failed to parse Excel file'];
+                    : [resolveRequestError(err, 'Failed to parse Excel file')];
                 this.parseErrors = messages;
                 this.resultText = `Parse error(s):\n${messages.join('\n')}`;
                 this._snackBar.open(messages[0], '', snackBarConfigWarn);
@@ -192,7 +192,7 @@ export class RegisterFromFileComponent implements OnInit {
                 try {
                     response = await this._serviceDevice.addDevicesBatch(payload) as DB_RESULT;
                 } catch (err) {
-                    const msg = (err as { message?: string })?.message || 'Request failed';
+                    const msg = resolveRequestError(err, 'Unable to register loggers');
                     this.appendResultLine(`  Status: FAILED — ${msg}`);
                     totalSkipped += batch.length;
                     continue;
@@ -233,7 +233,7 @@ export class RegisterFromFileComponent implements OnInit {
             this.selectedFileName = '';
         } catch (err) {
             console.error('Batch registration error', err);
-            this.appendResultLine(`\nUnexpected error: ${(err as Error)?.message || err}`);
+            this.appendResultLine(`\nUnexpected error: ${resolveRequestError(err, 'Unable to complete registration')}`);
             this._snackBar.open('Registration failed unexpectedly', '', snackBarConfigWarn);
         } finally {
             this.registering = false;

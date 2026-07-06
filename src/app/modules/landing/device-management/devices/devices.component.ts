@@ -8,12 +8,13 @@ import { Subject, Subscription, debounceTime, switchMap, takeUntil} from 'rxjs';
  import { DeviceManagementService } from '../device-management.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
-import { snackBarConfig, snackBarConfigWarn } from 'app/constants/globalFunctions';
+import { snackBarConfig, snackBarConfigWarn, resolveRequestError } from 'app/constants/globalFunctions';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FuseConfirmDialogComponent } from '@kitkat/components/confirm-dialog/confirm-dialog.component';
 import { Router } from '@angular/router';
 import { SocketService } from '../../../../services/socket.service';
-import { DB_RESULT, PageData, PageQuery, Device, DeviceFilterType, isWebAdminPermission, PERMISSION } from '../../utils/typedef';
+import { DB_RESULT, PageData, PageQuery, Device, DeviceFilterType, isWebAdminPermission, PERMISSION, DownloadDeviceListItem, DeviceStatusOverview, LoggerStatusFilterItem } from '../../utils/typedef';
+import { saveAs } from 'file-saver';
 import { identity } from 'lodash';
 import { GroupConfig, USER_ROLE } from '../../account/account.typedef';
 import { SharedService } from '../../../../services/shared.service';
@@ -84,6 +85,28 @@ export class DevicesComponent implements OnInit {
     intervalId: any;
     USER_ROLE = USER_ROLE
     lng = Language.ENG
+    downloadingLoggers = false;
+    statusOverview: DeviceStatusOverview = {
+        total: 0,
+        online: 0,
+        offline: 0,
+        userAlarm: 0,
+        batteryLow: 0,
+        batteryDead: 0,
+        airplane: 0,
+        simExpire: 0,
+    };
+
+    readonly statusFilterItems: LoggerStatusFilterItem[] = [
+        { filter: DeviceFilterType.All, label: 'All', countKey: 'total', color: '#1e3a5f', tooltip: 'All loggers matching the keyword' },
+        { filter: DeviceFilterType.Online, label: 'Online', countKey: 'online', color: '#22c55e', tooltip: 'Loggers currently online' },
+        { filter: DeviceFilterType.UserAlarm, label: 'Alarm', countKey: 'userAlarm', color: '#dc2626', tooltip: 'Loggers with active user alarms' },
+        { filter: DeviceFilterType.BatteryLow, label: 'Low Battery', countKey: 'batteryLow', color: '#ef4444', tooltip: 'Loggers with low battery' },
+        { filter: DeviceFilterType.BatteryDead, label: 'Battery Dead', countKey: 'batteryDead', color: '#383838', tooltip: 'Loggers with dead battery' },
+        { filter: DeviceFilterType.Flight, label: 'Flight', countKey: 'airplane', color: '#eab308', tooltip: 'Loggers in flight / sleep mode' },
+        { filter: DeviceFilterType.Offline, label: 'Offline', countKey: 'offline', color: '#000000', tooltip: 'Loggers currently offline' },
+        { filter: DeviceFilterType.SimExpire, label: 'SIM Expired', countKey: 'simExpire', color: '#b80808', tooltip: 'Loggers with expired SIM cards' },
+    ];
 
     constructor(private _serviceDevice: DeviceManagementService, public dialog: MatDialog,
         private _formBuilder:FormBuilder,
@@ -116,7 +139,10 @@ export class DevicesComponent implements OnInit {
             })
             )
             .subscribe({
-            next: (response) => this.updateDataSource(response),
+            next: (response) => {
+                this.updateDataSource(response);
+                this.loadStatusOverview();
+            },
             error: (err) => console.error(err),
             });
         });
@@ -158,6 +184,7 @@ export class DevicesComponent implements OnInit {
         ).then((response: any) => {
             this.updateDataSource(response);
         }).catch((err: HttpErrorResponse) => (console.log));
+        this.loadStatusOverview();
     }
 
     onPageChange(event: any): void {
@@ -171,17 +198,32 @@ export class DevicesComponent implements OnInit {
         }).catch((err: HttpErrorResponse) => (console.log));
     }
 
-    onFilterChange(event: any): void{
-        console.log('Filter value is changed:', event.value);
-        this.filter = event.value
+    selectFilter(filterType: DeviceFilterType): void {
+        this.filter = filterType;
+        this._pageQuery.filter = filterType;
         this.paginator.pageIndex = 0;
         this.fetchPage(this.paginator.pageIndex, this.paginator.pageSize,
-        this._pageQuery.keyword, this._pageQuery.keyChanged,
-        this._pageQuery.total
+            this._pageQuery.keyword, true,
+            this._pageQuery.total
         ).then((response: any) => {
-        this.updateDataSource(response);
+            this.updateDataSource(response);
         }).catch((err: HttpErrorResponse) => (console.log));
+    }
 
+    getStatusCount(item: LoggerStatusFilterItem): number {
+        return this.statusOverview[item.countKey] ?? 0;
+    }
+
+    loadStatusOverview(): void {
+        const keyword = (this.searchInputControl.value ?? this._pageQuery.keyword ?? '').toString().trim();
+        this._serviceDevice.getOverviewDeviceLists({ keyword })
+            .then((res: DB_RESULT) => {
+                if (res && !res.error_code && res.object) {
+                    this.statusOverview = { ...this.statusOverview, ...(res.object as DeviceStatusOverview) };
+                    this._cdr.detectChanges();
+                }
+            })
+            .catch((err) => console.error('Failed to load logger status overview:', err));
     }
 
     fetchPage(pageIndex: number, pageSize: number, keyword: string, keyChanged: boolean, total: number) {
@@ -220,6 +262,7 @@ export class DevicesComponent implements OnInit {
         this._pageQuery.keyword, this._pageQuery.keyChanged,
         this._pageQuery.total).then((response: any) => {
         this.updateDataSource(response);
+        this.loadStatusOverview();
         }).catch((err: HttpErrorResponse) => (console.log));
     }
 
@@ -480,6 +523,62 @@ export class DevicesComponent implements OnInit {
             this._snackBar.open(message, '', snackBarConfig)
         else
             this._snackBar.open(message[this.lng], '', snackBarConfig)
+    }
+
+    async downloadLoggersCsv(): Promise<void> {
+        if (this.downloadingLoggers) {
+            return;
+        }
+        this.downloadingLoggers = true;
+        try {
+            const res = await this._serviceDevice.downloadDeviceLists({
+                keyword: (this.searchInputControl.value ?? this._pageQuery.keyword ?? '').toString().trim(),
+                filter: this.filter,
+            }) as DB_RESULT;
+
+            if (!res || res.error_code) {
+                this.warning(res?.meta || 'Unable to download logger list');
+                return;
+            }
+
+            const devices = (res.object || []) as DownloadDeviceListItem[];
+            if (devices.length === 0) {
+                this.warning('No loggers found for the current keyword and filter');
+                return;
+            }
+
+            const csv = this.buildLoggerCsv(devices);
+            const stamp = new Date().toISOString().slice(0, 10);
+            saveAs(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `loggers_${stamp}.csv`);
+            this.notify(`Downloaded ${devices.length} logger(s)`);
+        } catch (err) {
+            console.error('Logger CSV download failed:', err);
+            this.warning(resolveRequestError(err, 'Unable to download logger list'));
+        } finally {
+            this.downloadingLoggers = false;
+            this._cdr.detectChanges();
+        }
+    }
+
+    private buildLoggerCsv(devices: DownloadDeviceListItem[]): string {
+        const header = ['index', 'name', 'serial'];
+        const lines = [header.join(',')];
+        devices.forEach((device, index) => {
+            lines.push([
+                index + 1,
+                this.escapeCsvField(device.name),
+                this.escapeCsvField(device.serial),
+            ].join(','));
+        });
+        return lines.join('\r\n');
+    }
+
+    private escapeCsvField(value: unknown): string {
+        const text = String(value ?? '');
+        if (/[",\n\r]/.test(text)) {
+            return `"${text.replace(/"/g, '""')}"`;
+        }
+        return text;
     }
 
 
