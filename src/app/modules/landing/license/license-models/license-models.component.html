@@ -1,0 +1,67 @@
+<section class="w-full h-full">
+    <div class="w-full flex justify-between items-center">
+        <a class="text-2xl whitespace-nowrap">License Models</a>
+    </div>
+
+    <div class="w-full bg-card mt-2 p-4">
+        <div class="flex flex-row mt-2 gap-2">
+            <input class="searchbox flex-shrink" matInput type="search" [formControl]="searchControl"
+                placeholder="Search by name/code/description">
+            <button [color]="'primary'" mat-flat-button type="button"
+                class="kitkat-mat-button RTM-button-color" (click)="openCreate()">Create</button>
+        </div>
+    </div>
+
+    <table class="w-full table-responsive mat-card mt-2" mat-table [dataSource]="dataSource">
+        <ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let x">{{x.name}}</td></ng-container>
+        <ng-container matColumnDef="code"><th mat-header-cell *matHeaderCellDef>Code</th><td mat-cell *matCellDef="let x">{{x.code}}</td></ng-container>
+        <ng-container matColumnDef="description"><th mat-header-cell *matHeaderCellDef>Description</th><td mat-cell *matCellDef="let x">{{x.description}}</td></ng-container>
+        <ng-container matColumnDef="featureCount"><th mat-header-cell *matHeaderCellDef>Features</th><td mat-cell *matCellDef="let x">{{x.featureCount}}</td></ng-container>
+        <ng-container matColumnDef="userCount"><th mat-header-cell *matHeaderCellDef>Users</th><td mat-cell *matCellDef="let x">{{x.userCount}}</td></ng-container>
+        <ng-container matColumnDef="createdAt"><th mat-header-cell *matHeaderCellDef>Created</th><td mat-cell *matCellDef="let x">{{removeTime(x.createdAt)}}</td></ng-container>
+        <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Operation</th>
+            <td mat-cell *matCellDef="let x">
+                <mat-icon class="cursor-pointer mr-2 icon-edit-copy" svgIcon="heroicons_outline:pencil-square" (click)="openEdit(x)"></mat-icon>
+                <mat-icon class="cursor-pointer mr-2 icon-edit-copy" svgIcon="heroicons_outline:document-duplicate" (click)="copy(x)"></mat-icon>
+                <mat-icon class="cursor-pointer icon-trash" svgIcon="heroicons_outline:trash" (click)="delete(x)"></mat-icon>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</section>
+
+<ng-template #licenseDialog>
+    <h2 mat-dialog-title class="dialog-title-large">{{ editId ? 'Update License' : 'Create License' }}</h2>
+    <mat-dialog-content>
+        <div class="grid grid-cols-1 gap-2">
+            <mat-form-field><mat-label>Name</mat-label><input matInput [formControl]="form.controls.name"></mat-form-field>
+            <mat-form-field><mat-label>Code</mat-label><input matInput [formControl]="form.controls.code" [readonly]="!!editId"></mat-form-field>
+            <mat-form-field><mat-label>Description</mat-label><input matInput [formControl]="form.controls.description"></mat-form-field>
+        </div>
+        <div class="mt-2">
+            <div *ngFor="let grp of groupedFeatures" class="mb-3">
+                <div class="feature-cat-header">
+                    <div class="font-semibold mb-1">{{getCategoryName(grp.category)}}</div>
+                    <mat-checkbox
+                        class="feature-cat-toggle"
+                        [checked]="isAllCategorySelected(grp.list)"
+                        (change)="toggleCategory(grp.list, $event.checked)">
+                        {{ isAllCategorySelected(grp.list) ? 'Uncheck all' : 'Check all' }}
+                    </mat-checkbox>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <mat-checkbox *ngFor="let f of grp.list" [checked]="selectedFeatureIds.has(f.id)"
+                        (change)="toggleFeature(f.id, $event.checked)"
+                        [matTooltip]="f.description || ''"
+                        matTooltipPosition="above">{{f.name}} ({{f.code}})</mat-checkbox>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="dialog.closeAll()">Cancel</button>
+        <button mat-flat-button color="primary" [disabled]="!canSave()" (click)="save()">Save</button>
+    </mat-dialog-actions>
+</ng-template>

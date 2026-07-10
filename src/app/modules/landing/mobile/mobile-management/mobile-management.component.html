@@ -1,0 +1,466 @@
+<section class="w-full h-full ">
+    <div class="w-full flex justify-between">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">Mobile Admins</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'">
+                    </mat-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="w-full bg-card mt-2">
+        <div class="w-full flex-col mt-3 p-4">
+            <div class="flex">
+                <label class="form-label">Keywords:</label>
+            </div>
+            <div class="w-full flex flex-row mt-2">
+                <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchInputControl"
+                    placeholder="name/email">
+
+                <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                    class="kitkat-mat-button RTM-button-color Querybutton ms-1" (click)="openAdminModal('add')">
+                    {{getCreateButtonLabel(true)}}
+                </button>
+            </div>
+        </div>
+
+
+        <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceAdmin" matSort #adminSort="matSort">
+            <!-- id -->
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+                    <p class="header-text">No</p>
+                </th>
+
+                <td mat-cell *matCellDef="let row; let i=index">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="onSingleSelectAdmin(row)"
+                        [checked]="selectionAdmin.isSelected(row)">
+                        {{i+1}}
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <!-- User name -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
+                    Name
+                </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item.name}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Email address -->
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
+                    Email
+                </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item.email}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- User permission -->
+            <ng-container matColumnDef="users">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Mobile Users</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{getUsercntOfAdmin(item)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- bound clusters -->
+            <ng-container matColumnDef="clusters">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Clusters</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{getClusterCountOfAdmin(item)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- created time -->
+            <ng-container matColumnDef="created">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Created</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{removeTime(item.created)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+           <!-- Operate -->
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Operate</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text" (click)="$event.stopPropagation()">
+                        <div class="example-button-row flex flex-row">
+                            <div class="example-flex-container flex flex-row">
+                                <div class="p-1">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square"
+                                        style="color: #0D6EFD !important;" (click)="openAdminModal('edit',item)"></mat-icon>
+                                </div>
+                                <div class="p-1">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash"
+                                        style="color: red !important;" (click)="openAdminModal('delete', item)"></mat-icon>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+        </table>
+        <hr class="m-0" *ngIf="this.usersAdmin.length == 0">
+
+        <div class="flex flex-row justify-end w-full">
+            <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="10" [pageSizeOptions]="[10, 20]"
+                [length]="totalRecords"></mat-paginator>
+        </div>
+
+        <!-- show mobile admins of selected web-mobile admin -->
+        <hr style="margin-top: 0px !important;">
+        <div class="w-full flex justify-between">
+            <!-- Mobile Admin selection -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div class="pr-4" style="border-right: 1px solid">
+                    <a class="text-2xl whitespace-nowrap">{{getSelectedWebAdminName()}}</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                    </div>
+                    <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span><a class="text-lg ml-1 text-primary-500">Mobile Users</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="w-full bg-card">
+
+        <div class="w-full flex-col mt-3 p-4">
+            <div class="flex">
+                <label class="form-label">Keywords:</label>
+            </div>
+            <div class="w-full flex flex-row mt-2">
+                <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchSubInputControl"
+                    placeholder="name/email">
+
+                <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                    class="kitkat-mat-button RTM-button-color Querybutton ms-1" (click)="openUserModal('add')">
+                    {{getCreateButtonLabel(false)}}
+                </button>
+            </div>
+        </div>
+
+
+    <hr style="margin-top: 0px !important;">
+
+    <!-- Mobile admin listing -->
+    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceUser" matSort #userSort="matSort">
+      <!-- id -->
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+                <p class="header-text">No</p>
+            </th>
+
+            <td mat-cell *matCellDef="let row; let i=index">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="onSingleSelectUser(row)"
+                    [checked]="selectionUser.isSelected(row)">
+                    {{i+1}}
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <!-- User name -->
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
+                Name
+            </th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text">
+                    <p>{{item.name}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- Email address -->
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
+                Email
+            </th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text">
+                    <p>{{item.email}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+       <!-- Clusters -->
+        <ng-container matColumnDef="cluster">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Clusters</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text">
+                    <p>{{getClusterCountOfUser(item)}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- created time -->
+        <ng-container matColumnDef="created">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Created</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text">
+                    <p>{{removeTime(item.created)}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- Operate -->
+        <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Operate</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text" (click)="$event.stopPropagation()">
+                    <div class="example-button-row flex flex-row">
+                        <div class="example-flex-container flex flex-row">
+                            <div class="p-1">
+                                <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square"
+                                    style="color: #0D6EFD !important;" (click)="openUserModal('edit',item)"></mat-icon>
+                            </div>
+                            <div class="p-1">
+                                <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash"
+                                    style="color: red !important;" (click)="openUserModal('delete', item)"></mat-icon>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </ng-container>  
+
+            <tr mat-header-row *matHeaderRowDef="displayedSubColumns"></tr>
+            <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedSubColumns;"></tr>
+        </table>
+        
+        <hr class="m-0" *ngIf="this.usersAdmin.length == 0">
+        <div class="flex flex-row justify-end w-full">
+            <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="10" [pageSizeOptions]="[10, 20]"
+                [length]="totalSubRecords"></mat-paginator>
+        </div>
+        </div>
+    </div>
+</section>
+
+<ng-template #add>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">{{getDialogTitle()}}</div>
+        <hr>
+    </section>
+    <section class="w-full">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="adminForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+                <!-- user name -->
+                <mat-form-field class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Name:</mat-label>
+                    <input matInput formControlName="name" placeholder="User name">
+                </mat-form-field>
+
+                <!-- email address -->
+                <mat-form-field class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Email:</mat-label>
+                    <input matInput formControlName="email" placeholder="User email">
+                </mat-form-field>
+
+                <!-- checkbox for password -->
+                <mat-checkbox
+                    *ngIf="!passwordRequired()"
+                    class = "mb-1"
+                    (click)="$event.stopPropagation()"
+                    formControlName="update_password"
+                    (change)="onUpdateUserPassword($event)"
+                    >
+                    Change password
+                </mat-checkbox>
+
+
+                <!-- update password -->
+                <mat-form-field
+                    *ngIf="showPasswordField()"
+                    class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Password:</mat-label>
+                    <input matInput formControlName="password" placeholder="6 characters at least" type="password">
+                </mat-form-field>
+
+                <!-- confirm password -->
+                <mat-form-field
+                    *ngIf="showPasswordField()"
+                    class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Confirm password:</mat-label>
+                    <input matInput formControlName="password_confirm" placeholder="Confirm password" type="password">
+                </mat-form-field>
+
+                <!-- cluster selection (all clusters) -->
+                <div class="gt-xs:pr-3 mb-2 w-full cluster-dialog-checkboxes">
+                    <label class="form-label">{{ getAdminClusterDialogLabel() }}</label>
+                    <input
+                        class="searchbox cluster-search-input w-full"
+                        matInput
+                        type="search"
+                        [value]="adminClusterSearch"
+                        (input)="onAdminClusterSearchInput($event)"
+                        placeholder="Filter clusters">
+                    <mat-checkbox
+                        class="cluster-select-all mt-1 mb-1"
+                        color="primary"
+                        [checked]="areAllVisibleAdminClustersSelected()"
+                        [indeterminate]="isSomeVisibleAdminClustersSelected()"
+                        (change)="onAdminSelectAllChange($event)"
+                        (click)="$event.stopPropagation()">
+                        {{ getAdminSelectAllLabel() }}
+                    </mat-checkbox>
+                    <div class="cluster-checkbox-panel">
+                        <div class="cluster-checkbox-grid">
+                            <mat-checkbox
+                                *ngFor="let cluster of getVisibleAdminDialogClusters()"
+                                class="cluster-checkbox-item"
+                                color="primary"
+                                [checked]="isAdminClusterSelected(cluster.id)"
+                                (change)="onAdminClusterSelectionChange(cluster.id, $event)"
+                                (click)="$event.stopPropagation()">
+                                {{ cluster.name }}
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button (click)="closeDialog()" type="submit"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button (click)="onSubmitAdmindata()" class="RTM-button-color p-4 border-radius-button"
+                type="submit" color="primary">Save</button>
+        </div>
+    </section>
+</ng-template>
+
+<ng-template #add_sub>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">{{getSubDialogTitle()}}</div>
+        <hr>
+    </section>
+    <section class="w-full">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="userForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+                <!-- user name -->
+                <mat-form-field class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Name:</mat-label>
+                    <input matInput formControlName="name" placeholder="User name">
+                </mat-form-field>
+
+                <!-- email address -->
+                <mat-form-field class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Email:</mat-label>
+                    <input matInput formControlName="email" placeholder="User email">
+                </mat-form-field>
+
+                <!-- cluster selection (parent mobile admin clusters) -->
+                <div *ngIf="showUserDialogClusters" class="gt-xs:pr-3 mb-2 w-full cluster-dialog-checkboxes">
+                    <label class="form-label">{{ getUserClusterDialogLabel() }}</label>
+                    <input
+                        class="searchbox cluster-search-input w-full"
+                        matInput
+                        type="search"
+                        [value]="userClusterSearch"
+                        (input)="onUserClusterSearchInput($event)"
+                        placeholder="Filter clusters">
+                    <mat-checkbox
+                        class="cluster-select-all mt-1 mb-1"
+                        color="primary"
+                        [checked]="areAllVisibleUserClustersSelected()"
+                        [indeterminate]="isSomeVisibleUserClustersSelected()"
+                        (change)="onUserSelectAllChange($event)"
+                        (click)="$event.stopPropagation()">
+                        {{ getUserSelectAllLabel() }}
+                    </mat-checkbox>
+                    <div class="cluster-checkbox-panel">
+                        <div class="cluster-checkbox-grid">
+                            <mat-checkbox
+                                *ngFor="let cluster of getVisibleUserDialogClusters()"
+                                class="cluster-checkbox-item"
+                                color="primary"
+                                [checked]="isUserClusterSelected(cluster.id)"
+                                (change)="onUserClusterSelectionChange(cluster.id, $event)"
+                                (click)="$event.stopPropagation()">
+                                {{ cluster.name }}
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- checkbox for password -->
+                <mat-checkbox
+                    *ngIf="!passwordRequired()"
+                    class = "mb-1"
+                    (click)="$event.stopPropagation()"
+                    formControlName="update_password"
+                    (change)="onUpdateUserPassword($event)"
+                    >
+                    Change password
+                </mat-checkbox>
+
+
+                <!-- update password -->
+                <mat-form-field
+                    *ngIf="showPasswordField()"
+                    class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Password:</mat-label>
+                    <input matInput formControlName="password" placeholder="6 characters at least" type="password">
+                </mat-form-field>
+
+                <!-- confirm password -->
+                <mat-form-field
+                    *ngIf="showPasswordField()"
+                    class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Confirm password:</mat-label>
+                    <input matInput formControlName="password_confirm" placeholder="Confirm password" type="password">
+                </mat-form-field>
+            </div>
+        </form>
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button (click)="closeDialog()" type="submit"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button (click)="onSubmitUserdata()" class="RTM-button-color p-4 border-radius-button"
+                type="submit" color="primary">Save</button>
+        </div>
+    </section>
+</ng-template>
+

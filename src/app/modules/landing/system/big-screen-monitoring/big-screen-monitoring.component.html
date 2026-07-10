@@ -1,0 +1,430 @@
+<section class="w-full bg-img">
+    <div class="flex flex-col">
+        <div class="flex mt-5 header-img w-full justify-center items-center">
+            <h4 class="text-3xl font-extrabold heading">IB-trace-G</h4>
+        </div>
+        <div class="flex">
+            <p class="time">{{realcurrentTime}}</p>
+            <a class="ant-dropdown-trigger ant-dropdown-link logout" href="/Account/Logout">
+                <span role="img" aria-label="setting" class="anticon anticon-setting" style="color: rgb(1, 179, 239);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-power text-primary">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                        <line x1="12" y1="2" x2="12" y2="12"></line>
+                    </svg>
+                </span>
+            </a>
+        </div>
+        <div id="marquee" class="marquee">
+            <marquee direction="left"></marquee>
+        </div>
+    </div>
+
+    <!-- main section -->
+    <div class="flex w-full">
+        <!-- dev -->
+        <div class="w-1/3 flex flex-col h-fit">
+            <div class="h-full borderSetting ml-4 ">
+                <div class="ant-card-head-title">
+                    <span class="flex">
+                        <img src="assets/images/device/deviceList.png" alt="Device List"
+                            style="height: 12px !important; width:15px !important;margin-top: 7px !important;">
+                        <span style="display: inline-block; margin-left: 10px; font: 18px; color:#2FCAFF">Device
+                            List</span>
+                    </span>
+                </div>
+
+                <table class="w-full table-responsive mat-card customTable" mat-table [dataSource]="dataSource">
+
+                    <!-- id -->
+
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef style="width:7rem !important;"
+                            class="text-left header-text">
+                            <p class="header-text">#</p>
+                        </th>
+                        <td mat-cell *matCellDef="let row; let i=index">
+                            <div class="column-text">
+                                {{i+1}}
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <!-- Device Name -->
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef class="text-left header-text"
+                            style="width:8rem !important">Device Name
+                        </th>
+                        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                            <div class="column-text">
+                                <p>{{item?.name}}</p>
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <!-- Device Id -->
+                    <ng-container matColumnDef="serial">
+                        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Device ID </th>
+                        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                            <div class="column-text">
+                                <p>{{item?.serial}}</p>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <!-- Condition -->
+                    <ng-container matColumnDef="cond">
+                        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Condition </th>
+                        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                            <div class="column-text">
+                                <div *ngIf="isOnline(item)">
+                                    <div class="flex column-text">
+                                        <span class="absolute w-2 h-2 mr-3 mt-2 rounded-full bg-green-500"></span>
+                                        <p class="ml-4">Online</p>
+                                    </div>
+                                </div>
+                                <div *ngIf="!isOnline(item)">
+                                    <div class="flex column-text">
+                                        <span class="absolute w-2 h-2 mr-3 mt-2 rounded-full bg-black"></span>
+                                        <p class="ml-4">Offline</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+
+            <div class="borderSetting p-4 ml-4 mt-4 h-80">
+                <div class="ant-card-head-title">
+                    <span class="flex">
+                        <img src="assets/images/device/realTimeData.png" alt="Device List"
+                            style="height: 12px !important; width:11px !important;margin-top: 7px !important;">
+                        <span style="display: inline-block; margin-left: 10px; font: 18px; color:#2FCAFF">Real-Time
+                            Data</span>
+                    </span>
+                </div>
+
+                <div class="realTimeData mt-4 h-72">
+                    <ul class="list">
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 0px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: left; padding: 2px;"
+                            title="IB Trace-Global TG">
+                            <div style="width:49%;height:80%;margin-top:5%; float:left;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M497.240276 817.681655a75.564138 75.564138 0 0 1-75.599448-75.564138 75.211034 75.211034 0 0 1 51.623724-71.326896V176.587034h48.551724v494.238897a75.458207 75.458207 0 0 1-24.576 146.891035m138.663724-299.643587v-75.917241h-41.454345v-27.61269h41.454345v-48.551724h-41.454345v-26.482758h41.454345V288.203034h-41.454345V263.415172h41.454345V213.168552h-41.454345v-25.388138h41.454345V138.628414a138.628414 138.628414 0 0 0-277.256828 0v379.444965A267.29931 267.29931 0 0 0 229.517241 746.813793a267.723034 267.723034 0 0 0 267.758345 267.758345 267.723034 267.723034 0 0 0 267.758345-267.758345 267.334621 267.334621 0 0 0-129.129931-228.705103"
+                                            fill="#4aa004"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Temperature_63569">-35.9℃</h4>
+                                </div>
+                            </div>
+                            <div style="width:49%;height:80%;margin-top:5%;float:right;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M856.4 0S723.1 126.3 723.1 200c0 73.6 59.7 133.3 133.3 133.3S989.7 273.6 989.7 200 856.4 0 856.4 0z m0 288.8c-49.1 0-88.9-39.8-88.9-88.9s88.9-133.3 88.9-133.3 88.9 84.2 88.9 133.3-39.9 88.9-88.9 88.9zM412 0S34.3 427.1 34.3 638.8 203.4 1022 412 1022s377.7-171.6 377.7-383.2S412 0 412 0z m0 955.4c-171.8 0-311-141.9-311-317S412 88.9 412 88.9s311 374.4 311 549.5c0.1 175-139.2 317-311 317z"
+                                            p-id="3041" fill="#1195db"></path>
+                                        <path
+                                            d="M412 933.1c-159.5 0-288.8-128.4-288.8-286.8s150.1-78.2 288.8 0c139.3 78.5 288.8-158.4 288.8 0S571.5 933.1 412 933.1z"
+                                            fill="#1195db"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Humidity_63569">43.9%</h4>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 6px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: right; padding: 2px;"
+                            title="IB-trace-Global-TG">
+                            <div style="width:49%;height:80%;margin-top:5%; float:left;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M497.240276 817.681655a75.564138 75.564138 0 0 1-75.599448-75.564138 75.211034 75.211034 0 0 1 51.623724-71.326896V176.587034h48.551724v494.238897a75.458207 75.458207 0 0 1-24.576 146.891035m138.663724-299.643587v-75.917241h-41.454345v-27.61269h41.454345v-48.551724h-41.454345v-26.482758h41.454345V288.203034h-41.454345V263.415172h41.454345V213.168552h-41.454345v-25.388138h41.454345V138.628414a138.628414 138.628414 0 0 0-277.256828 0v379.444965A267.29931 267.29931 0 0 0 229.517241 746.813793a267.723034 267.723034 0 0 0 267.758345 267.758345 267.723034 267.723034 0 0 0 267.758345-267.758345 267.334621 267.334621 0 0 0-129.129931-228.705103"
+                                            fill="#4aa004"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Temperature_63561">19.7℃</h4>
+                                </div>
+                            </div>
+                            <div style="width:49%;height:80%;margin-top:5%;float:right;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M856.4 0S723.1 126.3 723.1 200c0 73.6 59.7 133.3 133.3 133.3S989.7 273.6 989.7 200 856.4 0 856.4 0z m0 288.8c-49.1 0-88.9-39.8-88.9-88.9s88.9-133.3 88.9-133.3 88.9 84.2 88.9 133.3-39.9 88.9-88.9 88.9zM412 0S34.3 427.1 34.3 638.8 203.4 1022 412 1022s377.7-171.6 377.7-383.2S412 0 412 0z m0 955.4c-171.8 0-311-141.9-311-317S412 88.9 412 88.9s311 374.4 311 549.5c0.1 175-139.2 317-311 317z"
+                                            p-id="3041" fill="#1195db"></path>
+                                        <path
+                                            d="M412 933.1c-159.5 0-288.8-128.4-288.8-286.8s150.1-78.2 288.8 0c139.3 78.5 288.8-158.4 288.8 0S571.5 933.1 412 933.1z"
+                                            fill="#1195db"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Humidity_63561">96.3%</h4>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 0px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: left; padding: 2px;"
+                            title="IB-trace-Global-TG">
+                            <div style="width:49%;height:80%;margin-top:5%; float:left;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M497.240276 817.681655a75.564138 75.564138 0 0 1-75.599448-75.564138 75.211034 75.211034 0 0 1 51.623724-71.326896V176.587034h48.551724v494.238897a75.458207 75.458207 0 0 1-24.576 146.891035m138.663724-299.643587v-75.917241h-41.454345v-27.61269h41.454345v-48.551724h-41.454345v-26.482758h41.454345V288.203034h-41.454345V263.415172h41.454345V213.168552h-41.454345v-25.388138h41.454345V138.628414a138.628414 138.628414 0 0 0-277.256828 0v379.444965A267.29931 267.29931 0 0 0 229.517241 746.813793a267.723034 267.723034 0 0 0 267.758345 267.758345 267.723034 267.723034 0 0 0 267.758345-267.758345 267.334621 267.334621 0 0 0-129.129931-228.705103"
+                                            fill="#4aa004"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Temperature_63588">-19℃</h4>
+                                </div>
+                            </div>
+                            <div style="width:49%;height:80%;margin-top:5%;float:right;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M856.4 0S723.1 126.3 723.1 200c0 73.6 59.7 133.3 133.3 133.3S989.7 273.6 989.7 200 856.4 0 856.4 0z m0 288.8c-49.1 0-88.9-39.8-88.9-88.9s88.9-133.3 88.9-133.3 88.9 84.2 88.9 133.3-39.9 88.9-88.9 88.9zM412 0S34.3 427.1 34.3 638.8 203.4 1022 412 1022s377.7-171.6 377.7-383.2S412 0 412 0z m0 955.4c-171.8 0-311-141.9-311-317S412 88.9 412 88.9s311 374.4 311 549.5c0.1 175-139.2 317-311 317z"
+                                            p-id="3041" fill="#1195db"></path>
+                                        <path
+                                            d="M412 933.1c-159.5 0-288.8-128.4-288.8-286.8s150.1-78.2 288.8 0c139.3 78.5 288.8-158.4 288.8 0S571.5 933.1 412 933.1z"
+                                            fill="#1195db"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Humidity_63588">54.4%</h4>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 6px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: right; padding: 2px;"
+                            title="IB-trace-Global-TG">
+                            <div style="width:49%;height:80%;margin-top:5%; float:left;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M497.240276 817.681655a75.564138 75.564138 0 0 1-75.599448-75.564138 75.211034 75.211034 0 0 1 51.623724-71.326896V176.587034h48.551724v494.238897a75.458207 75.458207 0 0 1-24.576 146.891035m138.663724-299.643587v-75.917241h-41.454345v-27.61269h41.454345v-48.551724h-41.454345v-26.482758h41.454345V288.203034h-41.454345V263.415172h41.454345V213.168552h-41.454345v-25.388138h41.454345V138.628414a138.628414 138.628414 0 0 0-277.256828 0v379.444965A267.29931 267.29931 0 0 0 229.517241 746.813793a267.723034 267.723034 0 0 0 267.758345 267.758345 267.723034 267.723034 0 0 0 267.758345-267.758345 267.334621 267.334621 0 0 0-129.129931-228.705103"
+                                            fill="#4aa004"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Temperature_63585">-36.6℃</h4>
+                                </div>
+                            </div>
+                            <div style="width:49%;height:80%;margin-top:5%;float:right;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M856.4 0S723.1 126.3 723.1 200c0 73.6 59.7 133.3 133.3 133.3S989.7 273.6 989.7 200 856.4 0 856.4 0z m0 288.8c-49.1 0-88.9-39.8-88.9-88.9s88.9-133.3 88.9-133.3 88.9 84.2 88.9 133.3-39.9 88.9-88.9 88.9zM412 0S34.3 427.1 34.3 638.8 203.4 1022 412 1022s377.7-171.6 377.7-383.2S412 0 412 0z m0 955.4c-171.8 0-311-141.9-311-317S412 88.9 412 88.9s311 374.4 311 549.5c0.1 175-139.2 317-311 317z"
+                                            p-id="3041" fill="#1195db"></path>
+                                        <path
+                                            d="M412 933.1c-159.5 0-288.8-128.4-288.8-286.8s150.1-78.2 288.8 0c139.3 78.5 288.8-158.4 288.8 0S571.5 933.1 412 933.1z"
+                                            fill="#1195db"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Humidity_63585">56.2%</h4>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 0px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: left; padding: 2px;"
+                            title="ITE-Global-4G-84">
+                            <div style="width:49%;height:80%;margin-top:5%; float:left;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M497.240276 817.681655a75.564138 75.564138 0 0 1-75.599448-75.564138 75.211034 75.211034 0 0 1 51.623724-71.326896V176.587034h48.551724v494.238897a75.458207 75.458207 0 0 1-24.576 146.891035m138.663724-299.643587v-75.917241h-41.454345v-27.61269h41.454345v-48.551724h-41.454345v-26.482758h41.454345V288.203034h-41.454345V263.415172h41.454345V213.168552h-41.454345v-25.388138h41.454345V138.628414a138.628414 138.628414 0 0 0-277.256828 0v379.444965A267.29931 267.29931 0 0 0 229.517241 746.813793a267.723034 267.723034 0 0 0 267.758345 267.758345 267.723034 267.723034 0 0 0 267.758345-267.758345 267.334621 267.334621 0 0 0-129.129931-228.705103"
+                                            fill="#4aa004"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Temperature_57820">27.9℃</h4>
+                                </div>
+                            </div>
+                            <div style="width:49%;height:80%;margin-top:5%;float:right;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M856.4 0S723.1 126.3 723.1 200c0 73.6 59.7 133.3 133.3 133.3S989.7 273.6 989.7 200 856.4 0 856.4 0z m0 288.8c-49.1 0-88.9-39.8-88.9-88.9s88.9-133.3 88.9-133.3 88.9 84.2 88.9 133.3-39.9 88.9-88.9 88.9zM412 0S34.3 427.1 34.3 638.8 203.4 1022 412 1022s377.7-171.6 377.7-383.2S412 0 412 0z m0 955.4c-171.8 0-311-141.9-311-317S412 88.9 412 88.9s311 374.4 311 549.5c0.1 175-139.2 317-311 317z"
+                                            p-id="3041" fill="#1195db"></path>
+                                        <path
+                                            d="M412 933.1c-159.5 0-288.8-128.4-288.8-286.8s150.1-78.2 288.8 0c139.3 78.5 288.8-158.4 288.8 0S571.5 933.1 412 933.1z"
+                                            fill="#1195db"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Humidity_57820">19.7%</h4>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 6px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: right; padding: 2px;"
+                            title="IB-Global-4G-085">
+                            <div style="width:49%;height:80%;margin-top:5%; float:left;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M497.240276 817.681655a75.564138 75.564138 0 0 1-75.599448-75.564138 75.211034 75.211034 0 0 1 51.623724-71.326896V176.587034h48.551724v494.238897a75.458207 75.458207 0 0 1-24.576 146.891035m138.663724-299.643587v-75.917241h-41.454345v-27.61269h41.454345v-48.551724h-41.454345v-26.482758h41.454345V288.203034h-41.454345V263.415172h41.454345V213.168552h-41.454345v-25.388138h41.454345V138.628414a138.628414 138.628414 0 0 0-277.256828 0v379.444965A267.29931 267.29931 0 0 0 229.517241 746.813793a267.723034 267.723034 0 0 0 267.758345 267.758345 267.723034 267.723034 0 0 0 267.758345-267.758345 267.334621 267.334621 0 0 0-129.129931-228.705103"
+                                            fill="#4aa004"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Temperature_57822">27.3℃</h4>
+                                </div>
+                            </div>
+                            <div style="width:49%;height:80%;margin-top:5%;float:right;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M856.4 0S723.1 126.3 723.1 200c0 73.6 59.7 133.3 133.3 133.3S989.7 273.6 989.7 200 856.4 0 856.4 0z m0 288.8c-49.1 0-88.9-39.8-88.9-88.9s88.9-133.3 88.9-133.3 88.9 84.2 88.9 133.3-39.9 88.9-88.9 88.9zM412 0S34.3 427.1 34.3 638.8 203.4 1022 412 1022s377.7-171.6 377.7-383.2S412 0 412 0z m0 955.4c-171.8 0-311-141.9-311-317S412 88.9 412 88.9s311 374.4 311 549.5c0.1 175-139.2 317-311 317z"
+                                            p-id="3041" fill="#1195db"></path>
+                                        <path
+                                            d="M412 933.1c-159.5 0-288.8-128.4-288.8-286.8s150.1-78.2 288.8 0c139.3 78.5 288.8-158.4 288.8 0S571.5 933.1 412 933.1z"
+                                            fill="#1195db"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Humidity_57822">66.6%</h4>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 0px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: left; padding: 2px;"
+                            title="ITE-Global-4G-83">
+                            <div style="width:49%;height:80%;margin-top:5%; float:left;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M497.240276 817.681655a75.564138 75.564138 0 0 1-75.599448-75.564138 75.211034 75.211034 0 0 1 51.623724-71.326896V176.587034h48.551724v494.238897a75.458207 75.458207 0 0 1-24.576 146.891035m138.663724-299.643587v-75.917241h-41.454345v-27.61269h41.454345v-48.551724h-41.454345v-26.482758h41.454345V288.203034h-41.454345V263.415172h41.454345V213.168552h-41.454345v-25.388138h41.454345V138.628414a138.628414 138.628414 0 0 0-277.256828 0v379.444965A267.29931 267.29931 0 0 0 229.517241 746.813793a267.723034 267.723034 0 0 0 267.758345 267.758345 267.723034 267.723034 0 0 0 267.758345-267.758345 267.334621 267.334621 0 0 0-129.129931-228.705103"
+                                            fill="#4aa004"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Temperature_57823">19.2℃</h4>
+                                </div>
+                            </div>
+                            <div style="width:49%;height:80%;margin-top:5%;float:right;">
+                                <div style="float: left;"> <svg viewBox="0 0 1024 1024" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                                        <path
+                                            d="M856.4 0S723.1 126.3 723.1 200c0 73.6 59.7 133.3 133.3 133.3S989.7 273.6 989.7 200 856.4 0 856.4 0z m0 288.8c-49.1 0-88.9-39.8-88.9-88.9s88.9-133.3 88.9-133.3 88.9 84.2 88.9 133.3-39.9 88.9-88.9 88.9zM412 0S34.3 427.1 34.3 638.8 203.4 1022 412 1022s377.7-171.6 377.7-383.2S412 0 412 0z m0 955.4c-171.8 0-311-141.9-311-317S412 88.9 412 88.9s311 374.4 311 549.5c0.1 175-139.2 317-311 317z"
+                                            p-id="3041" fill="#1195db"></path>
+                                        <path
+                                            d="M412 933.1c-159.5 0-288.8-128.4-288.8-286.8s150.1-78.2 288.8 0c139.3 78.5 288.8-158.4 288.8 0S571.5 933.1 412 933.1z"
+                                            fill="#1195db"></path>
+                                    </svg> </div>
+                                <div style="float:left;margin-left:5px;">
+                                    <h4 style="color:#8ebcde" id="labRealtime_Humidity_57823">91.2%</h4>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 6px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: right; padding: 2px;">
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 0px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: left; padding: 2px;">
+                        </li>
+                        <li class="listItem"
+                            style="width: calc(50% - 10px); margin-left: 6px; height: calc(20% - 4px); margin-top: 0px; margin-bottom: 0px; float: right; padding: 2px;">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- maps -->
+        <div class="w-1/3 flex-none h-fit">
+            <!-- Load d3.js -->
+            <div class="borderSetting p-4 ml-4">
+                <div id="vmap" style="width: 475px; height: 275px; margin-right:auto; margin-left: auto;"></div>
+            </div>
+
+            <!-- realtime curve -->
+            <div class="borderSetting p-4 ml-4 mt-4 h-100">
+                <div class="ant-card-head-title">
+                    <span class="flex">
+                        <img src="assets/images/device/realTimeCurve.png" alt="Device List"
+                            style="height: 12px !important; width:11px !important;margin-top: 7px !important;">
+                        <span style="display: inline-block; margin-left: 10px; font: 18px; color:#2FCAFF">Real-time temperature Curve</span>
+                    </span>
+                </div>
+                 <!-- graphs -->
+                <div>
+                    <highcharts-chart [Highcharts]="Highcharts" [constructorType]="'stockChart'" [options]="chartOptions" style="margin-top: 8px;
+                    height: 330px;
+                    width: 300px;
+                    /* overflow: hidden; */
+                    width: 462px !important;
+                    display: block;
+                    background-color: transparent !important;">
+                    </highcharts-chart>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- device overview -->
+        <div class="w-1/3 flex flex-col h-fit">
+            <div class="h-full borderSetting p-4 ml-4">
+                <div class="ant-card-head-title">
+                    <span class="flex">
+                        <img src="assets/images/device/deviceOverview.png" alt="Device List"
+                            style="height: 12px !important; width:13px !important;margin-top: 7px !important;">
+                        <span style="display: inline-block; margin-left: 10px; font: 18px; color:#2FCAFF">Device
+                            Overview</span>
+                    </span>
+                </div>
+                <div class="overview flex justify-between items-center">
+                    <div class="overviewItem">
+                        <div
+                            class="ant-progress ant-progress-circle ant-progress-status-normal ant-progress-show-info ant-progress-default">
+                            <div class="ant-progress-inner" style="width: 76px; height: 76px; font-size: 17.4px;">
+                                <svg class="ant-progress-circle" viewBox="0 0 100 100">
+                                    <path class="ant-progress-circle-trail" d="M 50,50 m 0,-47
+a 47,47 0 1 1 0,94
+a 47,47 0 1 1 0,-94" stroke="#2FCAFF" stroke-linecap="round" stroke-width="6" fill-opacity="0"
+                                        style="stroke: rgb(47, 202, 255); stroke-dasharray: 295.31px, 295.31px; stroke-dashoffset: 0px; transition: stroke-dashoffset 0.3s ease 0s, stroke-dasharray 0.3s ease 0s, stroke 0.3s ease 0s, stroke-width 0.06s ease 0.3s, opacity 0.3s ease 0s;">
+                                    </path>
+                                    <path class="ant-progress-circle-path" d="M 50,50 m 0,-47
+a 47,47 0 1 1 0,94
+a 47,47 0 1 1 0,-94" stroke="" stroke-linecap="round" stroke-width="6" opacity="0" fill-opacity="0"
+                                        style="stroke: rgb(250, 178, 23); stroke-dasharray: 0px, 295.31px; stroke-dashoffset: 0px; transition: stroke-dashoffset 0.3s ease 0s, stroke-dasharray 0.3s ease 0s, stroke 0.3s ease 0s, stroke-width 0.06s ease 0.3s, opacity ease 0s;">
+                                    </path>
+                                    <path class="ant-progress-circle-path" d="M 50,50 m 0,-47
+a 47,47 0 1 1 0,94
+a 47,47 0 1 1 0,-94" stroke="" stroke-linecap="round" stroke-width="6" opacity="0" fill-opacity="0"
+                                        style="stroke: rgb(82, 196, 26); stroke-dasharray: 0px, 295.31px; stroke-dashoffset: 0px; transition: stroke-dashoffset 0.3s ease 0s, stroke-dasharray 0.3s ease 0s, stroke 0.3s ease 0s, stroke-width 0.06s ease 0.3s, opacity ease 0s;">
+                                    </path>
+                                </svg>
+                                <span class="ant-progress-text"><span id="labOnlineRate"
+                                        class="onlineStyle">46%</span></span>
+                            </div>
+                        </div>
+                        <span class="">Online Rate</span>
+                    </div>
+                    <p class="overviewItem"><span id="labTotal">{{overViewDetails?.total}}</span><span>Total number of
+                            devices</span></p>
+                    <p class="overviewItem"><span id="labOnLine">{{overViewDetails?.online}}</span><span>Online
+                            Device</span></p>
+                    <p class="overviewItem"><span id="labOffLine">{{overViewDetails?.offline}}</span><span>Offline
+                            Device</span></p>
+                </div>
+            </div>
+
+            <div class="borderSetting p-4 ml-4 mt-4 h-72">
+                <div class="ant-card-head-title">
+                    <span class="flex">
+                        <img src="assets/images/device/switchMonitor.png" alt="Device List"
+                            style="height: 12px !important; width:11px !important;margin-top: 7px !important;">
+                        <span style="display: inline-block; margin-left: 10px; font: 18px; color:#2FCAFF">Camera</span>
+                    </span>
+                </div>
+            </div>
+            <div class="borderSetting p-4 ml-4 mt-4 h-50">
+                <div class="ant-card-head-title">
+                    <span class="flex">
+                        <img src="assets/images/device/alarmInfo.png" alt="Device List"
+                            style="height: 12px !important; width:11px !important;margin-top: 7px !important;">
+                        <span style="display: inline-block; margin-left: 10px; font: 18px; color:#2FCAFF">Alarm
+                            notification</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

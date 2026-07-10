@@ -1,0 +1,135 @@
+@import '../devices/devices.component.scss';
+
+$register-green: #14a73c;
+$register-green-light: #e8f5e9;
+$register-green-border: #a5d6a7;
+
+.register-section {
+    padding: 0 0.5rem 1rem;
+}
+
+.register-header {
+    margin-bottom: 12px;
+}
+
+.register-hint {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.55);
+}
+
+.register-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.register-icon-btn {
+    color: $register-green !important;
+
+    .mat-icon {
+        color: $register-green !important;
+    }
+
+    &:disabled {
+        opacity: 0.55;
+
+        .mat-icon {
+            color: $register-green !important;
+        }
+    }
+}
+
+.register-file {
+    margin: 0 0 12px;
+}
+
+.register-progress {
+    border-radius: 4px;
+}
+
+.register-progress-label {
+    margin: -8px 0 0;
+}
+
+.result-panel {
+    position: relative;
+    border: 2px solid $register-green;
+    border-radius: 8px;
+    padding: 12px 12px 56px;
+    background: $register-green-light;
+    box-shadow: 0 0 0 1px rgba(20, 167, 60, 0.15);
+
+    &--no-action {
+        padding-bottom: 12px;
+    }
+}
+
+.result-copy-btn {
+    border-color: $register-green-border;
+    color: $register-green;
+}
+
+.result-textarea {
+    width: 100%;
+    min-height: 160px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 10px;
+    border: 1px solid $register-green-border;
+    border-radius: 4px;
+    resize: vertical;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.result-panel-footer {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.register-submit-btn {
+    min-width: 110px;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background-color: $register-green !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(20, 167, 60, 0.35);
+
+    .mat-icon {
+        color: #fff !important;
+    }
+
+    &:hover:not(:disabled) {
+        background-color: #118a32 !important;
+        box-shadow: 0 4px 12px rgba(20, 167, 60, 0.45);
+    }
+
+    &:disabled {
+        background-color: rgba(20, 167, 60, 0.45) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+        box-shadow: none;
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}

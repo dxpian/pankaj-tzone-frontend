@@ -1,0 +1,24 @@
+::ng-deep .custom-modalbox {
+    .mat-mdc-dialog-surface.mdc-dialog__surface {
+        border-radius: 5px !important;
+        padding: 0px !important;
+    }
+
+
+    .mat-mdc-dialog-container .mdc-dialog__content {
+        padding-bottom: 13px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        padding-top: 0px !important;
+    }
+}
+
+.searchbox {
+    border: 1px solid #ccc;
+    width: 300px !important;
+
+    max-height: 40px !important;
+    margin-right: 20px;
+    border-radius: 5px !important;
+    padding-left: 12px !important;
+}

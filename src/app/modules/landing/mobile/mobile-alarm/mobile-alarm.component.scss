@@ -1,0 +1,151 @@
+.searchbox {
+  border: 1px solid #ccc;
+  width: 300px !important;
+
+  max-height: 40px !important;
+  margin-right: 20px;
+  border-radius: 5px !important;
+  padding-left: 12px !important;
+}
+
+.column-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.status-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.status-enabled {
+  color: #16a34a;
+}
+
+.status-disabled {
+  color: #dc2626;
+}
+
+.time-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.target-device-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.target-device-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.target-device-select {
+  width: 100%;
+}
+
+.target-device-search {
+  width: 100%;
+}
+
+.status-checkbox-wrap {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+}
+
+.allocate-description {
+  font-size: 13px;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.allocate-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.allocate-user-item {
+  padding: 0.25rem 0;
+}
+
+.bound-users-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.allocate-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+.allocate-email-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 280px;
+  justify-content: flex-start;
+}
+
+.allocate-email-copy {
+  color: #16a34a;
+  font-size: 16px;
+}
+
+.allocate-user-email {
+  color: #6b7280;
+  margin-left: 0;
+}
+
+.allocate-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  border-radius: 9px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.mobile-alarm-dialog {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-header {
+  padding: 0.75rem 1.25rem 0.5rem;
+}
+
+.dialog-body {
+  padding: 0.5rem 1.25rem 0.25rem;
+}
+
+.dialog-form {
+  max-height: 65vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.dialog-actions {
+  padding: 0.75rem 1.25rem;
+}
+
+:host ::ng-deep .mobile-alarm-dialog .mat-mdc-form-field-subscript-wrapper {
+  min-height: 0;
+  height: 0;
+}

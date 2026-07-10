@@ -1,45 +1,143 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+## Development server
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+- Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- run app in public ip: 
+`ng serve --port 4201 --host 0.0.0.0`
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+## Install
+```shell
+nvm use v18
+rm -rf .angular/
+sudo rm -f package-lock.json
+sudo rm -rf node_modules
+ng cache clean
+npm cache clean --force
 
----
+sudo npm install
+# edit server url
+sudo nano src/enviroment/enviroment.ts
+# run 
+ng serve --port 4201 --host 0.0.0.0 --verbose
+```
 
-## Edit a file
+## add to auto run
+``` shell
+npm install pm2@latest -g
+chmod +x ./datalogger-frontend.sh
+pm2 start ./datalogger-frontend.sh
+pm2 save
+# restart service
+pm2 restart datalogger-frontend.sh
+```
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+## Build
 
----
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-## Create a file
+## kill server
+```bash
+# find process id 
+lsof -i :4201
+# kill process
+kill -9 pid
+```
 
-Next, you’ll add a new file to this repository.
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+## Code scaffolding
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
----
 
-## Clone a repository
+### run fronend 
+```shell
+nvm use v18
+# install http-server if it is not installed
+npm install -g http-server
 
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
+# change the server address
+nano .\src\enviroment\enviroment.ts
+# build app
+ng build --configuration=production
 
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
+nano dist/kitkat/index.html
+# change the following line
+<base href="/"> => <base href="./">
+# copy the frontend app(`kitkat` directory into the `frontend`directory of backend)
 
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+# start service: 
+pm2 restart datalogger-front.sh
+```
+
+
+
+## Web application account  
+- tzone website account  
+```
+pankaj@ithrue.com 
+titcod-Bossy7-kecdyr
+```
+- Account of `ibtrace.com`
+```shell
+Admin ID:
+admin@icebattery.com
+icebattery123
+
+
+Alfresa ID:
+alfresa@alfresa.co.jp
+Alfresa12345
+
+Zen nisshoku ZNS
+ZNS ID: zns@zchain.co.jp
+PW:12345678
+
+```
+
+
+
+### How to deploy app
+- change environment
+open `app/environment/environment.ts` and edit server url
+``` shell
+apiURL: 'https://www.ibtrace.com/tzoneserver/api',
+socketUrl:'wss://www.ibtrace.com/tzoneserver/'  
+```
+- build app
+`shell
+ng build --configuration=production
+`
+open index.html and change the <base href '/'> to <base href '/tzone/>
+
+* create a soft link of source directory
+`ln -l /home/ubunut/tzone/front2/ /var/www/html-tzone`
+
+* add proxy of 443 and 80 port in main domain in /etc/apache2/sites-available/ibt-le-ssl.conf
+```shell
+ProxyPass /tzone http://tzone.ibtrace.com
+ProxyPassRevers /tzone http://tzone.ibtrace.com
+```
+
+* open configuration file(`/etc/apache2/sites-available/tzone-le-ssl.config`) and set the document root of subdomain tzone.ibtrace.com into `/var/www/html-tzone`
+* restart apache2 
+`sudo systemctl restart apache2`
+
+
+### Configura apache2 to listen on 18801 port of domain
+- Install following dependency
+`sudo apt-get install libapache2-mod-proxy-tcp`
+
+- add apache configuration in `/etc/apache2/sites-available/ibt-le-ssl.conf` file
+```shell
+<VirtualHost *:18801>
+    ServerName www.ibtrace.com
+    ProxyPass / tcp://127.0.0.1:18801
+    ProxyPassReverse / tcp://127.0.0.1:18801
+</VirtualHost>
+```
+
+
+## Read Device status command  
+```
+*000000,040,201#
+```

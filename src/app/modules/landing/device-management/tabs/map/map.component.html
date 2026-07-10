@@ -1,0 +1,63 @@
+<section class="w-full">
+    <div class="w-full flex-col mt-2 mb-4 p-4" *ngIf="!checkForRoute()">
+        <div class="flex">
+            <label class="form-label">Time Span:</label>
+        </div>
+        <div class="w-full flex flex-row mt-2">
+            <mat-form-field class="flex pl-3 gt-xs:pr-3 w-1/4">
+                <input class="searchbox flex" id="searchID" matInput [matDatepicker]="picker"
+                    [(ngModel)]="this.startDate" [ngModelOptions]="{standalone: true}">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field class="flex pl-3 gt-xs:pr-3 w-1/4">
+                <input class="searchbox flex" id="searchID" matInput [matDatepicker]="picker2"
+                    [(ngModel)]="this.endDate" [ngModelOptions]="{standalone: true}">
+                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+
+            <div class="ml-6">
+                <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                    class="kitkat-mat-button RTM-button-color Querybutton" (click)="getGpsData()">
+                    <mat-icon>search</mat-icon>
+                    Query</button>
+            </div>
+
+        </div>
+    </div>
+    <div class="flex flex-row w-full mt-4">
+        <div class="flex flex-col w-3/4  bg-white border border-gray-200 rounded-lg shadow p-4">
+            <div id="bingMap" class="mapStyle">
+                <google-map
+                    width="100%"
+                    height="100%"
+                    [center]="center"
+                    [zoom]="zoom"
+                    [options]="mapOptions"
+                    (mapInitialized)="onMapInitialized($event)"
+                >
+                </google-map>
+
+            </div>
+        </div>
+        <div class="flex flex-row w-1/4  bg-white border border-gray-200 rounded-lg shadow ml-6" *ngIf="!checkForRoute()">
+            <div class="w-full h-10 bg-gray-100">
+                <h4 class="font-semibold text-center mt-2 mb-2">Location Information</h4>
+                <!-- Card body -->
+                <div class="p-2 h-[570px] overflow-auto" >
+                    <dl class="p-8 overflow-hidden pb-0.5 "  *ngFor="let item of gpsData">
+                        <dt class="font-bold">{{item?.id}}.  {{item?.servertime | date:"yyyy/MM/dd HH:mm:ss"}}</dt>
+                        <dd class="whitespace-pre-line overflow-ellipsis">{{item?.gps}}</dd>
+                        <hr class="mb-0 pb-0">
+                    </dl>
+
+                </div>
+            </div>
+            <hr>
+            <div class="card-body"></div>
+        </div>
+    </div>
+
+
+</section>

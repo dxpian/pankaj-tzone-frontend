@@ -1,0 +1,182 @@
+<section class="w-full h-full ">
+    <div class="w-full flex justify-between">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">E-mail</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span><a class="text-lg ml-1 text-primary-500">E-mail</a></span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Email listing -->
+    <div class="w-full bg-card mt-2">
+
+        <div class="w-full flex-col mt-3 p-4">
+            <div class="flex">
+                <label class="form-label">Keywords:</label>
+            </div>
+            <div class="w-full flex flex-row mt-2">
+                <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchInputControl"
+                    placeholder="Eamil Address/Description">
+
+                <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                    class="kitkat-mat-button RTM-button-color Querybutton ms-1" (click)="EmailPush()">
+                    Add
+                </button>
+            </div>
+        </div>
+
+
+        <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource">
+            <!-- id -->
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                        <p class="header-text">No</p>
+                    </mat-checkbox>
+
+                </th>
+                <td mat-cell *matCellDef="let row; let i=index">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null;isSomeSelected()"
+                        [checked]="selection.isSelected(row)">
+                        {{i+1}}
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <!-- Account ID -->
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                    Email
+                </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.email}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Server Address -->
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Description</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.description}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Email language -->
+            <ng-container matColumnDef="language">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Language</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{getLanguageLable(item?.language)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+
+            <!-- Created Time -->
+            <ng-container matColumnDef="created">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Create Time</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.created }}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Operate -->
+
+            <ng-container matColumnDef="operate">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text" (click)="$event.stopPropagation()">
+                        <div class="example-button-row flex flex-row">
+                            <div class="example-flex-container flex flex-row">
+                                <div class="p-1" *ngIf="item.role != 0">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square"
+                                        style="color: #0D6EFD !important;" (click)="editEmailPush(item)"></mat-icon>
+                                </div>
+                                <div class="p-1" *ngIf="item.role != 0">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash"
+                                        style="color: red !important;" (click)="deleteEmailPush(item)"></mat-icon>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+        </table>
+        <hr class="m-0" *ngIf="this.tableData.length == 0">
+
+        <div class="flex flex-row justify-end w-full">
+            <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="50" [pageSizeOptions]="[20, 50, 100, 200]"
+                [length]="totalRecords"></mat-paginator>
+        </div>
+    </div>
+
+</section>
+
+
+
+<ng-template #addEmailPush>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">{{(!this.editState) ? 'Add': 'Revise'}}</div>
+        <hr>
+    </section>
+    <section class="w-full">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="EmailPushForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+                <mat-form-field class="gt-xs:pr-3">
+                    <mat-label>Email:</mat-label>
+                    <input matInput formControlName="email">
+
+                </mat-form-field>
+                <mat-form-field class="gt-xs:pl-3">
+                    <mat-label>Description:</mat-label>
+                    <input matInput formControlName="description">
+                </mat-form-field>
+                <mat-form-field class="gt-xs:pr-3">
+                    <mat-label>Alarm Language:</mat-label>
+                        <mat-select formControlName="language" (selectionChange)="alarmTypeChange($event)">
+                        <mat-option [value]="Language.ENG" selected>English</mat-option>
+                        <mat-option [value]="Language.JPN" selected>日本語</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </form>
+
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button (click)="cancel()" type="submit"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button (click)="saveEmailPush()" class="RTM-button-color p-4 border-radius-button"
+                type="submit" color="primary">Save</button>
+        </div>
+    </section>
+</ng-template>

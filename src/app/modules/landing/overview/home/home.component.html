@@ -1,0 +1,91 @@
+<section class="w-full bg-card ">
+    <div class="flex rounded-md">
+        <h4 class="text-2xl p-4">Device Monitoring</h4>
+    </div>
+    <div class="flex flex-col sm:flex-row">
+        <!-- map div -->
+        <div class="flex w-100 sm:w-4/5">
+            <div id="bingMap" class="mapStyle ml-4">
+                <google-map
+                    width="100%"
+                    height="100%"
+                    [center]="center"
+                    [zoom]="zoom"
+                    [options]="mapOptions"
+                    (mapInitialized)="onMapInitialized($event)"
+                >
+                </google-map>
+            </div>
+
+        </div>
+        <!-- cards -->
+        <div class="flex flex-wrap flex-row w-auto sm:w-1/5 sm:flex-col">
+            <div
+                class="cursor-pointer bg-card flex mr-0 ml-4 flex-row justify-between p-5 pb-1 rounded-lg shadow-lg mt-3 sm:mr-12 border-l-blue-500 border-x-4">
+                <div class="device-summary-card" (click)="pinpointDevices(DeviceState.total,'total')">
+                    <p>Total Devices</p>
+                    <h4 class="text-4xl font-bold text-blue-700 ">{{overViewDetails?.total || 0}}</h4>
+                </div>
+                <div class="bg-total-device device-icons-display text-white ms-auto text-center justify-center mt-1" >
+                    <mat-icon class="icon-device" [svgIcon]="'hard-drive'" (click)="pinpointDevices(3,'total')" ></mat-icon>
+                </div>
+
+            </div>
+            <div class="cursor-pointer bg-card flex mr-0 ml-4 flex-row justify-between p-5 pb-1 rounded-lg shadow-lg mt-3 sm:mr-12  border-l-green-700 border-x-4">
+                <div class="device-summary-card">
+                    <p>Online Devices</p>
+                    <h4 class="text-4xl font-bold text-green-700" (click)="pinpointDevices(DeviceState.online)">{{overViewDetails?.online
+                        || 0}}</h4>
+                </div>
+                <div class="bg-online-device device-icons-display text-white ms-auto text-center justify-center mt-1" >
+                    <mat-icon class="icon-device" [svgIcon]="'pulse'" (click)="pinpointDevices(DeviceState.online)"></mat-icon>
+                </div>
+
+            </div>
+            <div class="cursor-pointer bg-card flex mr-0 ml-4 flex-row justify-between p-5 pb-1 rounded-lg shadow-lg mt-3 sm:mr-12 border-l-pink-700 border-x-4">
+                <div class="device-summary-card">
+                    <p>Alarm Devices</p>
+                    <h4 class="text-4xl font-bold text-pink-700" (click)="pinpointDevices(DeviceState.alarm)">{{overViewDetails?.alarm
+                        || 0}}</h4>
+                </div>
+                <div class="bg-alarm-device device-icons-display text-white ms-auto text-center justify-center mt-1 ">
+                    <mat-icon class="icon-device" [svgIcon]="'bell'" (click)="pinpointDevices(DeviceState.alarm)"></mat-icon>
+                </div>
+
+            </div>
+            <div class="cursor-pointer bg-card flex mr-0 ml-4 flex-row justify-between p-5 pb-1 rounded-lg shadow-lg mt-3 sm:mr-12 border-l-black border-x-4">
+                <div class="flex flex-col">
+                    <p>Offline Devices</p>
+                    <h4 class="text-4xl font-bold text-black" (click)="pinpointDevices(DeviceState.offline)">{{overViewDetails?.offline ||
+                        0}}</h4>
+                </div>
+                <div class="bg-unlink-device device-icons-display text-white ms-auto text-center justify-center mt-1">
+                    <mat-icon class="icon-device" [svgIcon]="'unlink'" (click)="pinpointDevices(DeviceState.offline)"></mat-icon>
+                </div>
+
+            </div>
+            <div
+                class="cursor-pointer bg-card flex mr-0 ml-4 flex-row justify-between p-5 pb-1 rounded-lg shadow-lg mt-3 mb-5 sm:mr-12 ">
+                <!-- <div class="bg-gradient-deepblue text-white ms-auto text-center justify-center mt-1">
+                    <mat-icon svgIcon="heroicons_outline:plus-circle" (click)="navigateDevices()"></mat-icon>
+                </div>
+                <div class="flex flex-col">
+                    <h4 class="text-3xl font-normal"> Add Devices</h4>
+                </div> -->
+                <div class="flex">
+                    <div style="width: 42px; height: 42px; line-height: 38px;border-radius: 50%;background: rgb(41, 141, 248);cursor: pointer; text-align:center;">
+                        <svg (click)="navigateDevices()" style="margin-top: 8px !important;
+                        color: white;
+                        margin-left: auto;
+                        margin-right: auto;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus text-light"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </div>
+                    <div style="margin-left:20px; margin-top:6px;">
+                        <h4 class="mb-0 text-secondary" style="font-size: large;">Add Device</h4>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</section>

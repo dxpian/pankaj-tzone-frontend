@@ -1,0 +1,61 @@
+<section class="w-full h-full ml-auto mr-auto ">
+    <div class="w-full flex justify-between">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">User Management</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span><a class="text-lg ml-1 text-primary-500">Account</a></span>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span><a class="text-lg ml-1 text-primary-500">Security and privacy settings</a></span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- log  listing -->
+    <div class="bg-card mt-2 w-240 ml-auto mr-auto"> 
+
+        <h3 class="p-4 text-2xl">Shared Data</h3>
+     
+        <hr style="margin-top: 0px !important;">
+
+         <div class="flex flex-col mb-4">
+             <form class="flex flex-row pl-4" [formGroup]="securityForm">
+                <!-- <mat-form-field class="w-full"> -->
+                    <mat-label class="form-label mt-2">Enabled</mat-label>
+                    <mat-checkbox checked="true" formControlName="enable"></mat-checkbox>
+                <!-- </mat-form-field> -->
+            </form>
+
+            <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4 pl-4 pr-4">
+                <span fuseAlertTitle>Note:</span>
+                <div>
+                    1、Enable public data, you can enter the device ID on the homepage to directly query the device data.
+               </div> 
+
+            </kitkat-alert>
+         </div>
+         <div class="flex flex-row justify-center pr-8 mb-3"> 
+            <button mat-raised-button (click)="saveSecurity()" class="RTM-button-color p-4 mb-8 border-radius-button"
+                type="submit" color="primary">Save Settings</button>
+        </div>
+        
+      
+
+    </div>
+
+</section>

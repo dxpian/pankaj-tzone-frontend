@@ -1,0 +1,236 @@
+<div class="w-full bg-card">
+
+  <div class="flex flex-row">
+    <div class="w-full flex-col mt-3 p-4">
+      <div class="w-full flex flex-row mt-2">
+        <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchInputControl"
+          placeholder="Search FileName">
+        <div class="ml-6">
+          <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+            class="kitkat-mat-button RTM-button-color Querybutton" (click)="search()">
+            Search</button>
+        </div>
+
+        <div class="ml-6 justify-end items-end">
+          <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+            class="kitkat-mat-button RTM-button-color Querybutton" (click)="addNew()">
+            New</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <hr style="margin-top: 0px !important;"> -->
+
+  <!-- table -->
+  <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource" matSort>
+
+    <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox
+                (change)="$event ? toggleAllRows() : null"
+                [checked]="isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()"
+                [aria-label]="checkboxLabel()">
+            </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+            <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)"
+                [aria-label]="checkboxLabel(row)">
+            </mat-checkbox>
+        </td>
+    </ng-container>
+
+    <!-- id -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:7rem !important;" class="text-left header-text">
+        # Id
+
+      </th>
+      <td mat-cell *matCellDef="let item; let i=index" class="tab-row text-left">
+        <div class="column-text">
+          <p>{{i+1}}</p>
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- from -->
+    <ng-container matColumnDef="start">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Start Time
+      </th>
+      <td mat-cell *matCellDef="let item" class="tab-row text-left">
+        <div class="column-text">
+          <p>{{item?.start}}</p>
+        </div>
+      </td>
+    </ng-container>
+
+    <!--to -->
+    <ng-container matColumnDef="end">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">End Time </th>
+      <td mat-cell *matCellDef="let item" class="tab-row text-left">
+        <div class="column-text">
+          <p>{{item?.end}}</p>
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- createdat -->
+    <ng-container matColumnDef="time">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Time</th>
+      <td mat-cell *matCellDef="let item" class="tab-row text-left">
+        <div class="column-text">
+          <p>{{item?.time}}</p>
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- file -->
+    <ng-container matColumnDef="file">
+      <th mat-header-cell *matHeaderCellDef class="text-left header-text">Files</th>
+      <td mat-cell *matCellDef="let item" class="tab-row text-left">
+        <div class="column-text">
+          <!-- <mat-icon svgIcon="mat_outline:picture_as_pdf"></mat-icon> -->
+
+          <div class="flex items-center justify-center  relative cursor-pointer">
+            <ng-container>
+              <mat-icon class="icon-size-12 text-hint" [svgIcon]="'heroicons_outline:document'" (click)="downloadReport(item)"></mat-icon>
+            </ng-container>
+            <div [ngClass]="{
+              'left-0 cursor-pointer absolute bottom-0 px-1.5 rounded text-xs font-semibold leading-2 text-white': true,
+              'bg-red-600': getFileExtension(item?.file) === 'pdf',
+              'bg-green-600': getFileExtension(item?.file) === 'xlsx'
+            }">
+              {{getFileIconClass(item?.file)}}
+            </div>
+            <span class="cursor-pointer w-full">
+              <a class="text-md font-medium text-primary-500 hover:underline" (click)="downloadReport(item)">
+                {{item?.file}}
+              </a>
+            </span>
+
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+
+    <!-- Operate -->
+    <ng-container matColumnDef="Actions">
+      <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+      <td mat-cell *matCellDef="let item" class="tab-row text-left">
+        <div class="column-text" (click)="$event.stopPropagation()">
+          <div class="example-button-row flex flex-row">
+            <div class="example-flex-container flex flex-row">
+              <div class="p-1">
+                <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash" style="color: red !important;"
+                  (click)="deleteReport(item)"></mat-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+  </table>
+  <div class="flex flex-row justify-end w-full">
+    <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="50" [pageSizeOptions]="[50, 100, 200]"
+      [length]="totalRecords"></mat-paginator>
+  </div>
+</div>
+
+<ng-template #addNewFile>
+  <section class="w-full">
+    <div class="text-lg font-medium text-secondary pt-3 pl-6">New Report</div>
+    <hr>
+  </section>
+  <section class="w-full">
+    <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="FileForm">
+      <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+        <!-- file name -->
+        <mat-form-field class="gt-xs:pr-3">
+          <mat-label>File:</mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
+
+        <div class = "flex flex-row w-full">
+            <mat-form-field class="w-1/2 pr-3">
+                <mat-label>Start Time</mat-label>
+                <input class=" flex" id="searchID" matInput [matDatepicker]="picker" formControlName="from"
+                    [ngModelOptions]="{standalone: true}">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field class="w-1/2 pr-3">
+                <mat-label>End Time</mat-label>
+                <input class="flex" id="searchID" matInput [matDatepicker]="picker2" formControlName="to"
+                    [ngModelOptions]="{standalone: true}">
+                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <mat-checkbox formControlName="addMultiple" labelPosition="before">
+            Add more loggers
+        </mat-checkbox>
+
+        <kitkat-alert *ngIf="FileForm.get('addMultiple')?.value"
+            [type]="'primary'" [appearance]="'border'" class="mt-1">
+            Please upload a `.txt` or `.csv` file. Each line should contain one serial number.
+        </kitkat-alert>
+
+        <!-- File Upload Button -->
+        <div *ngIf="FileForm.get('addMultiple')?.value" class="mt-4">
+            <input type="file" (change)="onLoggerFileSelected($event)" accept=".txt,.csv" />
+        </div>
+
+        <!-- Serial Number Table -->
+        <div *ngIf="FileForm.get('addMultiple')?.value && dataSourceLogger.data.length > 0"
+            class="mt-2 max-h-[300px] overflow-y-auto border border-gray-300 rounded">
+            <table mat-table [dataSource]="dataSourceLogger" class="w-full">
+                <ng-container matColumnDef="index">
+                    <th mat-header-cell *matHeaderCellDef>#</th>
+                    <td mat-cell *matCellDef="let row; let i = index">{{ i + 1 }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="serialNumber">
+                    <th mat-header-cell *matHeaderCellDef>Serial Number</th>
+                    <td mat-cell *matCellDef="let row">{{ row.serialNumber }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Action</th>
+                    <td mat-cell *matCellDef="let row; let i = index">
+                       <mat-icon
+                        class="cursor-pointer" svgIcon="heroicons_outline:trash" style="color: red !important;"
+                        (click)="deleteLoggerRow(i)">
+                       </mat-icon>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsLogger"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsLogger;"></tr>
+            </table>
+        </div>
+      </div>
+
+    </form>
+
+  </section>
+  <hr class="mt-0">
+  <section class="w-full mb-4">
+    <div class="flex flex-row justify-end pr-8 mb-4">
+      <button mat-raised-button (click)="cancel()" type="submit"
+        class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+      <button mat-raised-button (click)="saveFile()" class="RTM-button-color p-4 border-radius-button" type="submit"
+        color="primary">Submit</button>
+    </div>
+  </section>
+</ng-template>

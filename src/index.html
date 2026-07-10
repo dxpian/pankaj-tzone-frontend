@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Real Time Monitoring</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+
+    <base href="/">
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/images/device/small-Logo-ibtrace.png">
+    <link rel="icon" href="assets/images/device/small-Logo-ibtrace.png">
+
+    <!-- Fonts -->
+    <link href="assets/fonts/inter/inter.css" rel="stylesheet">
+
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon fonts -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Splash screen styles -->
+    <link href="assets/styles/splash-screen.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/jvectormap@2.0.4/jquery-jvectormap.css">
+    </link>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="node_modules/jqvmap/dist/jquery.vmap.js"></script>
+    <script type="text/javascript" src="node_modules/jqvmap/dist/maps/jquery.vmap.world.js" charset="utf-8"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            jQuery('#vmap').vectorMap({ map: 'world_en' });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jvectormap@2.0.4/jquery-jvectormap.min.js"></script>
+    <script type="text/javascript"
+        src="https://www.bing.com/api/maps/mapcontrol?callback=loadMapScenario&key=AtRTuGh0YggtKnpWfVsFZEb409OeknHP7Cp8Yc99CfdoNt0RoaCUOces8sMWUP4M"
+        async defer></script>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/jvectormap-next/jquery-jvectormap.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBM12yh7DTTDShQJC9SsJoMmVHTn5zO51A&libraries=visualization"></script>
+</head>
+
+<body>
+
+    <!-- Splash screen -->
+    <kitkat-splash-screen>
+        <img src="assets/images/logo/logo.png" alt="kitkat logo">
+        <div class="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+    </kitkat-splash-screen>
+
+    <!-- App root -->
+    <app-root></app-root>
+
+</body>
+
+</html>

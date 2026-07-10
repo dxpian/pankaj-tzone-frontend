@@ -1,0 +1,182 @@
+<section class="w-full bg-card">
+    <div class="flex">
+        <div class="w-1/3 border-r items-center flex justify-center">
+            <img id="imgDevice" src="assets/images/device/tzone_device.png"
+            class="device_image" >
+        </div>
+        <div class="w-2/3">
+            <div class="p-4">
+                <div class="flex">
+                    <div class="w-8/12">
+                        <div class="w-full flex items-center mb-2">
+                            <label class="form-label mr-4 self-center">Keywords:</label>
+                            <input class="searchbox"
+                                id="searchID"
+                                matInput
+                                type="number"
+                                [formControl]="searchInputControl"
+                                placeholder="Serial ID"
+                                (keydown)="preventNonNumeric($event)"
+                            >
+                        </div>
+
+                        <h4 class="text-2xl font-bold" id="labDeviceName">{{this.realTimeData?.name || '--'}}</h4>
+                        <br>
+                        <dl class="grid grid-cols-2 gap-4">
+                            <dt class="col-span-1">Device ID</dt>
+                            <dd class="col-span-1" id="labDeviceID">{{this.realTimeData?.serial || '--'}}</dd>
+
+                            <dt class="col-span-1">Device Type</dt>
+                            <dd class="col-span-1" id="labDeviceType">{{this.realTimeData?.model || '--'}}</dd>
+
+                            <dt class="col-span-1">Group</dt>
+                            <dd class="col-span-1" id="labGroup">{{getGroupName(this.realTimeData?.groups)}}</dd>
+
+                            <!-- <dt class="col-span-1">Gateway</dt>
+                            <dd class="col-span-1" id="labReceiver">--</dd> -->
+                        </dl>
+                    </div>
+                    <div class="w-4/12">
+                        <div class="card radius-10 w-full">
+                            <div class="card-body">
+                                <p class="font-bold mb-1 text-secondary text-center">Device Barcode</p>
+                                <br>
+                                <div *ngIf="deviceId"  id="imgBarCode" class="mx-auto rounded-2xl shadow dark:bg-card">
+                                    <ngx-barcode [bc-margin-left]="60" bc-font-size="14" [bc-value]="serialId" [bc-display-value]="true" [bc-width]="1" [bc-height]="50" class="w-full"></ngx-barcode>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="card-text text-sm" id="labDescription">&nbsp;&nbsp;</p>
+                <!-- <hr> -->
+                <div class="flex flex-col items-start mb-2">
+                    <span class="inline-flex items-center text-secondary" id="labStatus">
+                        <span class="bx bxs-circle me-1 chart-offline text-xs"></span>{{!this.isActive ? 'Offline': 'Online' }}
+                    </span>
+                    <span class="inline-flex items-center text-secondary mt-1" id="labUpdateTime">Last Active Time : {{getLastActiveTimeString()}}</span>
+                    <span *ngIf="hasHeartBitTime()" class="inline-flex items-center text-secondary mt-1" id="labHeartBittime">Last HeartBit Time: {{getLastHeartBitTime()}}</span>
+                </div>
+                <div class="flex items-center text-xl">
+                    <mat-icon svgIcon="heroicons_outline:bell"></mat-icon>
+                    <span class="ml-2">Alarm:</span>
+                    <span class="ml-2" id="labAlarmInfo">{{getAlarmCode()}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="margin-top: 0px !important;">
+    <div class="flex-auto ">
+        <div class="w-full max-w-screen-xl mx-auto">
+            <!-- Tabs -->
+            <mat-tab-group
+                class="sm:px-2"
+                mat-stretch-tabs="false"
+                [animationDuration]="'0'">
+
+                <!-- RTM -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon svgIcon="mat_outline:timeline"></mat-icon>
+                            <span class="">Real Time Data</span>
+
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                        <app-real-time-data [realTimeData]="realTimeData.state"></app-real-time-data>
+                    </ng-template>
+
+                </mat-tab>
+
+                <!-- chart -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon svgIcon="heroicons_outline:presentation-chart-line"></mat-icon>
+                            <span class="">Chart</span>
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                        <app-chart [deviceId] = "deviceId"></app-chart>
+                    </ng-template>
+                </mat-tab>
+
+                <!-- List -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon svgIcon="mat_outline:list_alt"></mat-icon>
+                            <span class="">List</span>
+
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                       <app-list [deviceId] = "deviceId"></app-list>
+                    </ng-template>
+
+                </mat-tab>
+
+                <!-- alarm -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon svgIcon="heroicons_outline:bell"></mat-icon>
+                            <span class="">Alarm Data</span>
+
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                        <app-alarm-data [devicesInfo]="deviceDetails"  [deviceId] = "deviceId"></app-alarm-data>
+                     </ng-template>
+
+                </mat-tab>
+                <!-- Map -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon svgIcon="heroicons_outline:globe-alt"></mat-icon>
+                            <span class="">Map</span>
+
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                        <app-map [deviceId] = "deviceId"></app-map>
+                     </ng-template>
+
+                </mat-tab>
+                <!-- Data Report -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon>
+                            <span class="">Data Report</span>
+
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                        <app-loading-overlay></app-loading-overlay>
+                        <app-data-report [deviceId]="deviceId" [deviceSerial]="serialId"></app-data-report>
+                     </ng-template>
+
+                </mat-tab>
+
+                <!-- Setup -->
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="inline-flex items-center space-x-2">
+                            <mat-icon svgIcon="heroicons_outline:bell"></mat-icon>
+                            <span class="">Setup</span>
+
+                        </span>
+                    </ng-template>
+                    <ng-template matTabContent>
+                        <app-set-up  [deviceId]="deviceId" [deviceSerial]="serialId"></app-set-up>
+                     </ng-template>
+                </mat-tab>
+
+            </mat-tab-group>
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,339 @@
+<section class="w-full h-full ">
+  <div class="w-full flex justify-between">
+
+    <!-- Breadcrum and heading Section -->
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">Loggers</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+        </div>
+        <div class="pl-0" style="display: flex; align-items: center;">
+          <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span><a class="text-lg ml-1 text-primary-500">Loggers</a></span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- device listing -->
+  <div class="w-full bg-card">
+
+    <div class="logger-status-panel">
+      <div class="logger-status-panel__toolbar">
+        <div class="logger-status-panel__intro">
+          <span class="logger-status-panel__title">Status overview</span>
+          <span class="logger-status-panel__subtitle">
+            {{ statusOverview.total }} logger(s) match your search — select a status to filter
+          </span>
+        </div>
+        <div class="logger-status-panel__header-actions">
+          <button mat-flat-button type="button" color="primary" id="btnSearch"
+            class="kitkat-mat-button RTM-button-color logger-add-btn"
+            (click)="openDialog('add')"
+            matTooltip="Register a new logger with name, serial number, and group">
+            <mat-icon class="icon-size-4" svgIcon="heroicons_outline:plus"></mat-icon>
+            <span>Add</span>
+          </button>
+          <button *ngIf="isAdmin()" mat-stroked-button type="button" class="logger-export-btn"
+            (click)="downloadLoggersCsv()" [disabled]="downloadingLoggers"
+            matTooltip="Download all loggers matching the current keyword and filter as CSV">
+            <mat-icon class="icon-size-4" [class.animate-spin]="downloadingLoggers"
+              [svgIcon]="downloadingLoggers ? 'heroicons_outline:refresh' : 'heroicons_outline:arrow-down-tray'"></mat-icon>
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="logger-status-panel__search">
+        <mat-form-field appearance="outline" class="logger-search-field">
+          <mat-label>Keywords</mat-label>
+          <input matInput type="search" id="searchID" [formControl]="searchInputControl"
+            placeholder="Device name or serial number"
+            matTooltip="Filter loggers and status counts by device name or serial number">
+          <mat-icon matPrefix class="icon-size-4 text-secondary" svgIcon="heroicons_outline:magnifying-glass"></mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="logger-status-metrics logger-status-metrics--filtered">
+        <button type="button" class="logger-status-card"
+          *ngFor="let item of statusFilterItems"
+          [class.logger-status-card--active]="filter === item.filter"
+          [class.logger-status-card--inactive]="filter !== item.filter"
+          [style.--status-color]="item.color"
+          (click)="selectFilter(item.filter)"
+          [matTooltip]="item.tooltip"
+          [attr.aria-pressed]="filter === item.filter">
+          <span class="logger-status-card__accent" [style.background-color]="item.color"></span>
+          <span class="logger-status-card__content">
+            <span class="logger-status-card__label">{{ item.label }}</span>
+            <span class="logger-status-card__value">{{ getStatusCount(item) }}</span>
+          </span>
+          <span class="logger-status-card__check" *ngIf="filter === item.filter" aria-hidden="true">
+            <mat-icon svgIcon="heroicons_solid:check-circle"></mat-icon>
+          </span>
+        </button>
+      </div>
+    </div>
+    <hr style="margin-top: 0px !important;">
+
+    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource" matSort>
+
+        <!-- id -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:7rem !important;" class="text-left header-text">
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
+              <p class="header-text">No</p>
+            </mat-checkbox>
+
+          </th>
+          <td mat-cell *matCellDef="let row; let i=index">
+            <mat-checkbox (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null;isSomeSelected()" [checked]="selection.isSelected(row)">
+              {{i+1}}
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- Device Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Device Name
+          </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.name}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Device Id -->
+        <ng-container matColumnDef="serial">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Device ID </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.serial}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Model -->
+        <ng-container matColumnDef="model">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Model</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.model}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Groups -->
+        <ng-container matColumnDef="groups">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Groups</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{getGroupName(item?.groups)}}</p>
+            </div>
+          </td>
+        </ng-container>
+        <!-- Created Time -->
+        <ng-container matColumnDef="time">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Last Log Time </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p matTooltip="Last Log Time" style="color: #000000;">{{item?.time | date:"yyyy/MM/dd HH:mm:ss"}}</p>
+            </div>
+            
+            <div *ngIf="hasHeartBit(item)" class="column-text">
+              <p matTooltip="Last HeartBit Time" [style.color]="getHeartBitColor(item)">{{item?.time_heart | date:"yyyy/MM/dd HH:mm:ss"}}</p>
+            </div>
+          </td>
+        </ng-container>
+        <!-- Condition -->
+        <ng-container matColumnDef="cond">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Condition </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+                <div class="flex column-text">
+                  <span
+                    [ngClass]="{
+                      'bg-green-500': item.status === FilterType.Online ,
+                      'bg-red-600': item.status === FilterType.UserAlarm,
+                      'bg-red-500': item.status === FilterType.BatteryLow,
+                      'bg-black-dead': item.status === FilterType.BatteryDead,
+                      'bg-black-offline': item.status === FilterType.Offline,
+                      'bg-red-SIM': item.status === FilterType.SimExpire,
+                      'bg-yellow-500': item.status === FilterType.Flight
+                      }"
+                    class="absolute w-2 h-2 mr-3 mt-2 rounded-full">
+                  </span>
+                  <p class="ml-4">{{getDeviceStatusLabel(item)}}</p>
+                </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="SIM">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">SIM expiration date </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.simexpire | date:"yyyy/MM/dd"}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+
+
+        <!-- Operate -->
+
+      <ng-container matColumnDef="Actions">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text" (click)="$event.stopPropagation()">
+            <div class="example-button-row flex flex-row">
+              <div class="example-flex-container flex flex-row">
+                <div class="p-1"> <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:information-circle" style="color:#0DCAF0 !important" matTooltip="Device information"></mat-icon>
+
+                </div>
+                <div class="p-1">
+                  <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square" style="color: #0D6EFD !important;" (click)="openDialog('edit', item)" matTooltip="Edit device"></mat-icon>
+                </div>
+                <div class="p-1">
+                  <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash" style="color: red !important;" (click)="openDialog('delete', item)" matTooltip="Delete device"></mat-icon>
+                </div>
+                <div class="p-1">
+                  <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:chat" style="color: black !important;"  (click)="viewDevice(item)" matTooltip="View device details"></mat-icon>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+    </table>
+    <div class="flex flex-row justify-end w-full">
+      <mat-paginator class="mt-4 mb-4 mr-16"
+        [pageSize]="20"
+        [pageSizeOptions]="[20, 50, 100, 200]"
+        [length]="_pageQuery.total"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- Add Device Section -->
+<ng-template #addDevice>
+  <section class="w-full">
+    <div class="text-lg font-medium text-secondary pt-5 pl-6">{{this.editState ? 'Update':'Add'}} Device</div>
+    <hr>
+  </section>
+  <section class="w-full">
+    <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="deviceForm">
+      <div class="w-1/2 flex flex-col gt-xs:flex-row pr-3 borderLine">
+        <mat-form-field class="gt-xs:pr-3">
+          <mat-label>Device Name:</mat-label>
+          <input matInput formControlName="name">
+
+        </mat-form-field>
+        <mat-form-field class="gt-xs:pl-3">
+          <mat-label>Device ID:</mat-label>
+          <input matInput formControlName="serial">
+
+        </mat-form-field>
+        <mat-form-field class="gt-xs:pl-3">
+          <mat-label>Model</mat-label>
+          <mat-select [(value)]="TT19" class="accent-fg" matInput formControlName="model" >
+            <mat-option value="TT18">TT18</mat-option>
+            <mat-option value="TT19">TT19</mat-option>
+            <mat-option value="TT20">TT20</mat-option>
+            <mat-option value="TT21">TT21</mat-option>
+            <mat-option value="TT22">TT22</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox class="gt-xs:pl-3" formControlName="gps_enabled">
+                Enable GPS estimation
+        </mat-checkbox>
+
+        <!-- Conditionally show GPS Interval -->
+        <mat-form-field *ngIf="deviceForm.get('gps_enabled')?.value"
+             class="gt-xs:pl-3">
+                <mat-label>GPS Estimation Interval (minutes)</mat-label>
+                <input matInput type="number" formControlName="gps_interval" min="60">
+        </mat-form-field>
+
+
+        <mat-form-field class="gt-xs:pl-3">
+          <mat-label>Groups</mat-label>
+          <mat-select formControlName="groups" class="accent-fg" matInput>
+              <mat-option *ngIf="isStdUser()" value="">Default</mat-option>
+              <mat-option *ngFor="let item of groups" [value]="item.id">{{item.groupname}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="gt-xs:pl-3">
+          <mat-label>Sim Start at</mat-label>
+          <input class=" flex" id="searchID" matInput [matDatepicker]="picker" formControlName="simstart"
+            [ngModelOptions]="{standalone: true}">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field class="gt-xs:pl-3">
+          <mat-label>Sim Expire at</mat-label>
+          <input class="flex" id="searchID" matInput [matDatepicker]="picker2" formControlName="simexpire"
+            [ngModelOptions]="{standalone: true}">
+          <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-datepicker #picker2></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="w-1/2 flex flex-col pl-4">
+        <mat-form-field class="gt-xs:pl-3">
+          <mat-label>Device Address:</mat-label>
+          <input matInput>
+        </mat-form-field>
+
+        <div id="bingMap" class="mapStyle">
+            <google-map
+                #googleMapRef
+                style="
+                    display:block;
+                    width:100%;
+                    height:100%;
+                "
+                [center]="center"
+                width="100%"
+                height="100%"
+                [zoom]="8"
+                [options]="mapOptions"
+            >
+            </google-map>
+        </div>
+
+      </div>
+    </form>
+
+  </section>
+  <hr class="mt-0">
+  <section class="w-full mb-4">
+    <div class="flex flex-row justify-end pr-8 mb-4">
+      <button mat-raised-button (click)="cancel()" type="submit"
+        class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+      <button mat-raised-button (click)="saveDeviceDetails()" class="RTM-button-color p-4 border-radius-button" type="submit"
+         color="primary">Save</button>
+    </div>
+  </section>
+</ng-template>

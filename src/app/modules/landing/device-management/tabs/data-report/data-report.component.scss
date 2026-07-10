@@ -1,0 +1,19 @@
+.Querybutton{
+    border-radius: 5px !important;
+}
+.searchbox {
+    border: 1px solid #ccc; 
+    width: 40% !important;
+   
+    max-height: 40px !important;
+    border-radius: 5px !important;
+}
+#searchID::placeholder {
+    padding-left: 12px !important;
+}
+::ng-deep .custom-modalbox {
+    .mat-mdc-dialog-surface.mdc-dialog__surface {
+        border-radius: 5px !important;
+        padding: 0px !important;
+    }
+}

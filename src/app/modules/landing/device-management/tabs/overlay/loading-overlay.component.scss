@@ -1,0 +1,43 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.content {
+  text-align: center;
+  color: #fff;
+}
+
+.icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Rotating icon */
+.rotate {
+  position: absolute;
+  font-size: 60px;
+  color: #fff;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.text {
+  margin-top: 20px;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}

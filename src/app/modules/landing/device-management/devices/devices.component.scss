@@ -1,0 +1,329 @@
+.Querybutton{
+    border-radius: 5px !important;
+}
+
+.bg-black-dead {
+    background-color: #383838; /* Black for Battery Dead */
+}
+
+.bg-black-offline {
+    background-color: #000; /* Black for Offline */
+}
+
+.bg-red-SIM {
+    background-color: #b80808;
+}
+
+$logger-green: #14a73c;
+$logger-green-light: #f4faf6;
+$logger-green-border: #c8e6c9;
+$logger-panel-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+
+.logger-status-panel {
+    margin: 16px;
+    padding: 0;
+    border: 1px solid $logger-green-border;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: $logger-panel-shadow;
+    overflow: hidden;
+}
+
+.logger-status-panel__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 16px;
+    padding: 14px 18px;
+    background: linear-gradient(180deg, $logger-green-light 0%, #fff 100%);
+    border-bottom: 1px solid $logger-green-border;
+}
+
+.logger-status-panel__header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.logger-add-btn {
+    height: 36px;
+    padding: 0 14px !important;
+    border-radius: 8px !important;
+    font-size: 13px;
+    font-weight: 500;
+
+    .mat-icon {
+        margin-right: 4px;
+    }
+}
+
+.logger-status-panel__search {
+    padding: 12px 18px 14px;
+    border-bottom: 1px solid $logger-green-border;
+    background: #fff;
+}
+
+.logger-search-field {
+    width: 100%;
+    max-width: 420px;
+    margin: 0;
+}
+
+:host ::ng-deep .logger-search-field.mat-mdc-form-field {
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+    }
+
+    .mat-mdc-text-field-wrapper {
+        background: #fafbfa;
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+        border-color: #e8ece9;
+    }
+
+    &.mat-focused .mdc-notched-outline__leading,
+    &.mat-focused .mdc-notched-outline__notch,
+    &.mat-focused .mdc-notched-outline__trailing {
+        border-color: $logger-green;
+    }
+}
+
+.logger-status-panel__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.logger-status-panel__title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #1a3d2a;
+    text-transform: uppercase;
+}
+
+.logger-status-panel__subtitle {
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.55);
+    line-height: 1.4;
+}
+
+.logger-export-btn {
+    height: 36px;
+    padding: 0 14px !important;
+    border-color: $logger-green-border !important;
+    color: $logger-green !important;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px !important;
+
+    .mat-icon {
+        margin-right: 6px;
+        color: $logger-green !important;
+    }
+
+    &:disabled {
+        opacity: 0.55;
+    }
+}
+
+.logger-status-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+    gap: 10px;
+    padding: 14px 16px 16px;
+
+    &--filtered .logger-status-card--inactive {
+        opacity: 0.55;
+        filter: grayscale(0.15);
+        background: #f5f5f5;
+        border-color: #e5e7eb;
+        box-shadow: none;
+        transform: none;
+
+        .logger-status-card__accent {
+            opacity: 0.45;
+        }
+
+        .logger-status-card__label {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        .logger-status-card__value {
+            color: #9ca3af;
+        }
+
+        &:hover {
+            opacity: 0.72;
+            filter: none;
+            border-color: #d1d5db;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+        }
+    }
+}
+
+.logger-status-card {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    min-height: 72px;
+    padding: 0;
+    border: 1px solid #e8ece9;
+    border-radius: 10px;
+    background: #fafbfa;
+    cursor: pointer;
+    text-align: left;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, background-color 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+
+    &:hover:not(.logger-status-card--active) {
+        border-color: #d0ddd4;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+        transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid $logger-green;
+        outline-offset: 2px;
+    }
+
+    &--active {
+        z-index: 1;
+        border: 2px solid var(--status-color);
+        background: #fff;
+        opacity: 1;
+        filter: none;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow:
+            0 0 0 3px color-mix(in srgb, var(--status-color) 28%, transparent),
+            0 6px 16px rgba(15, 23, 42, 0.12);
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--status-color);
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .logger-status-card__accent {
+            width: 6px;
+            opacity: 1;
+        }
+
+        .logger-status-card__label {
+            color: var(--status-color);
+            font-weight: 700;
+        }
+
+        .logger-status-card__value {
+            color: var(--status-color);
+            font-size: 24px;
+        }
+
+        .logger-status-card__check {
+            opacity: 1;
+        }
+    }
+}
+
+.logger-status-card__accent {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 4px;
+    width: 4px;
+    transition: width 0.2s ease, opacity 0.2s ease;
+}
+
+.logger-status-card__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 28px 10px 10px;
+}
+
+.logger-status-card__check {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    line-height: 0;
+
+    .mat-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+        color: var(--status-color);
+    }
+}
+
+.logger-status-card__label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.5);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.logger-status-card__value {
+    margin-top: 4px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: #1f2937;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+
+::ng-deep .custom-modalbox {
+    .mat-mdc-dialog-surface.mdc-dialog__surface {
+        border-radius: 5px !important;
+        padding: 0px !important;
+    }
+
+
+    .mat-mdc-dialog-container .mdc-dialog__content {
+        padding-bottom: 13px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        padding-top: 0px !important;
+    }
+}
+.borderLine {
+    border-right: 1px solid black;
+}
+.mapStyle {
+    position: relative; width: 100%; height: 300px;
+}
+.border-radius-button {
+    border-radius:5px !important;
+}

@@ -1,0 +1,8 @@
+::ng-deep .mat-form-field-placeholder {
+    visibility: visible !important;
+    transform: translateY(-100%) scale(0.75);
+  }
+  .mat-input-element::placeholder {
+    opacity: 1 !important;
+    color: initial !important;
+  }

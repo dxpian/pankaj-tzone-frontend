@@ -1,0 +1,308 @@
+<section class="w-full h-full ">
+    <div class="w-full flex justify-between">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">User Management</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span><a class="text-lg ml-1 text-primary-500">Account</a></span>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span><a class="text-lg ml-1 text-primary-500">User Management</a></span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- device listing -->
+    <div class="w-full bg-card mt-2">
+
+        <div class="flex flex-row">
+            <div class="w-full flex-col mt-3 p-4">
+                <div class="flex">
+                    <label class="form-label">Keywords:</label>
+                </div>
+                <div class="w-full flex flex-row mt-2">
+                    <input class="searchbox flex-shrink" id="searchID" matInput type="search"
+                        [formControl]="searchInputControl" placeholder="Username">
+
+                    <div class="ml-6 justify-end items-end">
+                        <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                            class="kitkat-mat-button RTM-button-color Querybutton" (click)="openDialog('add_user')">
+                            Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr style="margin-top: 0px !important;">
+
+        <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource">
+
+            <!-- id -->
+            <ng-container matColumnDef="id">
+
+                <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                        <p class="header-text">No</p>
+                    </mat-checkbox>
+                </th>
+
+                <td mat-cell *matCellDef="let row; let i=index">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null;isSomeSelected()"
+                        [checked]="selection.isSelected(row)">
+                        {{i+1}}
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">User
+                    Name
+                </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.name}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- email -->
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">E-mail</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.email}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- role -->
+            <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">User Role</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{getUserRole(item?.role)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Available groups of this subaccount -->
+            <ng-container matColumnDef="available_groups">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Available Group</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div   *ngFor="let grpid of item.groups" class="column-text">
+                        <p>{{getGroupName(grpid)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+
+
+            <!-- Created Time -->
+            <ng-container matColumnDef="time">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Registered Time </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item?.time | date:"dd/mm/yyyy hh:mm:ss"}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+
+
+            <!-- Operate -->
+            <ng-container matColumnDef="Actions">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text" (click)="$event.stopPropagation()">
+                        <div class="example-button-row flex flex-row">
+                            <div class="example-flex-container flex flex-row">
+                                <div class="p-1"> <mat-icon class="cursor-pointer"
+                                        svgIcon="heroicons_outline:information-circle"
+                                        style="color:#0DCAF0 !important"></mat-icon>
+
+                                </div>
+
+                                <div class="p-1" *ngIf="item.role != USER_ROLE.STD">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square"
+                                        style="color: #0D6EFD !important;" (click)="openDialog('edit_user', item)"></mat-icon>
+                                </div>
+                                <div class="p-1" *ngIf="item.role != USER_ROLE.STD">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash"
+                                        style="color: red !important;" (click)="openDialog('delete_user', item)"></mat-icon>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+        </table>
+
+        <div class="flex flex-row justify-end w-full">
+            <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="10" [pageSizeOptions]="[10, 20, 30]"
+                [length]="totalRecords"></mat-paginator>
+        </div>
+    </div>
+</section>
+
+<!-- Add Revise Section -->
+<ng-template #subaccount>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">{{getDialogName()}}</div>
+            <hr>
+    </section>
+
+    <section class="w-full">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="accountForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+
+                <mat-form-field class="gt-xs:pr-3 mb-3">
+                    <mat-label>UserName:</mat-label>
+                    <input matInput formControlName="name" matTooltip="Subuser name">
+                    <mat-error *ngIf="accountForm.get('name').hasError('required')">
+                        Username is required!
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="gt-xs:pl-3 mb-3">
+                    <mat-label>E-mail:</mat-label>
+                    <input matInput formControlName="email" matTooltip="email address of subuser" placeholder="subuser@example.com">
+                    <mat-error *ngIf="accountForm.get('email').hasError('required')">
+                        Email is required!
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="gt-xs:pl-3 mb-3">
+                    <mat-label>Sub Roles</mat-label>
+                    <mat-select [(value)]="TT19" class="accent-fg" matInput formControlName="role">
+                        <mat-option [value]="USER_ROLE.SUB">{{getUserRole(USER_ROLE.SUB)}}</mat-option>
+                        <mat-option [value]="USER_ROLE.SUB_QUERY">{{getUserRole(USER_ROLE.SUB_QUERY)}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Update password ? -->
+                <mat-checkbox *ngIf="isEditMode()" formControlName="updatePwd" labelPosition="before">
+                    Update password?
+                </mat-checkbox>
+
+                <!-- password field -->
+                <mat-form-field *ngIf="showPasswordField()" class="gt-xs:pl-3 mb-3">
+                    <mat-label>Password:</mat-label>
+                    <input matInput formControlName="password" type="password" #passwordField>
+                    <mat-error *ngIf="accountForm.get('password').hasError('required')">
+                        Password is required!
+                  </mat-error>
+                    <button
+                        mat-icon-button
+                        type="button"
+                        (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                        matSuffix>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="passwordField.type === 'password'"
+                            [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="passwordField.type === 'text'"
+                            [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <!-- confirm password field -->
+                <mat-form-field *ngIf="showPasswordField()" class="gt-xs:pl-3 mb-3">
+                    <mat-label>Confirm Password:</mat-label>
+                    <input matInput formControlName="confirmpassword" type="password" #confirmpasswordField required>
+                    <mat-error *ngIf="accountForm.controls['password'].value != accountForm.controls['confirmpassword'].value">
+                            Confirm Password doesn't match with password
+                    </mat-error>
+
+                    <button
+                        mat-icon-button
+                        type="button"
+                        (click)="confirmpasswordField.type === 'password' ? confirmpasswordField.type = 'text' : confirmpasswordField.type = 'password'"
+                        matSuffix>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="confirmpasswordField.type === 'password'"
+                            [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                        <mat-icon
+                            class="icon-size-5"
+                            *ngIf="confirmpasswordField.type === 'text'"
+                            [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <!-- list of group list -->
+                <mat-label style="display: flex; justify-content: center; font-size: 20px; margin: 20px 0;">
+                    Select available group of Subaccount
+                </mat-label>
+                <div class="emailtable_container mat-elevation-z8">
+                    <mat-table [dataSource]="dataSourceGroup" matSort>
+                        <!-- Checkbox Column -->
+                        <ng-container matColumnDef="select">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header >
+                                <mat-checkbox (change)="$event ? groupSelectionToggle() : null"
+                                            [checked]="groupSelector.hasValue() && isAllGroupSelected()"
+                                            [indeterminate]="groupSelector.hasValue() && !isAllGroupSelected()">
+                                No
+                                </mat-checkbox>
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row; let i=index;">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                            (change)="$event ? groupSelector.toggle(row) : null"
+                                            [checked]="groupSelector.isSelected(row)">
+                                            {{i + 1}}
+                                </mat-checkbox>
+                            </mat-cell>
+                        </ng-container>
+
+                        <!-- group name -->
+                        <ng-container matColumnDef="name">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header > Group Name </mat-header-cell>
+                            <mat-cell *matCellDef="let row"> {{row.groupname}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Description Column -->
+                        <ng-container matColumnDef="description">
+                            <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+                            <mat-cell *matCellDef="let row"> {{row.remark}} </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="displayedGroupColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedGroupColumns;"></mat-row>
+                    </mat-table>
+                </div>
+
+            </div>
+        </form>
+
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button (click)="cancel()" type="submit"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button (click)="saveReviseRoles()" class="RTM-button-color p-4 border-radius-button"
+                color="primary">Save</button>
+        </div>
+    </section>
+</ng-template>

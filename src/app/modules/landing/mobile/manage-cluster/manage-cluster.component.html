@@ -1,0 +1,257 @@
+<section class="w-full h-full">
+  <div class="w-full flex justify-between">
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">{{ title }}</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon
+            class="icon-size-4 text-secondary"
+            [svgIcon]="'heroicons_solid:home'"
+          ></mat-icon>
+        </div>
+        <div class="pl-0" style="display: flex; align-items: center">
+          <mat-icon
+            class="icon-size-10 text-secondary"
+            [svgIcon]="'heroicons_solid:chevron-right'"
+          ></mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Web admin users -->
+  <div class="w-full bg-card mt-2">
+    <div class="w-full flex-col mt-3 p-4">
+      <div class="flex">
+        <label class="form-label">Keywords (users)</label>
+      </div>
+      <div class="w-full flex flex-row mt-2">
+        <input
+          class="searchbox flex-shrink"
+          matInput
+          type="search"
+          [formControl]="searchCtrlUsers"
+          placeholder="email or user name"
+        />
+      </div>
+    </div>
+
+    <table
+      class="w-full table-responsive mat-card user-table"
+      mat-table
+      [dataSource]="dataSrcUsers"
+    >
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          <mat-checkbox
+            [checked]="isFirstOnPageSelected()"
+            (change)="onUserHeaderCheckbox($event)"
+            (click)="$event.stopPropagation()"
+            matTooltip="First user on this page"
+          ></mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let item" class="tab-row">
+          <mat-checkbox
+            [checked]="isUserSelected(item)"
+            (change)="onUserRowCheckbox(item, $event)"
+            (click)="$event.stopPropagation()"
+          ></mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="index">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          #
+        </th>
+        <td mat-cell *matCellDef="let row; let i = index" class="tab-row">
+          {{ userRowIndex(i) }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          User email
+        </th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">
+            <p>{{ item.email }}</p>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          User name
+        </th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">
+            <p>{{ item.name }}</p>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedUserColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="
+          let row;
+          columns: displayedUserColumns;
+          trackBy: trackByUserId
+        "
+        class="user-table__row"
+        [class.user-table__row--selected]="isUserSelected(row)"
+        (click)="selectUser(row, true)"
+      ></tr>
+    </table>
+
+    <hr class="m-0" *ngIf="dataSrcUsers.filteredData.length === 0" />
+
+    <div class="flex flex-row justify-end w-full">
+      <mat-paginator
+        #userPaginator
+        class="mt-4 mb-4 mr-16"
+        [pageSize]="10"
+        [pageSizeOptions]="pageSizeOptions"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
+
+    <p *ngIf="users.length === 0" class="text-secondary text-sm px-4 pb-4">
+      No web admin users found.
+    </p>
+  </div>
+
+  <!-- Clusters -->
+  <div class="w-full bg-card mt-2">
+    <div class="w-full flex-col mt-3 p-4">
+      <div class="flex">
+        <label class="form-label">Keywords (clusters)</label>
+      </div>
+      <div class="w-full flex flex-row mt-2">
+        <input
+          class="searchbox flex-shrink"
+          matInput
+          type="search"
+          [formControl]="searchCtrlClst"
+          placeholder="cluster name or owner"
+        />
+      </div>
+      <div *ngIf="permissionsLoading" class="text-sm text-secondary mt-2">
+        Loading permissions…
+      </div>
+    </div>
+
+    <table
+      class="w-full table-responsive mat-card"
+      mat-table
+      [dataSource]="dataSrcClst"
+    >
+      <ng-container matColumnDef="index">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          #
+        </th>
+        <td mat-cell *matCellDef="let row; let i = index" class="tab-row">
+          {{ rowIndex(i) }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="clusterName">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          Cluster name
+        </th>
+        <td mat-cell *matCellDef="let row" class="tab-row text-left">
+          <div class="column-text">
+            <p>{{ row.cluster.name }}</p>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ownerName">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          Owner name
+        </th>
+        <td mat-cell *matCellDef="let row" class="tab-row text-left">
+          <div class="column-text">
+            <p>{{ row.cluster.owner || '—' }}</p>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="permission">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          Permission
+        </th>
+        <td mat-cell *matCellDef="let row" class="tab-row text-left">
+          <mat-slide-toggle
+            [checked]="row.draftPermission"
+            [disabled]="!isClusterResolved(row.cluster.id)"
+            (change)="onPermissionToggle(row, $event)"
+          ></mat-slide-toggle>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">
+          Action
+        </th>
+        <td mat-cell *matCellDef="let row" class="tab-row text-left">
+          <div
+            class="example-button-row flex flex-row"
+            (click)="$event.stopPropagation()"
+          >
+            <button
+              mat-icon-button
+              type="button"
+              matTooltip="Save"
+              [disabled]="!isClusterActionEnabled(row)"
+              (click)="saveRow(row)"
+            >
+              <mat-icon
+                class="cursor-pointer"
+                svgIcon="heroicons_outline:check"
+                style="color: #0d6efd !important"
+              ></mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              type="button"
+              matTooltip="Cancel"
+              [disabled]="!isClusterActionEnabled(row)"
+              (click)="cancelRow(row)"
+            >
+              <mat-icon
+                class="cursor-pointer"
+                svgIcon="heroicons_outline:x"
+                style="color: #6c757d !important"
+              ></mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="
+          let row;
+          columns: displayedColumns;
+          trackBy: trackByClusterId
+        "
+      ></tr>
+    </table>
+
+    <hr class="m-0" *ngIf="dataSrcClst.data.length === 0" />
+
+    <div class="flex flex-row justify-end w-full">
+      <mat-paginator
+        #clusterPaginator
+        class="mt-4 mb-4 mr-16"
+        [pageSize]="10"
+        [pageSizeOptions]="pageSizeOptions"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
+  </div>
+</section>

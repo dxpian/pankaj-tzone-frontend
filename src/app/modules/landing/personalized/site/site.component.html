@@ -1,0 +1,83 @@
+<section class="w-full">
+    <div class="w-full flex justify-between mb-4">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">Site</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span>
+                        <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:globe-alt'"></mat-icon>
+                        <a class="text-lg ml-1 text-primary-500">Personalized</a></span>
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon> <span> Site</span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="flex flex-col bg-card justify-center mr-auto ml-auto w-4/5">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-8 pb-4  overflow-hidden" [formGroup]="siteForm">
+            <div class="w-1/2 flex flex-col gt-xs:flex-row pr-3 borderLine">
+                <mat-form-field class="gt-xs:pr-3">
+                    <mat-label>Site Title:</mat-label>
+                    <input matInput formControlName="title">
+
+                </mat-form-field>
+                <mat-form-field class="gt-xs:pl-3">
+                    <mat-label>Site SubTitle:</mat-label>
+                    <input matInput formControlName="subtitle">
+
+                </mat-form-field>
+                <mat-form-field class="gt-xs:pl-3">
+                    <mat-label>Description</mat-label>
+                    <textarea matInput formControlName="description" cdkTextareaAutosize
+                        [cdkAutosizeMinRows]="3"></textarea>
+                </mat-form-field>
+
+                <div class="flex flex-col">
+                    <h4 class="text-md mb-1 font-medium">LOGO</h4>
+                    <input type="file" class="logobox" [(ngModel)]="this.logo1" (change)="uploadLogo('1', $event.target.files)"
+                        [ngModelOptions]="{standalone: true}">
+                    <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4"> 
+                        The image size is required to be less than 200kb, the resolution is 128*128px, and it is in PNG format.
+                    </kitkat-alert>
+                </div>
+                <div class="flex flex-col mt-5">
+                    <!-- <h4 class="text-md mb-1 font-medium">LOGO</h4> -->
+                    <input type="file" class="logobox" [(ngModel)]="this.logo1" (change)="uploadLogo('2', $event.target.files)"
+                        [ngModelOptions]="{standalone: true}">
+                    <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4"> 
+                        The image size is required to be less than 200kb, the resolution is 250*80px, and it is in PNG format.
+                    </kitkat-alert>
+                </div>
+            </div>
+
+            <div class="w-1/2 flex flex-col pl-4">
+                <div class="flex flex-col">
+                    <h4 class="text-md mb-1 font-medium">Background Image</h4>
+                    <input type="file" class="logobox" [(ngModel)]="this.logo1" (change)="uploadLogo('3', $event.target.files)"
+                        [ngModelOptions]="{standalone: true}">
+                    <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4"> 
+                        The image size is required to be less than 1M, the resolution is 1920*1080px, and it is in PNG or JPG format.
+                    </kitkat-alert>
+                </div> 
+            </div>
+        </form>
+        <hr>
+        <section class="w-full mb-4">
+            <div class="flex flex-row justify-end pr-8 mb-4"> 
+              <button mat-raised-button (click)="saveSettings()" class="RTM-button-color p-4 border-radius-button" type="submit"
+                 color="primary">Save Settings</button>
+            </div>
+          </section>
+    </div>
+</section>

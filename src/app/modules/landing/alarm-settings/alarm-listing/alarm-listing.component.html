@@ -1,0 +1,594 @@
+<section class="w-full h-full" (click)="$event.stopPropagation()">
+  <div class="w-full flex justify-between" *ngIf="checkForRoute()">
+
+    <!-- Breadcrum and heading Section -->
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">Alarm Settings</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+        </div>
+        <div class="pl-0" style="display: flex; align-items: center;">
+          <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span><a class="text-lg ml-1 text-primary-500">Alarm Settings</a></span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="w-full bg-card" >
+    <div class="flex flex-row" *ngIf="checkForRoute()">
+      <div class="w-full flex-col mt-3 p-4">
+        <div class="flex">
+          <label class="form-label">Keywords:</label>
+        </div>
+        <div class="w-full flex flex-row mt-2">
+          <input 
+            class="searchbox flex-shrink" id="searchID"
+            matInput type="search" [formControl]="searchInputControl"
+            placeholder="Alarm Name/ Logger Name / Logger Serial / Email Address"
+            >
+          <div class="ml-6 justify-end items-end">
+            <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+              class="kitkat-mat-button RTM-button-color Querybutton" (click)="addAlarm()">
+              Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr style="margin-top: 0px !important;" *ngIf="checkForRoute()">
+    <div>
+
+      <table class="w-full table-responsive mat-card fuse-card bg-white border border-gray-200 rounded-lg shadow"
+        mat-table [dataSource]="dataSource" matSort>
+
+        <!-- Toggle -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:4rem !important;" class="text-left header-text">
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
+              #
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row; let i = index;">
+            <mat-checkbox (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null;isSomeSelected()" [checked]="selection.isSelected(row)">
+              {{i+1}}
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">Name</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.name}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- alarm type -->
+        <ng-container matColumnDef="alarm_type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Alarm Type</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{getAlarmType(item?.alarm_type)}}</p>
+            </div>
+          </td>
+        </ng-container>
+        <!-- Object -->
+        <ng-container matColumnDef="alarm_object">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Object</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{getGroups(item?.alarm_object)}} &nbsp;{{getDeviceName(item?.alarm_target,item)}}</p>
+            </div>
+          </td>
+        </ng-container>
+        <!-- Event -->
+        <ng-container matColumnDef="Event">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Event</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{getEvents(item)}}</p>
+            </div>
+          </td>
+        </ng-container>
+        <!-- effectiveTime -->
+        <ng-container matColumnDef="effectiveTime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Effective Time</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.effect_date_from}}~{{item?.effect_date_to}} {{getDayNames(item?.repeat)}} {{item?.effect_time_from}}-{{item?.effect_time_to}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- createTime -->
+        <ng-container matColumnDef="createTime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Create Time</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.time | date:"MM/dd/yyyy hh:mm:ss"}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- last updated time -->
+        <ng-container matColumnDef="lastUpdate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Last Updated</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+              <div class="column-text">
+                <p>{{item?.timeUpdate | date:"MM/dd/yyyy hh:mm:ss"}}</p>
+              </div>
+            </td>
+         </ng-container>
+
+        <!-- alarm interval time -->
+        <ng-container matColumnDef="interval">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Alarm Interval Time(min)</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-center">
+            <div *ngIf="alarmForm.value.alarm_type != AlarmType.SIM" class="column-text" >
+              <p>{{item?.interval}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+         <!-- created by -->
+        <ng-container matColumnDef="created_by">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Created By</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-center">
+            <div *ngIf="alarmForm.value.alarm_type != AlarmType.SIM" class="column-text" >
+              <p>{{item?.creator}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+
+        <!-- Operate -->
+        <ng-container matColumnDef="Operate">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text" (click)="$event.stopPropagation()">
+              <div class="example-button-row flex flex-row">
+                <div class="example-flex-container flex flex-row">
+                  <div class="p-1">
+                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:clipboard-copy" style="color: #0D6EFD !important;" (click)="copyAlarm(item)"></mat-icon>
+                  </div>
+
+                  <div class="p-1">
+                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square" style="color: #0D6EFD !important;" (click)="editAlarm(item)"></mat-icon>
+                  </div>
+                  <div class="p-1">
+                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash" style="color: red !important;" (click)="deleteAlarm(item.id)"></mat-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+      </table>
+      <div class="flex flex-row justify-end w-full">
+        <mat-paginator #alarmPaginator class="mt-4 mb-4 mr-16"
+        [pageSize]="20" [pageSizeOptions]="[20, 50, 100, 200]"
+        [length]="totalRecords"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- Add Alarm Section -->
+<ng-template #addNewAlarm>
+  <section class="w-full">
+    <div class="text-lg font-medium text-secondary pt-5 pl-6">{{getAlarmDialogName()}}</div>
+    <hr class="p-0 m-0 mb-4">
+  </section>
+  <section class="w-full">
+    <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="alarmForm">
+      <div class="flex flex-col">
+        <div class="flex flex-row">
+          <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+            <mat-form-field class="gt-xs:pr-3">
+              <mat-label>Name:</mat-label>
+              <input matInput formControlName="name" (click)="$event.stopPropagation()">
+            </mat-form-field>
+
+            <mat-form-field class="gt-xs:pr-3">
+              <mat-label>Alarm Type:</mat-label>
+              <mat-select formControlName="alarm_type" (selectionChange)="alarmTypeChange($event)">
+                <mat-option [value]="AlarmType.Temperature" selected>Temperature Alarm</mat-option>
+                <mat-option [value]="AlarmType.ProbTemperature" selected>Prob Temperature Alarm</mat-option>
+                <mat-option [value]="AlarmType.Humidity" selected>Humidity Alarm</mat-option>
+                <mat-option [value]="AlarmType.Light">Light Alarm</mat-option>
+                <mat-option [value]="AlarmType.Vibration">Vibration Alarm</mat-option>
+                <mat-option [value]="AlarmType.Battery">Battery Alarm</mat-option>
+                <mat-option [value]="AlarmType.SIM">SIM Expiration Alarm</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div *ngIf="alarmForm.value.alarm_type != AlarmType.SIM" class="flex flex-row mt-3">
+              <mat-form-field class="flex gt-xs:pr-3">
+                <mat-label>Effective Start Date</mat-label>
+                <input class=" flex" id="searchID" matInput [matDatepicker]="picker" formControlName="effect_date_from"
+                  [ngModelOptions]="{standalone: true}">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field class="flex pl-3 gt-xs:pr-3">
+                <mat-label>Effective End Date</mat-label>
+                <input class="flex" id="searchID" matInput [matDatepicker]="picker2" formControlName="effect_date_to"
+                  [ngModelOptions]="{standalone: true}">
+                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <!-- alarm repeat interval -->
+            <div *ngIf="alarmForm.value.alarm_type != AlarmType.SIM" class="flex input-group mt-3">
+              <mat-form-field class="w-full">
+                  <mat-label class="form-label">Interval time</mat-label>
+                  <input matInput formControlName="interval" type="number">
+                  <span class="input-group-text">Minute</span>
+              </mat-form-field>
+            </div>
+
+            <div *ngIf="alarmForm.value.alarm_type != AlarmType.SIM" class="flex flex-col gap-0 mt-5 flex-wrap" formArrayName="repeat">
+              <p>Repeat:</p>
+              <div class="flex flex-row flex-wrap flex-grow-4">
+                <div class="flex" *ngFor="let item of alarmForm.get('repeat')['controls'];  let i = index;"
+                  [formGroupName]="i">
+                  <div class="flex flex-row gap-2  w-full pl-2">
+                    <h3 style="margin-top: 15px !important;" class="w-full">
+                      <input type="checkbox" formControlName="checked"
+                        class="inline-block rounded-sm border-gray-300 text-neutral-900 focus:ring-neutral-500">
+                      &nbsp; {{getName(i+1)}}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div *ngIf="alarmForm.value.alarm_type != AlarmType.SIM" class="flex flex-row w-full mt-4">
+              <mat-form-field class="flex gt-xs:pr-3">
+                <mat-label>Effective Start Time</mat-label>
+                <input matInput
+                      class=" flex"
+                      formControlName="effect_time_from"
+                      name="selected_time_A"
+                      [ngxMatTimepicker]="pickerA"
+                      placeholder="4:00 PM"
+                      readonly />
+                <mat-icon matSuffix
+                          (click)="pickerA.open()" svgIcon="watch_later">
+                </mat-icon>
+            </mat-form-field>
+            <ngx-mat-timepicker #pickerA></ngx-mat-timepicker>
+
+
+              <mat-form-field class="flex pl-3 gt-xs:pr-3">
+              <mat-label>Effective End Time</mat-label>
+                <input matInput
+                      class=" flex"
+                      formControlName="effect_time_to"
+                      name="selected_time_B"
+                      [ngxMatTimepicker]="pickerB"
+                      placeholder="4:00 PM"
+                      readonly />
+                <mat-icon matSuffix
+                          (click)="pickerB.open()" svgIcon="watch_later">
+                </mat-icon>
+            </mat-form-field>
+            <ngx-mat-timepicker #pickerB></ngx-mat-timepicker>
+
+            </div>
+
+          </div>
+
+          <!-- Temperature  alarm settings -->
+          <div  class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine"
+           *ngIf="(alarmForm.value.alarm_type == AlarmType.Temperature)
+            || (alarmForm.value.alarm_type ==AlarmType.ProbTemperature)">
+
+            <h4  *ngIf="alarmForm.value.alarm_type == AlarmType.Temperature" class="font-medium text-lg">
+              Temperature alarm settings
+            </h4>
+            <h4  *ngIf="alarmForm.value.alarm_type == AlarmType.ProbTemperature" class="font-medium text-lg">
+              Prob Temperature alarm settings
+            </h4>
+
+            <!-- <mat-form-field class="gt-xs:pr-3 mt-3 w-full">
+              <mat-label>Sensor Channel</mat-label>
+              <mat-select formControlName="channel">
+                <mat-option [value]="1">channel 1</mat-option>
+                <mat-option [value]="2">channel 2</mat-option>
+              </mat-select>
+            </mat-form-field> -->
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label class="flex-grow">Warning low temperature limit:</mat-label>
+                <input matInput formControlName="warning_low_temperature" suffix=" ℃" mask="separator.1" max="100.0" [allowNegativeNumbers]="true">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label>Warning high temperature limit:</mat-label>
+                <input matInput formControlName="warning_high_temperature" suffix=" ℃" mask="separator.1" max="100" [allowNegativeNumbers]="true">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label>Alarm low temperature limit: </mat-label>
+                <input matInput formControlName="low_temperature" suffix=" ℃" mask="separator.1" max="100" [allowNegativeNumbers]="true">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label>Alarm high temperature limit:</mat-label>
+                <input matInput formControlName="high_temperature" suffix=" ℃" mask="separator.1" max="100" [allowNegativeNumbers]="true">
+              </mat-form-field>
+            </div>
+
+            <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4">
+              <span fuseAlertTitle>Note:</span>
+              The color of the warning display is yellow, and the color of the alarm is red.
+            </kitkat-alert>
+          </div>
+
+          <!-- Humidity alarm settings -->
+          <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine"
+          *ngIf="alarmForm.value.alarm_type ==AlarmType.Humidity">
+            <h4 class="font-medium text-lg">
+              Humidity alarm settings
+            </h4>
+            <mat-form-field class="gt-xs:pr-3 mt-3 w-full">
+              <mat-label>Sensor Channel</mat-label>
+              <mat-select formControlName="channel">
+                <mat-option [value]="1">channel 1</mat-option>
+                <mat-option [value]="2">channel 2</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 pl-3 flex flex-col w-full flex-wrap">
+                <mat-label class="flex flex-col flex-wrap">Warning low humidity limit:</mat-label>
+                <input matInput formControlName="warning_low_humidity" suffix=" %" mask="000" min="0" max="100">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full pl-3">
+                <mat-label>Warning high humidity limit:</mat-label>
+                <input matInput formControlName="warning_high_humidity" suffix=" %" mask="000" min="0" max="100">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full pl-3">
+                <mat-label>Alarm low humidity limit:</mat-label>
+                <input matInput formControlName="low_humidity" suffix=" %" mask="000" min="0" max="100">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full pl-3">
+                <mat-label>Alarm High humidity limit:</mat-label>
+                <input matInput formControlName="high_humidity" suffix=" %" mask="000" min="0" max="100">
+              </mat-form-field>
+            </div>
+
+            <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4">
+              <span fuseAlertTitle>Note:</span>
+              The color of the warning display is yellow, and the color of the alarm is red.
+            </kitkat-alert>
+          </div>
+
+          <!-- light Alarm settings -->
+          <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine"
+            *ngIf="alarmForm.value.alarm_type ==AlarmType.Light">
+            <h4 class="font-medium text-lg">
+              Light Alarm settings
+            </h4>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label class="flex-grow">Warning lower limit:</mat-label>
+                <input matInput formControlName="warning_low" suffix=" lux" mask="000" max="100">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label class="flex-grow">Warning upper limit:</mat-label>
+                <input matInput formControlName="warning_high" suffix=" lux" mask="000" max="100">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label class="flex-grow">Alarm lower limit:</mat-label>
+                <input matInput formControlName="low" suffix=" lux" mask="000" max="100">
+              </mat-form-field>
+            </div>
+            <div class="flex flex-row w-full">
+              <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label class="flex-grow">Alarm upper limit:</mat-label>
+                <input matInput formControlName="high" suffix=" lux" mask="000" max="100">
+              </mat-form-field>
+            </div>
+            <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4">
+              <span fuseAlertTitle>Note:</span>
+              The color of the warning display is yellow, and the color of the alarm is red.
+            </kitkat-alert>
+          </div>
+
+          <!-- vibration Alarm Settings -->
+          <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine"
+            *ngIf="alarmForm.value.alarm_type ==AlarmType.Vibration">
+            <h4 class="font-medium text-lg">
+              Vibration Alarm settings
+            </h4>
+            <div class="flex flex-row w-full">
+              <div class="flex flex-col gt-xs:flex-row w-full">
+                <mat-form-field class="gt-xs:pr-3 w-full">
+                  <mat-label class="flex-grow">Warning upper limit:</mat-label>
+                  <input matInput formControlName="warning_high" mask="000" max="100" suffix="mg">
+
+                </mat-form-field>
+              </div>
+
+            </div>
+            <div class="flex flex-row w-full">.
+              <div class="flex flex-col gt-xs:flex-row w-full">
+                <mat-form-field class="gt-xs:pr-3 w-full">
+                  <mat-label class="flex-grow">Alarm upper limit:</mat-label>
+                  <input matInput formControlName="high" mask="000" max="100" suffix="mg">
+                </mat-form-field>
+              </div>
+
+            </div>
+            <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4">
+              <span fuseAlertTitle>Note:</span>
+              The color of the warning display is yellow, and the color of the alarm is red.
+            </kitkat-alert>
+          </div>
+
+          <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine"
+            *ngIf="alarmForm.value.alarm_type ==AlarmType.Battery">
+            <h4 class="font-medium text-lg">
+              Battery Alarm settings
+            </h4>
+            <div class="flex flex-row w-full">
+              <div class="flex flex-col gt-xs:flex-row w-full">
+                <mat-form-field class="gt-xs:pr-3 w-full">
+                  <mat-label class="flex-grow">Warning low limit:</mat-label>
+                  <input matInput formControlName="warning_low" mask="00" max="99" suffix="%">
+                </mat-form-field>
+              </div>
+
+            </div>
+            <div class="flex flex-row w-full">.
+              <div class="flex flex-col gt-xs:flex-row w-full">
+                <mat-form-field class="gt-xs:pr-3 w-full">
+                  <mat-label class="flex-grow">Alarm low limit:</mat-label>
+                  <input matInput formControlName="low" mask="00" max="99" suffix="%">
+                </mat-form-field>
+              </div>
+
+            </div>
+            <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4">
+              <span fuseAlertTitle>Note:</span>
+              The color of the warning display is yellow, and the color of the alarm is red.
+            </kitkat-alert>
+          </div>
+
+        </div>
+
+        <div class="horizontal-line"></div>
+        <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine mt-3">
+          <div class="gt-xs:pr-3">
+            <mat-label>Alarm Object:</mat-label>
+            <mat-radio-group formControlName="alarm_object" (change)="onAlarmObejctChanged($event.value)">
+              <mat-radio-button [value]="0" *ngIf="alarmForm.value.alarm_type != AlarmType.SIM">By Account</mat-radio-button>
+              <mat-radio-button [value]="1" *ngIf="alarmForm.value.alarm_type != AlarmType.SIM">By Group</mat-radio-button>
+              <mat-radio-button [value]="2" >By Device</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <div class="gt-xs:pr-3" *ngIf="isDevices" formArrayName="alarm_target" (click)="$event.stopPropagation()">
+            <div class="flex flex-row flex-wrap flex-grow-4" *ngIf="userDevices?.length > 0">
+              <!-- Check/Uncheck All Checkbox -->
+              <div *ngIf="alarmForm.value.alarm_object == '2'" class="mb-3">
+                <label>
+                  <input type="checkbox" [checked]="isAllChecked()" (change)="toggleAllCheckboxes($event)">
+                  Check All
+                </label>
+              </div>
+
+              <!-- Grid Container to show all devices -->
+              <div class="grid-container" [ngStyle]="{'grid-template-columns': getGridTemplateColumns()}">
+                <div class="flex" *ngFor="let item of alarmForm.get('alarm_target')['controls']; let i = index;"
+                  [formGroupName]="i" (click)="$event.stopPropagation()">
+                  <div class="flex flex-row gap-2 w-full pl-2" *ngIf="alarmForm.value.alarm_object =='2'">
+                    <h3 style="margin-top: 15px !important;" class="w-full">
+                      <input type="checkbox" formControlName="value"
+                        class="inline-block rounded-sm border-gray-300 text-neutral-900 focus:ring-neutral-500">
+                      &nbsp; {{getDeviceValues(item,alarmForm.value.alarm_object)}}
+                    </h3>
+                  </div>
+
+                  <div class="flex flex-row gap-2 w-full pl-2" (click)="$event.stopPropagation()" *ngIf="alarmForm.value.alarm_object =='1' && getGroupsValues(item, i)">
+                    <h3 style="margin-top: 15px !important;" (click)="$event.stopPropagation()" class="w-full" *ngIf="this.displayedGroups.length > 0 && this.displayedGroups[i] !=''">
+                      <input type="checkbox" formControlName="value"
+                        class="inline-block rounded-sm border-gray-300 text-neutral-900 focus:ring-neutral-500">
+                      &nbsp; {{this.displayedGroups[i]}}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="horizontal-line"></div>
+
+
+      <!------------------------- email ist ------------------------>
+        <mat-label style="display: flex; justify-content: center; font-size: 20px; margin: 20px 0;">Select Emails to connect</mat-label>
+        <div class="emailtable_container mat-elevation-z8">
+          <mat-table [dataSource]="emailSource" matSort>
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <mat-header-cell *matHeaderCellDef mat-sort-header >
+                <mat-checkbox (change)="$event ? emailSelectionToggle() : null"
+                              [checked]="selectionEmail.hasValue() && isEmailAllSelected()"
+                              [indeterminate]="selectionEmail.hasValue() && !isEmailAllSelected()">
+                No
+                </mat-checkbox>
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row; let i=index;">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                              (change)="$event ? selectionEmail.toggle(row) : null"
+                              [checked]="selectionEmail.isSelected(row)">
+                              {{i + 1}}
+                </mat-checkbox>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+              <mat-header-cell *matHeaderCellDef mat-sort-header > Email </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.email}} </mat-cell>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+              <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.description}} </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumnsEmail"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumnsEmail;"></mat-row>
+          </mat-table>
+        </div>
+
+      </div>
+    </form>
+
+  </section>
+  <hr class="mt-0">
+  <section class="w-full mb-4">
+    <div class="flex flex-row justify-end pr-8 mb-4">
+      <button mat-raised-button (click)="cancel()" type="submit"
+        class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+      <button mat-raised-button (click)="saveAlarm()" class="RTM-button-color p-4 border-radius-button" type="submit"
+        color="primary">Submit</button>
+    </div>
+  </section>
+</ng-template>

@@ -1,0 +1,390 @@
+<section class="w-full h-full">
+  <div class="w-full flex justify-between">
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">Mobile Alarm Settings</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+        </div>
+        <div class="pl-0" style="display: flex; align-items: center;">
+          <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span><a class="text-lg ml-1 text-primary-500">Mobile Alarm</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full bg-card mt-2">
+    <div class="w-full flex-col mt-3 p-4">
+      <div class="flex">
+        <label class="form-label">Keywords:</label>
+      </div>
+      <div class="w-full flex flex-row mt-2">
+        <input
+          class="searchbox flex-shrink"
+          matInput
+          type="search"
+          [formControl]="searchInputControl"
+          placeholder="alarm name / device name"
+        />
+        <button
+          [color]="'primary'"
+          mat-flat-button
+          type="button"
+          class="kitkat-mat-button RTM-button-color Querybutton ms-1"
+          (click)="openCreateDialog()"
+        >
+          Create Mobile Alarm
+        </button>
+      </div>
+    </div>
+
+    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceAlarm" matSort>
+      <ng-container matColumnDef="index">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">No</th>
+        <td mat-cell *matCellDef="let row; let i = index">{{ getRowIndex(i) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="alarm_name">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Alarm Name</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ item.name }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="mobile_admin">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Mobile Admin</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getMobileAdminName(item.user) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="alarm_type">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Alarm Type</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getAlarmTypeName(item.alarm_type) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="alarm_interval">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Alarm Interval</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getAlarmIntervalText(item) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="intervalWarn">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">intervalWarn (min)</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ item.intervalWarn }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="intervalAlarm">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">intervalAlarm (min)</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ item.intervalAlarm }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="devices">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Devices</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text">{{ getDeviceNames(item.alarm_target) }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Status</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <mat-checkbox [checked]="item.status === 1" (change)="onStatusToggle(item, $event.checked)">
+            {{ item.status === 1 ? 'Enable' : 'Disable' }}
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="operation">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operation</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="column-text" (click)="$event.stopPropagation()">
+            <div class="example-button-row flex flex-row">
+              <div class="example-flex-container flex flex-row">
+                <div class="p-1">
+                  <mat-icon
+                    class="cursor-pointer"
+                    svgIcon="heroicons_outline:clipboard-copy"
+                    style="color: #16a34a !important;"
+                    matTooltip="Copy alarm"
+                    (click)="copyAlarm(item)"
+                  ></mat-icon>
+                </div>
+                <div class="p-1">
+                  <mat-icon
+                    class="cursor-pointer"
+                    svgIcon="heroicons_outline:pencil-square"
+                    style="color: #15803d !important;"
+                    matTooltip="Edit alarm"
+                    (click)="openEditDialog(item)"
+                  ></mat-icon>
+                </div>
+                <div class="p-1">
+                  <mat-icon
+                    class="cursor-pointer"
+                    svgIcon="heroicons_outline:trash"
+                    style="color: #166534 !important;"
+                    matTooltip="Delete alarm"
+                    (click)="deleteAlarm(item)"
+                  ></mat-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="bound_users">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Bound Users</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div class="bound-users-cell" (click)="$event.stopPropagation()">
+            <mat-icon
+              class="cursor-pointer"
+              svgIcon="heroicons_outline:bell"
+              style="color: #0d6efd !important;"
+              matTooltip="Allocate mobile users"
+              (click)="openAllocateDialog(item)"
+            ></mat-icon>
+            <span class="allocate-count-badge" [matTooltip]="'Bound users: ' + getAllocatedUserCount(item.id)">
+              {{ getAllocatedUserCount(item.id) }}
+            </span>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <div class="flex flex-row justify-end w-full">
+      <mat-paginator
+        #alarmPaginator
+        class="mt-4 mb-4 mr-16"
+        [pageSize]="10"
+        [pageSizeOptions]="[10, 20, 50]"
+        [length]="totalRecords"
+        (page)="onPageChange($event)"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+</section>
+
+<ng-template #alarmDialog>
+  <div class="mobile-alarm-dialog">
+    <section class="w-full dialog-header">
+      <div class="text-lg font-medium text-secondary">{{ getDialogTitle() }}</div>
+      <hr class="p-0 m-0" />
+    </section>
+
+    <section class="w-full dialog-body">
+      <form class="dialog-form" [formGroup]="mobileAlarmForm">
+        <div class="w-full flex flex-col gap-3">
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field>
+            <mat-label>Mobile Admin User*</mat-label>
+            <mat-select formControlName="user" [disabled]="editState">
+              <mat-option *ngFor="let admin of mobileAdmins" [value]="admin.id">
+                {{ admin.name }} ({{ admin.email }})
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Alarm Name</mat-label>
+            <input matInput formControlName="name" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Alarm Type</mat-label>
+            <mat-select formControlName="alarm_type">
+              <mat-option *ngFor="let item of alarmTypes" [value]="item.value">{{ item.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="status-checkbox-wrap">
+            <mat-checkbox [checked]="mobileAlarmForm.value.status === 1" (change)="onStatusChanged($event.checked)">
+              Enable
+            </mat-checkbox>
+          </div>
+
+          <mat-form-field>
+            <mat-label>Repeat Days</mat-label>
+            <mat-select formControlName="repeat" multiple>
+              <mat-option *ngFor="let day of dayOptions" [value]="day.value">{{ day.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="target-device-section">
+          <div class="target-device-controls">
+            <mat-form-field class="target-device-select" appearance="outline">
+              <mat-label>Selected Devices* ({{ getSelectedDeviceCount() }} selected)</mat-label>
+              <mat-select #deviceSelect formControlName="alarm_target" multiple>
+                <mat-option *ngFor="let device of filteredDevices" [value]="device.id">
+                  {{ device.name }} ({{ device.serial }})
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="target-device-search" appearance="outline">
+              <mat-label>Search by serial/name</mat-label>
+              <input matInput [formControl]="deviceSearchControl" />
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="time-row">
+          <mat-form-field>
+            <mat-label>Time From</mat-label>
+            <input
+              matInput
+              formControlName="time_from"
+              [ngxMatTimepicker]="timeFromPicker"
+              placeholder="08:00 AM"
+              readonly
+            />
+            <mat-icon matSuffix (click)="timeFromPicker.open()" svgIcon="watch_later"></mat-icon>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Time To</mat-label>
+            <input
+              matInput
+              formControlName="time_to"
+              [ngxMatTimepicker]="timeToPicker"
+              placeholder="06:00 PM"
+              readonly
+            />
+            <mat-icon matSuffix (click)="timeToPicker.open()" svgIcon="watch_later"></mat-icon>
+          </mat-form-field>
+        </div>
+        <ngx-mat-timepicker #timeFromPicker></ngx-mat-timepicker>
+        <ngx-mat-timepicker #timeToPicker></ngx-mat-timepicker>
+
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field>
+            <mat-label>intervalWarn (minute)</mat-label>
+            <input matInput type="number" formControlName="intervalWarn" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>intervalAlarm (minute)</mat-label>
+            <input matInput type="number" formControlName="intervalAlarm" />
+          </mat-form-field>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field>
+            <mat-label>Warning Low</mat-label>
+            <input matInput type="number" formControlName="warningLow" />
+          </mat-form-field>
+
+          <mat-form-field *ngIf="!isBatteryAlarm()">
+            <mat-label>Warning High</mat-label>
+            <input matInput type="number" formControlName="warningHigh" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Alarm Low</mat-label>
+            <input matInput type="number" formControlName="alarmLow" />
+          </mat-form-field>
+
+          <mat-form-field *ngIf="!isBatteryAlarm()">
+            <mat-label>Alarm High</mat-label>
+            <input matInput type="number" formControlName="alarmHigh" />
+          </mat-form-field>
+        </div>
+        </div>
+      </form>
+    </section>
+
+    <hr class="m-0" />
+    <section class="w-full dialog-actions">
+      <div class="flex flex-row justify-end">
+        <button mat-raised-button (click)="closeDialog()" type="button" class="pr-4 mr-4 border-radius-button">
+          Cancel
+        </button>
+        <button
+          mat-raised-button
+          (click)="saveMobileAlarm()"
+          class="RTM-button-color border-radius-button"
+          type="button"
+          color="primary"
+        >
+          Save
+        </button>
+      </div>
+    </section>
+  </div>
+</ng-template>
+
+<ng-template #allocateDialog>
+  <div class="mobile-alarm-dialog">
+    <section class="w-full dialog-header">
+      <div class="text-lg font-medium text-secondary">Allocate Mobile Users</div>
+      <hr class="p-0 m-0" />
+    </section>
+
+    <section class="w-full dialog-body">
+      <div class="dialog-form">
+        <div class="allocate-description">
+          Select mobile users owned by this mobile admin to bind with the alarm.
+        </div>
+
+        <div class="allocate-user-list" *ngIf="allocationUsers.length > 0; else noUsers">
+          <div class="allocate-user-item" *ngFor="let user of allocationUsers">
+            <div class="allocate-user-row">
+              <mat-checkbox
+                [checked]="isUserAllocated(user.id)"
+                (change)="onAllocationChanged(user.id, $event.checked)"
+              >
+                {{ user.name }}
+              </mat-checkbox>
+              <div class="allocate-email-wrap">
+                <span class="allocate-user-email">{{ user.email }}</span>
+                <mat-icon
+                  class="cursor-pointer allocate-email-copy"
+                  svgIcon="heroicons_outline:clipboard-copy"
+                  matTooltip="Copy email"
+                  (click)="copyEmail(user.email, $event)"
+                ></mat-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noUsers>
+          <div class="allocate-description">No mobile users available for this mobile admin.</div>
+        </ng-template>
+      </div>
+    </section>
+
+    <hr class="m-0" />
+    <section class="w-full dialog-actions">
+      <div class="flex flex-row justify-end">
+        <button mat-raised-button (click)="closeDialog()" type="button" class="pr-4 mr-4 border-radius-button">
+          Cancel
+        </button>
+        <button
+          mat-raised-button
+          (click)="saveAllocation()"
+          class="RTM-button-color border-radius-button"
+          type="button"
+          color="primary"
+        >
+          Save
+        </button>
+      </div>
+    </section>
+  </div>
+</ng-template>

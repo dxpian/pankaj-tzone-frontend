@@ -1,0 +1,162 @@
+<section class="w-full h-full ">
+    <div class="w-full flex justify-between">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">Real Time Monitoring</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span><a class="text-lg ml-1 text-primary-500">Real-time Monitoring</a></span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="flex flex-row">
+        <div class="w-full flex-col mt-3 p-4">
+          <div class="flex">
+            <label class="form-label">Keywords:</label>
+          </div>
+          <div class="w-full flex flex-row mt-2">
+            <input class="searchbox flex-shrink" id="searchID" matInput type="search"
+            [formControl]="searchInputControl"
+            placeholder="Device Name / Serial ID">
+          </div>
+        </div>
+        <div class="w-full flex-row mt-3 p-4 ">
+            <div class="flex">
+              <label class="form-label mt-3 mb-2">Filter by condition:</label>
+            </div>
+            <mat-form-field >
+              <mat-select [(value)]="filter" class="accent-fg" matInput (selectionChange)="onFilterChange($event)" >
+                <mat-option [value]=FilterType.Online>Online</mat-option>
+                <mat-option [value]=FilterType.UserAlarm>Alarm</mat-option>
+                <mat-option [value]=FilterType.BatteryLow>Low Battery</mat-option>
+                <mat-option [value]=FilterType.BatteryDead>Battery Dead</mat-option>
+                <mat-option [value]=FilterType.Flight>Flight</mat-option>
+                <mat-option [value]="FilterType.Offline">Offline</mat-option>
+                <mat-option [value]="FilterType.SimExpire">SIM Expired</mat-option>
+                <mat-option [value]=FilterType.All>All</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+
+      </div>
+
+    <div class="flex flex-row">
+        <div class="flex w-full">
+            <div class="card bg-card w-full m-4 rtm-card-section ">
+                <h2 class="text-2xl mt-4" style="text-align: center !important;">{{selectedGroup}}</h2>
+                <div class="grid grid-cols-4">
+                    <div class="card-body  py-6 px-3 m-3 rtm-bg-color " style="border-radius: 5px;"
+                     *ngFor="let item of deviceData"
+                        [appChangeColorBasedOnTime]="{lastTime:item.time, alarmTime: item?.state?.alarmTime}">
+                        <div class="flex items-center">
+                            <div>
+                                <h6 class="mb-0">{{item?.name || '--'}}</h6>
+                                <p class="mb-0">{{item?.serial || '--'}}</p>
+                            </div>
+                            <div class="ml-auto">
+                                <div class="cursor-pointer flex items-center">
+                                    <img [src]="getBatteryImg(item?.state?.battery)" class="w-10">
+
+                                --V/{{item?.state?.battery || ''}}%
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="hr-color my-4">
+                        <table class="table table-borderless mb-0 w-full">
+                            <tbody>
+                                <tr>
+                                    <th class="flex">Temperature</th>
+                                    <td class="text-lg">{{getItemExpression(item, 'temperature')}}</td>
+                                </tr>
+                                <tr *ngIf="item?.state?.tempexternal != undefined; else emptyRow">
+                                    <th class="flex">External Temperature</th>
+                                    <td class="text-lg">{{getItemExpression(item, 'ext_temperature')}}</td>
+                                </tr>
+                                <tr>
+                                    <th class="flex">Humidity</th>
+                                    <td class="text-lg">{{getItemExpression(item, 'humidity')}}</td>
+                                </tr>
+                                <tr>
+                                    <th class="flex">Light</th>
+                                    <td colspan="2" class="text-lg">{{getItemExpression(item, 'light')}}</td>
+                                </tr>
+                                <tr>
+                                    <th class="flex">Vibration</th>
+                                    <td colspan="2" class="text-lg">{{getItemExpression(item, 'vibration')}}</td>
+                                </tr>
+
+                                <tr *ngIf="showSim">
+                                    <th class="flex">SIM expiration</th>
+                                    <td colspan="2" class="text-lg">{{getItemExpression(item, 'sim')}}</td>
+                                </tr>
+
+                                <tr
+                                >
+                                    <th class="flex"  >
+                                        Location
+                                    </th>
+                                    <td colspan="2" class="text-lg"
+                                        [matTooltip]="item?.state?.address"
+                                        [ngStyle]="item?.state?.address ? {'cursor': 'pointer'} : {}"
+                                    >
+                                        {{getItemExpression(item, 'location')}}
+                                    </td>
+                                </tr>
+
+
+                                <tr *ngIf="item?.state?.isRecentAlarm; else emptyRow"
+                                >
+                                    <th class="flex">Last Alarm</th>
+                                    <td colspan="2"
+                                        [matTooltip]="getAlarmType(item)"
+                                    >
+                                        {{getItemExpression(item, 'alarm')}}
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        <hr class="hr-color my-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="mb-0" matTooltip="Last Log Time" >{{item?.time}}</p>
+                                <div class="mt-1" style="min-height: 1.0rem;">
+                                    <p *ngIf="hasHeartBitTime(item)" matTooltip="Last HeartBit Time" [style.color]="getHeartBitColor(item)" class="mb-0">{{item?.time_heart}}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <p class="cursor-pointer">
+                                    <i class="lni lni-arrow-right"></i>&nbsp;
+                                    <a class="mb-0" (click)="navigateToDetail(item)">&rarr; Details</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-row justify-end w-full">
+        <mat-paginator [length]="_pageQuery.total"
+               [pageSize]="20"
+               [pageSizeOptions]="[20, 40, 60, 80, 100]"
+               (page)="onPageChange($event)">
+        </mat-paginator>
+    </div>
+
+
+</section>

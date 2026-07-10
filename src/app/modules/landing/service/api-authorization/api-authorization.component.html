@@ -1,0 +1,157 @@
+<section class="w-full h-full ">
+    <div class="w-full flex justify-between">
+  
+      <!-- Breadcrum and heading Section -->
+      <div class="flex flex-wrap items-center font-medium">
+        <div class="pr-4" style="border-right: 1px solid">
+          <a class="text-2xl whitespace-nowrap">API Athourization</a>
+        </div>
+        <div class="flex items-center ml-1 whitespace-nowrap">
+          <div class="pl-3">
+            <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+          </div>
+          <div class="pl-0" style="display: flex; align-items: center;">
+            <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+            <span><a class="text-lg ml-1 text-primary-500">API Athourization</a></span>
+          </div>
+  
+        </div>
+      </div>
+  
+    </div>
+  
+    <!-- Api  Authorization listing -->
+    <div class="w-full bg-card"> 
+  
+      <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource">
+          
+          <!-- id -->
+          
+          <ng-container matColumnDef="no">
+            <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+              <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()">
+                <p class="header-text">No</p>
+              </mat-checkbox>
+    
+            </th>
+            <td mat-cell *matCellDef="let row; let i=index">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                (change)="$event ? selection.toggle(row) : null;isSomeSelected()" [checked]="selection.isSelected(row)">
+                {{i+1}}
+              </mat-checkbox>
+            </td>
+          </ng-container>
+     
+    
+          <!-- AppId-->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">App ID</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+              <div class="column-text">
+                <p>{{item?.id}}</p>
+              </div>
+            </td>
+          </ng-container>
+    
+          <!-- Key -->
+          <ng-container matColumnDef="key">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Key</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left" [matTooltip]="item?.key">
+              <div class="column-text">
+                <p>{{item?.key | truncate : 40}}
+                 <span><mat-icon class="cursor-pointer" [cdkCopyToClipboard]="item.key"
+                  matTooltip="Copy to clipboard" (click)="onclick()">file_copy</mat-icon></span>
+                </p>
+              </div>
+            </td>
+          </ng-container>
+    
+          <!-- Description -->
+          <ng-container matColumnDef="comment">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Description</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+              <div class="column-text">
+                <p>{{item?.comment}}</p>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Create Time -->
+          <ng-container matColumnDef="created">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Create Time</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+              <div class="column-text">
+                <p>{{item?.created}}</p>
+              </div>
+            </td>
+          </ng-container>
+          <!-- Opereate -->
+          <ng-container matColumnDef="operate">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text" (click)="$event.stopPropagation()">
+                    <div class="example-button-row flex flex-row">
+                      <div class="example-flex-container flex flex-row"> 
+                        <div class="p-1"> 
+                          <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square" style="color: #0D6EFD !important;" (click)="editkey(item)"></mat-icon>
+                        </div>
+                        <div class="p-1">
+                          <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash" style="color: red !important;" (click)="deletekey(item?.id)"></mat-icon>
+                        </div> 
+        
+                      </div>
+                    </div>
+                  </div>
+            </td>
+          </ng-container> 
+  
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+      </table>
+      <hr class="m-0">
+      <div class="flex flex-col w-40 mt-5 pl-4">
+        <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+          class="kitkat-mat-button RTM-button-color Querybutton rounded-1" (click)="addKey()">
+          Create</button>
+      </div>
+      <div class="flex flex-row justify-end w-full">
+        <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="50" [pageSizeOptions]="[50, 100, 200]"
+          [length]="totalRecords"></mat-paginator>
+      </div>
+  
+    </div>
+  
+  </section>
+
+
+  <ng-template #editAuthourization>
+    <section class="w-full">
+      <div class="text-lg font-medium text-secondary pt-5 pl-6">Revise</div>
+      <hr>
+    </section>
+    <section class="w-full">
+      <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="apiAuthorizeForm">
+        <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine"> 
+          <mat-form-field class="gt-xs:pl-3">
+            <mat-label>Remark:</mat-label>
+            <textarea matInput formControlName="comment" cdkTextareaAutosize [cdkAutosizeMinRows]="1"></textarea>
+  
+          </mat-form-field>
+        </div>
+   
+      </form>
+  
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+      <div class="flex flex-row justify-end pr-8 mb-4">
+        <button mat-raised-button (click)="cancel()" type="submit"
+          class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+        <button mat-raised-button (click)="saveEditKey()" class="RTM-button-color p-4 border-radius-button" type="submit"
+           color="primary">Save</button>
+      </div>
+    </section>
+  </ng-template>
+  
+ 

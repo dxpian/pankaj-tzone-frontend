@@ -1,0 +1,252 @@
+<section class="sim-management-page w-full h-full" *ngIf="isAdmin(); else accessDenied">
+  <div class="w-full flex justify-between">
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">SIM Management</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+        </div>
+        <div class="pl-0 flex items-center">
+          <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span><a class="text-lg ml-1 text-primary-500">SIM Management</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full bg-card mt-2 p-4">
+    <div class="status-panel">
+      <div class="status-metrics">
+        <div class="status-metric status-metric--total">
+          <span class="label">Total</span>
+          <span class="value">{{ statusTotal }}</span>
+        </div>
+        <div class="status-metric status-metric--selected">
+          <span class="label">Selected</span>
+          <span class="value">{{ statusSelected }}</span>
+        </div>
+        <div class="status-metric status-metric--online">
+          <span class="label">Online (selected)</span>
+          <span class="value">{{ statusOnline }}</span>
+        </div>
+        <div class="status-metric status-metric--offline">
+          <span class="label">Offline (selected)</span>
+          <span class="value">{{ statusOffline }}</span>
+        </div>
+      </div>
+      <div class="status-actions">
+        <button mat-icon-button class="sim-icon-btn"
+          [class.sim-icon-btn--active]="isAllResultSelected()"
+          [class.sim-icon-btn--muted]="isNoneResultSelected()"
+          [class.sim-icon-btn--partial]="isPartialResultSelected()"
+          matTooltip="Select all loggers" (click)="checkAllInResult()">
+          <mat-icon [svgIcon]="isAllResultSelected() ? 'heroicons_solid:check-circle' : 'heroicons_outline:check-circle'"></mat-icon>
+        </button>
+        <button mat-icon-button class="sim-icon-btn"
+          [class.sim-icon-btn--active]="isNoneResultSelected() && statusTotal > 0"
+          [class.sim-icon-btn--muted]="isAllResultSelected()"
+          [class.sim-icon-btn--partial]="isPartialResultSelected()"
+          matTooltip="Deselect all loggers" (click)="uncheckAllInResult()">
+          <mat-icon [svgIcon]="isNoneResultSelected() ? 'heroicons_solid:x-circle' : 'heroicons_outline:x-circle'"></mat-icon>
+        </button>
+        <button mat-icon-button class="sim-icon-btn" [matTooltip]="statusDownloadTooltip"
+          (click)="onStatusPanelDownload()" [disabled]="exporting">
+          <mat-icon [class.animate-spin]="exporting" svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-panel">
+      <mat-form-field appearance="outline" class="filter-keywords">
+        <mat-label>Keywords</mat-label>
+        <input matInput type="search" [formControl]="searchInputControl" placeholder="Logger name or serial">
+      </mat-form-field>
+
+      <div class="filter-expiry-group">
+        <mat-form-field appearance="outline" class="filter-date">
+          <mat-label>SIM expires before</mat-label>
+          <input matInput [matDatepicker]="expirePicker" [(ngModel)]="expireBeforeDate"
+            (dateChange)="onExpireDateChange()">
+          <mat-datepicker-toggle matIconSuffix [for]="expirePicker"></mat-datepicker-toggle>
+          <mat-datepicker #expirePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-slide-toggle class="filter-unknown-toggle sim-green-toggle"
+          [(ngModel)]="includeUnknownEndDate"
+          (change)="onUnknownEndDateChange()"
+          matTooltip="Include loggers with no SIM expiration date">
+          No expiry set
+        </mat-slide-toggle>
+        <button mat-icon-button class="sim-icon-btn filter-refresh-btn" matTooltip="Reload list" (click)="refresh()"
+          [disabled]="loading">
+          <mat-icon [class.animate-spin]="loading" svgIcon="heroicons_outline:refresh"></mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <mat-progress-bar *ngIf="loading" mode="indeterminate" class="my-3"></mat-progress-bar>
+
+    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:3.5rem">
+          <mat-checkbox class="sim-table-checkbox" [checked]="isAllPageSelected()" [indeterminate]="isSomePageSelected()"
+            (change)="$event.checked ? checkAllOnPage() : uncheckAllOnPage()"
+            matTooltip="Select or clear all on this page">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let item">
+          <mat-checkbox class="sim-table-checkbox" [checked]="isRowChecked(item)" (change)="toggleRow(item, $event.checked)"
+            (click)="$event.stopPropagation()">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:4rem">No</th>
+        <td mat-cell *matCellDef="let row; let i = index">{{ (paginator?.pageIndex ?? 0) * (paginator?.pageSize ?? _pageQuery.pagesize) + i + 1 }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Device Name</th>
+        <td mat-cell *matCellDef="let item">{{ item?.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="serial">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Device ID</th>
+        <td mat-cell *matCellDef="let item">{{ item?.serial }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="model">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Model</th>
+        <td mat-cell *matCellDef="let item">{{ item?.model }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="groups">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Groups</th>
+        <td mat-cell *matCellDef="let item">{{ getGroupName(item?.groups) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="time">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Last Log Time</th>
+        <td mat-cell *matCellDef="let item">
+          <p matTooltip="Last log time">{{ item?.time | date:'yyyy/MM/dd HH:mm:ss' }}</p>
+          <p *ngIf="hasHeartBit(item)" matTooltip="Last heartbeat time" [style.color]="getHeartBitColor(item)">
+            {{ item?.time_heart | date:'yyyy/MM/dd HH:mm:ss' }}
+          </p>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cond">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Condition</th>
+        <td mat-cell *matCellDef="let item">
+          <div class="flex items-center">
+            <span [ngClass]="{
+                'bg-green-500': item.status === FilterType.Online,
+                'bg-red-600': item.status === FilterType.UserAlarm,
+                'bg-red-500': item.status === FilterType.BatteryLow,
+                'bg-black-dead': item.status === FilterType.BatteryDead,
+                'bg-black-offline': item.status === FilterType.Offline,
+                'bg-red-SIM': item.status === FilterType.SimExpire,
+                'bg-yellow-500': item.status === FilterType.Flight
+              }" class="w-2 h-2 mr-2 rounded-full"></span>
+            <span>{{ getDeviceStatusLabel(item) }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="SIM">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">SIM expiration date</th>
+        <td mat-cell *matCellDef="let item">
+          <span *ngIf="item?.simexpire; else noSim">{{ item.simexpire | date:'yyyy/MM/dd' }}</span>
+          <ng-template #noSim><span class="text-secondary">—</span></ng-template>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Actions">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+        <td mat-cell *matCellDef="let item">
+          <button mat-icon-button class="sim-icon-btn table-view-btn" matTooltip="View device details" (click)="viewDevice(item)">
+            <mat-icon svgIcon="heroicons_outline:chat"></mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell p-4" [attr.colspan]="displayedColumns.length">
+          <span *ngIf="!loading && loadErrorMessage" class="text-red-600">{{ loadErrorMessage }}</span>
+          <span *ngIf="!loading && !loadErrorMessage" class="text-secondary">No loggers found for the selected SIM expiry criteria.</span>
+        </td>
+      </tr>
+    </table>
+
+    <div class="flex justify-end w-full">
+      <mat-paginator class="mt-4 mb-4 mr-16" [pageSize]="20" [pageSizeOptions]="[20, 50, 100, 200]"
+        [length]="_pageQuery.total" (page)="onPageChange($event)">
+      </mat-paginator>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="renew-plan-section">
+      <div class="renew-plan-header">
+        <div>
+          <h3 class="text-lg font-medium">Renewal plan</h3>
+          <p class="renew-plan-hint">Upload a filled Excel file, then apply it to update SIM expiration dates.</p>
+        </div>
+      </div>
+
+      <div class="renew-plan-actions">
+        <button mat-stroked-button type="button" class="renew-plan-btn renew-plan-btn--upload" (click)="triggerUpload()"
+          matTooltip="Choose a filled renewal Excel file (.xlsx)">
+          <mat-icon class="icon-size-4 mr-1" svgIcon="heroicons_outline:upload"></mat-icon>
+          Upload Excel file
+        </button>
+        <input #renewFileInput type="file" class="hidden" accept=".xlsx,.xls" (change)="onRenewFileSelected($event)">
+      </div>
+
+      <p *ngIf="uploadedFileName" class="renew-plan-file text-sm text-secondary">
+        Selected: <span class="font-medium">{{ uploadedFileName }}</span>
+        <span *ngIf="parsedRenewRows.length"> — {{ parsedRenewRows.length }} row(s) ready to apply</span>
+        <span *ngIf="parseErrors.length"> — fix parse errors before applying</span>
+      </p>
+
+      <kitkat-alert *ngIf="parseErrors.length" [type]="'warn'" [appearance]="'border'" class="mb-3">
+        <span fuseAlertTitle>Parse errors</span>
+        <div *ngFor="let err of parseErrors">{{ err }}</div>
+      </kitkat-alert>
+
+      <div class="result-panel" [class.result-panel--no-apply]="parsedRenewRows.length === 0 && !applying">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-secondary">Renewal result</span>
+          <button mat-stroked-button type="button" class="result-copy-btn" (click)="copyApplyResult()" [disabled]="!applyResultText"
+            matTooltip="Copy result to clipboard">
+            <mat-icon class="icon-size-4 mr-1" svgIcon="heroicons_outline:clipboard-copy"></mat-icon>
+            Copy
+          </button>
+        </div>
+        <textarea class="result-textarea" readonly [value]="applyResultText"
+          placeholder="Upload an Excel file, then click Apply in the bottom-right corner. Results will appear here."></textarea>
+        <div class="result-panel-footer" *ngIf="parsedRenewRows.length > 0 || applying">
+          <button mat-flat-button type="button" class="renew-apply-btn"
+            (click)="applyRenewPlan()" [disabled]="applying"
+            matTooltip="Submit parsed rows and update logger SIM expiry dates">
+            <mat-icon class="icon-size-5 mr-1" [class.animate-spin]="applying"
+              [svgIcon]="applying ? 'heroicons_outline:refresh' : 'heroicons_outline:check-circle'"></mat-icon>
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<ng-template #accessDenied>
+  <div class="p-8 text-center text-secondary">
+    <mat-icon class="icon-size-12 mb-4" svgIcon="heroicons_outline:lock-closed"></mat-icon>
+    <p>This page is available to admin and web-mobile-admin users only.</p>
+  </div>
+</ng-template>

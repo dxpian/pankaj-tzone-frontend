@@ -1,0 +1,14 @@
+<div class="overlay" *ngIf="visible">
+  <div class="content">
+    <div class="icon-wrapper">
+      <mat-progress-spinner
+        [value]="progress"
+        mode="determinate"
+        diameter="80"
+        color="accent">
+      </mat-progress-spinner>
+    </div>
+
+  Generating report... {{ progress | number:'1.1-1' }}%
+  </div>
+</div>

@@ -1,0 +1,100 @@
+<section class="register-page w-full h-full" *ngIf="isAdmin(); else accessDenied">
+  <div class="w-full flex justify-between">
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">Register</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+        </div>
+        <div class="pl-0 flex items-center">
+          <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span><a class="text-lg ml-1 text-primary-500">Register From file</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full bg-card mt-4 p-6">
+    <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mb-4">
+      <span fuseAlertTitle matTooltip="Steps to register multiple loggers">How to Register Multiple Loggers from an Excel File</span>
+      <div>
+        1. Download the Excel template file from the server.<br>
+        2. Fill in the template with the logger data, then upload the completed file.<br>
+        3. If no errors are detected, click <b>Register</b> in the result panel to proceed.
+      </div>
+    </kitkat-alert>
+
+    <div class="register-section">
+      <div class="register-header">
+        <div>
+          <h3 class="text-lg font-medium">Registration file</h3>
+          <p class="register-hint">Upload a filled Excel file, then register loggers from the result panel.</p>
+        </div>
+      </div>
+
+      <div class="register-actions">
+        <button mat-icon-button type="button" class="register-icon-btn"
+          (click)="downloadScheduleTemplate()"
+          matTooltip="Download the Excel registration template from server">
+          <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
+        </button>
+        <button mat-icon-button type="button" class="register-icon-btn"
+          (click)="triggerUpload()"
+          matTooltip="Choose a filled registration Excel file (.xlsx)">
+          <mat-icon svgIcon="heroicons_outline:upload"></mat-icon>
+        </button>
+        <input #fileInput type="file" accept=".xlsx" class="hidden" (change)="onSelectScheduleFile($event)">
+      </div>
+
+      <p *ngIf="selectedFileName" class="register-file text-sm text-secondary">
+        Selected: <span class="font-medium">{{ selectedFileName }}</span>
+        <span *ngIf="devicesExcel.length"> — {{ devicesExcel.length }} row(s) ready to register</span>
+        <span *ngIf="parseErrors.length"> — fix parse errors before registering</span>
+      </p>
+
+      <kitkat-alert *ngIf="parseErrors.length" [type]="'warn'" [appearance]="'border'" class="mb-3">
+        <span fuseAlertTitle>Parse errors</span>
+        <div *ngFor="let err of parseErrors">{{ err }}</div>
+      </kitkat-alert>
+
+      <mat-progress-bar *ngIf="registering && registerBatchTotal > 1" mode="determinate"
+        [value]="registerProgressPercent" class="register-progress mb-3"></mat-progress-bar>
+      <p *ngIf="registering && registerBatchTotal > 1" class="register-progress-label text-sm text-secondary mb-3">
+        Batch {{ registerBatchCurrent }} / {{ registerBatchTotal }} ({{ registerProgressPercent }}%)
+      </p>
+      <mat-progress-bar *ngIf="registering && registerBatchTotal <= 1" mode="indeterminate"
+        class="register-progress mb-3"></mat-progress-bar>
+
+      <div class="result-panel" [class.result-panel--no-action]="devicesExcel.length === 0 && !registering">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-secondary">Registration result</span>
+          <button mat-stroked-button type="button" class="result-copy-btn" (click)="copyResult()" [disabled]="!resultText"
+            matTooltip="Copy result to clipboard">
+            <mat-icon class="icon-size-4 mr-1" svgIcon="heroicons_outline:clipboard-copy"></mat-icon>
+            Copy
+          </button>
+        </div>
+        <textarea class="result-textarea" readonly [value]="resultText"
+          placeholder="Upload an Excel file or run registration. Messages and results will appear here."></textarea>
+        <div class="result-panel-footer" *ngIf="devicesExcel.length > 0 || registering">
+          <button mat-flat-button type="button" class="register-submit-btn"
+            (click)="openRegisterDialog()" [disabled]="registering || devicesExcel.length === 0"
+            matTooltip="Register all loggers from the uploaded file">
+            <mat-icon class="icon-size-5 mr-1" [class.animate-spin]="registering"
+              [svgIcon]="registering ? 'heroicons_outline:refresh' : 'heroicons_outline:check-circle'"></mat-icon>
+            Register
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<ng-template #accessDenied>
+  <div class="p-8 text-center text-secondary">
+    <mat-icon class="icon-size-12 mb-4" svgIcon="heroicons_outline:lock-closed"></mat-icon>
+    <p>This page is available to admin and web-mobile-admin users only.</p>
+  </div>
+</ng-template>

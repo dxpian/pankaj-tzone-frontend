@@ -1,0 +1,698 @@
+<section class="w-full h-full ">
+  <div class="w-full flex justify-between">
+
+    <!-- Breadcrum and heading Section -->
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">Alfrea</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+        </div>
+        <div class="pl-0" style="display: flex; align-items: center;">
+          <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span><a class="text-lg ml-1 text-primary-500">Alarm</a></span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- centers listing -->
+  <div class="w-full bg-card">
+
+    <div class="flex flex-row">
+      <div class="w-full flex-col mt-3 p-4">
+        <div class="flex">
+          <label class="form-label">Keywords:</label>
+        </div>
+        <div class="w-full flex flex-row mt-2">
+          <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchInputControl"
+            placeholder="Serial / Location">
+
+          <div class="ml-6 justify-end items-end">
+            <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+              class="kitkat-mat-button RTM-button-color Querybutton" (click)="openDialog('add_alarm')">
+              Add Alarm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr style="margin-top: 0px !important;">
+
+    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource" matSort>
+        <!-- Alarm ID -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:7rem !important;" class="text-left header-text">
+            <p class="header-text">No</p>
+
+          </th>
+          <td mat-cell *matCellDef="let row; let i=index">
+            <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="onSingleSelect(row)"
+                [checked]="selection.isSelected(row)">
+              {{i+1}}
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- serial number -->
+        <ng-container matColumnDef="serial">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
+            Serial
+          </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.serial}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- enable status -->
+        <ng-container matColumnDef="enable">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Activated</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <div class="flex items-center justify-center h-full w-full">
+                  <span
+                    [ngClass]="{
+                      'bg-green-500': item.alarm_status == true ,
+                      'bg-gray-500': item.alarm_status == false
+                      }"
+                    class="absolute w-4 h-4 mr-3 mt-2 rounded-full">
+                  </span>
+                </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- location of logger -->
+        <ng-container matColumnDef="location">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Location</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.location}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Alarm Range -->
+        <ng-container matColumnDef="alarm_range">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Alarm Range</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.alarm_l}}°C~{{item?.alarm_h}}°C</p>
+              <p>{{item?.warn_l}}°C~{{item?.warn_h}}°C</p>
+            </div>
+          </td>
+        </ng-container>
+
+
+        <!-- Alarm type -->
+        <ng-container matColumnDef="alarm_type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Alarm Type</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{getAlarmTypeLabel(item)}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+
+
+        <!-- Created Time -->
+        <ng-container matColumnDef="calib_status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Calibration Start</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{getCalibStatusLabelOfAlarm(item)}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Operate -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div *ngIf="isAdmin()" class="column-text" (click)="$event.stopPropagation()">
+            <div class="example-button-row flex flex-row">
+              <div class="example-flex-container flex flex-row">
+                <div class="p-1">
+                  <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square" style="color: #0D6EFD !important;" (click)="openDialog('edit_alarm', item)"></mat-icon>
+                </div>
+                <div class="p-1">
+                  <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash" style="color: red !important;" (click)="openDialog('delete_alarm', item)"></mat-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="flex flex-row justify-end w-full">
+      <mat-paginator class="mt-4 mb-4 mr-16"
+        [pageSize]="20"
+        [pageSizeOptions]="[20, 50, 100]"
+        [length]="_pageQuery.total"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+    </div>
+  </div>
+
+  <!-- calibration listing -->
+   <div class="w-full flex justify-between pt-5">
+
+    <!-- Breadcrum and heading Section -->
+    <div class="flex flex-wrap items-center font-medium">
+      <div class="pr-4" style="border-right: 1px solid">
+        <a class="text-2xl whitespace-nowrap">Alfrea</a>
+      </div>
+      <div class="flex items-center ml-1 whitespace-nowrap">
+        <div class="pl-3">
+          <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+        </div>
+        <div class="pl-0" style="display: flex; align-items: center;">
+          <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+          <span><a class="text-lg ml-1 text-primary-500">Calibration</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- calib plan listing -->
+  <div class="w-full bg-card">
+
+    <div class="flex flex-row">
+      <div class="w-full flex-col mt-3 p-4">
+        <div class="flex">
+          <label class="form-label">Keywords:</label>
+        </div>
+        <div class="w-full flex flex-row mt-2">
+            <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchInputControlCalib"
+                placeholder="Serial">
+
+            <div class="ml-6 ">
+                <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                class="kitkat-mat-button RTM-button-color Querybutton" (click)="openDialog('add_calib')">
+                Create Calib Plan</button>
+            </div>
+
+            <div class = "ml-6">
+                <mat-form-field >
+                        <mat-select [(value)]="filterCalib" class="accent-fg" matInput (selectionChange)="onCalibFilterChanged($event)" >
+                            <mat-option [value]=CALIB_STATUS.PLANNED>Scheduled</mat-option>
+                            <mat-option [value]=CALIB_STATUS.PROG>Calibrating</mat-option>
+                            <mat-option [value]=CALIB_STATUS.COMPLETED>Completed</mat-option>
+                            <mat-option [value]=CALIB_STATUS.ALL>ALL</mat-option>
+                        </mat-select>
+                </mat-form-field>
+            </div>
+
+        </div>
+     </div>
+    </div>
+
+    <hr style="margin-top: 10px !important;">
+
+    <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSourceCalib" matSort>
+        <!-- Calib ID -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:7rem !important;" class="text-left header-text">
+            <p class="header-text">No</p>
+
+          </th>
+          <td mat-cell *matCellDef="let row; let i=index">
+            <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="onSingleSelect(row)"
+                [checked]="selectionCalib.isSelected(row)">
+              {{i+1}}
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- serial number of source device -->
+        <ng-container matColumnDef="serial">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text" style="width:8rem !important">
+            Serial
+          </th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.serial_calib}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Calib start time -->
+        <ng-container matColumnDef="calib_start">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Calibration Start</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.calib_start}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Calibration end time -->
+        <ng-container matColumnDef="calib_stop">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Calibration End</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.calib_end}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Candidate serial number -->
+        <ng-container matColumnDef="candidate_serial">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Candidate serial</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item.serial_opt || ''}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Candidate start working time -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Description</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+              <p>{{item?.description || ''}}</p>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Status</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left">
+            <div class="column-text">
+                <div class="flex items-center justify-start h-full w-full">
+                    <span
+                    [ngClass]="{
+                        'bg-blue-500': item.calib_status == CALIB_STATUS.PLANNED,
+                        'bg-orange-500': item.calib_status == CALIB_STATUS.PROG,
+                        'bg-green-500': item.calib_status == CALIB_STATUS.COMPLETED
+                    }"
+                    class="w-3 h-3 rounded-full mr-2">
+                    </span>
+                    <p class="text-sm">{{ getCalibStatusLabel(item) }}</p>
+                </div>
+            </div>
+          </td>
+        </ng-container>
+
+
+
+      <!-- Operate -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="text-left header-text">Operate</th>
+        <td mat-cell *matCellDef="let item" class="tab-row text-left">
+          <div *ngIf="isAdmin()" class="column-text" (click)="$event.stopPropagation()">
+            <div class="example-button-row flex flex-row">
+              <div  class="example-flex-container flex flex-row">
+                <div [style.visibility]="!isCompletedCalib(item)? 'visible' : 'hidden'" class="p-1"  class="p-1">
+                  <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square"
+                    style="color: #0D6EFD !important;"    (click)="openDialog('edit_calib', item)"
+                    matTooltip="Edit calibration shcedule"
+                  ></mat-icon>
+                </div>
+                <div [style.visibility]="!!isDeleteableCalib(item)? 'visible' : 'hidden'" class="p-1" >
+                  <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash" style="color: red !important;"
+                  (click)="openDialog('delete_calib', item)"
+                    matTooltip="Delete a calibration shcedule"
+                    ></mat-icon>
+                </div>
+
+                <!-- refresh icon -->
+                <div *ngIf="isRefreshable(item)" class="p-1" >
+                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:refresh" style="color: #0D6EFD !important;"
+                        (click)="openDialog('refresh_calib', item)"
+                        matTooltip="Refresh calibration shcedule"
+                    ></mat-icon>
+                </div>
+
+                <!-- change details timeline for completed plans -->
+                <div *ngIf="isCompletedCalib(item)" class="p-1" >
+                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:clock" style="color: #0D6EFD !important;"
+                        (click)="openDialog('control_calib', item)"
+                        matTooltip="Finetunning calibration start/end time"
+                    ></mat-icon>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsCalib"></tr>
+      <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumnsCalib;"></tr>
+    </table>
+
+    <div class="flex flex-row justify-end w-full">
+      <mat-paginator class="mt-4 mb-4 mr-16"
+        [pageSize]="20"
+        [pageSizeOptions]="[20, 50, 100]"
+        [length]="_pageQueryCalib.total"
+        (page)="onCalibPageChange($event)">
+      </mat-paginator>
+    </div>
+
+    <kitkat-alert [type]="'primary'" [appearance]="'border'" class="mt-4 pl-4 pr-4">
+        <span fuseAlertTitle>Note:</span>
+        <div>
+            1. If the candidate device is not defined in the calibration schedule, the actual logger data replacement will begin from the calibration start time.<br>
+
+            2. Before calibration begins, the alarm of the candidate device should be in deactivated status.<br>
+
+            3. Once calibration starts, the alarm of the candidate device will be automatically activated.<br>
+
+            4. When calibration starts, the alarm of the calibrated device will be automatically deactivated.<br>
+
+            5. After calibration is completed, the alarm of the calibrated device remains deactivated. The user must manually re-enable it.<br>
+        </div>
+    </kitkat-alert>
+
+    <hr style="margin-top: 10px !important;">
+
+    <div class="w-full flex justify-between pt-3">
+        <!-- Breadcrum and heading Section -->
+        <div *ngIf="isAdmin()" class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">Alfrea</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                <span><a class="text-lg ml-1 text-primary-500">Calib Schedule From file</a></span>
+                </div>
+            </div>
+            </div>
+    </div>
+
+
+    <div *ngIf="isAdmin()" class = "flex flex-row justify-begin w-full mt-6">
+        <div class="ml-4 ">
+            <button [color]="'primary'" mat-flat-button type="button"
+            class="kitkat-mat-button RTM-button-color Querybutton" (click)="openDialog('download_calib_template')">
+            Download Calib template </button>
+        </div>
+    </div>
+
+    <div *ngIf="isAdmin()" class = "flex flex-row justify-begin w-full mt-6">
+        <input class="ml-4" type="file" (change)="onSelectSchduleFile($event)" accept=".xlsx" />
+        <div class="ml-6 ">
+            <button [color]="'primary'" mat-flat-button type="button"
+            class="kitkat-mat-button RTM-button-color Querybutton" (click)="openDialog('add_calib_batch')">
+            Create Calib from xlsx </button>
+        </div>
+    </div>
+
+    <kitkat-alert *ngIf="isAdmin()" [type]="'primary'" [appearance]="'border'" class="mt-4 pl-4 pr-4">
+        <span fuseAlertTitle>How to create schedule from excel file:</span>
+        <div>
+            1. Download the Excel template to create a calibration schedule from a file.<br>
+            2. Fill in the template with your calibration schedule, then select the completed file.<br>
+            3. If no errors are detected after selecting the file, click "Create Calib from XLSX" to proceed.<br>
+        </div>
+    </kitkat-alert>
+  </div>
+</section>
+
+
+<!-- Add Alarm Section -->
+<ng-template #addAlarm>
+  <section class="w-full">
+    <div class="text-lg font-medium text-secondary pt-5 pl-6">{{this.editState ? 'Update':'Add'}} Alarm</div>
+    <hr>
+  </section>
+  <section class="w-full">
+    <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="alarmForm">
+      <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+        <mat-form-field class="gt-xs:pr-3" appearance="fill">
+            <mat-label>Serial</mat-label>
+            <input
+                matInput
+                type="number"
+                formControlName="serial"
+                (wheel)="onWheelScroll($event)"
+                autocomplete="off"
+                inputmode="numeric"
+                [attr.maxlength]="getSerialMaxLen()"
+                [readonly]="editState"
+            >
+        </mat-form-field>
+
+         <!-- dropdown for centers -->
+        <mat-form-field class="gt-xs:pr-3 w-full">
+            <mat-label>Alarm Type</mat-label>
+            <mat-select  class="accent-fg" matInput formControlName="alarm_type" >
+                <mat-option  [value]="AlarmType.Temperature">Temperature </mat-option>
+                <mat-option  [value]="AlarmType.ProbTemperature">Prob Temperature </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <div class="w-full flex flex-row space-x-4">
+            <mat-form-field class="gt-xs:pl-3 w-1/2 flex items-center">
+                <mat-label>Alarm Low Temperature(°C)</mat-label>
+                <input matInput formControlName="alarm_l"
+                    type="number" step="0.1" min="-20" max ="20" (wheel)="onWheel($event)">
+            </mat-form-field>
+
+            <mat-form-field class="gt-xs:pl-3 w-1/2 flex items-center">
+                <mat-label>Alarm High Temperature(°C)</mat-label>
+                <input matInput formControlName="alarm_h"
+                type="number" step="0.1" min="-20" max ="20" (wheel)="onWheel($event)">
+            </mat-form-field>
+        </div>
+
+        <div class="w-full flex flex-row space-x-4 ">
+            <mat-form-field class="gt-xs:pl-3 w-1/2 flex items-center">
+                <mat-label>Warning Low Temperature(°C)</mat-label>
+                <input matInput formControlName="warn_l"
+                type="number" step="0.1" min="-20" max ="20" (wheel)="onWheel($event)">
+            </mat-form-field>
+
+            <mat-form-field class="gt-xs:pl-3 w-1/2 flex items-center">
+                <mat-label>Warning High Temperature(°C)</mat-label>
+                <input matInput formControlName="warn_h"
+                type="number" step="0.1" min="-20" max ="20" (wheel)="onWheel($event)">
+            </mat-form-field>
+        </div>
+
+
+        <!-- Enable/disable alarm -->
+        <mat-checkbox formControlName="alarm_status" labelPosition="before">
+            Activate this alarm?
+        </mat-checkbox>
+
+        <!-- Select an location of the logger(center/branch) -->
+        <div class="w-full flex flex-row items-center  space-x-4 ">
+            <mat-label class="form-label">Select location of logger:</mat-label>
+            <mat-radio-group
+                formControlName="location"
+                (change)="onLocationChange($event)"
+                class="flex gap-4 items-center"
+                >
+                <mat-radio-button [value]="false">Center</mat-radio-button>
+                <mat-radio-button [value]="true">Branch</mat-radio-button>
+            </mat-radio-group>
+        </div>
+
+        <!-- dropdown for centers -->
+        <mat-form-field class="gt-xs:pr-3 w-full">
+            <mat-label>Center</mat-label>
+            <mat-select  class="accent-fg" matInput formControlName="center" >
+                <mat-option *ngFor="let center of centerNames" [value]="center.id">
+                    [{{center.code}}]&nbsp; {{ center.name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- dropdown for branches.  -->
+        <ng-container *ngIf="alarmForm.get('location')?.value">
+            <mat-form-field class="gt-xs:pr-3 w-full">
+                <mat-label>Branch</mat-label>
+                <mat-select  class="accent-fg" matInput formControlName="branch" >
+                    <mat-option *ngFor="let branch of branchVisibles" [value]="branch.id">
+                        [{{branch.code}}]&nbsp; {{ branch.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </ng-container>
+      </div>
+    </form>
+  </section>
+  <hr class="mt-0">
+  <section class="w-full mb-4">
+    <div class="flex flex-row justify-end pr-8 mb-4">
+      <button mat-raised-button (click)="close()" type="submit"
+        class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+      <button mat-raised-button (click)="saveAlarm()" class="RTM-button-color p-4 border-radius-button" type="submit"
+         color="primary">Save</button>
+    </div>
+  </section>
+</ng-template>
+
+
+<!-- Add Center Section -->
+<ng-template #addCalib>
+  <section class="w-full">
+    <div class="text-lg font-medium text-secondary pt-5 pl-6">{{this.editState ? 'Update':'Add'}} Calibration Plan</div>
+    <hr>
+  </section>
+  <section class="w-full">
+    <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="calibForm">
+      <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+
+        <div class="w-full flex flex-row space-x-4">
+            <mat-form-field class="gt-xs:pl-3 w-1/3 flex items-center">
+                <mat-label>Serial</mat-label>
+                <input matInput
+                    type = "number"
+                    formControlName="serial_calib"
+                    (keypress)="onlyAllowDigits($event)"
+                    (paste)="blockNonDigitsPaste($event)"
+                    autocomplete="off"
+                    inputmode="numeric"
+                    [attr.maxlength]="getSerialMaxLen()"
+                    matTooltip="Serial of calibrated device"
+                    >
+            </mat-form-field>
+            <mat-form-field class="gt-xs:pl-3 w-1/3 flex items-center">
+                <mat-label>Calibration Start</mat-label>
+                <input class=" flex" id="searchID"
+                    matInput [matDatepicker]="picker"
+                    formControlName="calib_start"
+                    matTooltip="Start date for calibrated logger"
+                    >
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field class="gt-xs:pl-3 w-1/3 flex items-center">
+                <mat-label>Stop</mat-label>
+                <input class=" flex" id="searchID"
+                    matInput [matDatepicker]="picker2"
+                    formControlName="calib_end"
+                    matTooltip="End date for calibrated logger"
+                >
+                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div class="w-full flex flex-row space-x-4">
+            <mat-form-field class="gt-xs:pl-3 w-1/3 flex items-center">
+                <mat-label>Candidate Serial</mat-label>
+                <input matInput
+                    type = "number"
+                    formControlName="serial_opt"
+                    (keypress)="onlyAllowDigits($event)"
+                    (paste)="blockNonDigitsPaste($event)"
+                    autocomplete="off"
+                    inputmode="numeric"
+                    [attr.maxlength]="getSerialMaxLen()"
+                    matTooltip="Serial of candidate device"
+                    >
+            </mat-form-field>
+        </div>
+
+        <mat-form-field class="gt-xs:pr-3">
+          <mat-label>Description</mat-label>
+          <input matInput formControlName="description">
+        </mat-form-field>
+      </div>
+    </form>
+  </section>
+  <hr class="mt-0">
+  <section class="w-full mb-4">
+    <div class="flex flex-row justify-end pr-8 mb-4">
+      <button mat-raised-button (click)="close()" type="submit"
+        class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+      <button mat-raised-button (click)="saveCalibration()" class="RTM-button-color p-4 border-radius-button" type="submit"
+         color="primary">Save</button>
+    </div>
+  </section>
+</ng-template>
+
+
+
+<!-- Add Center Section -->
+<ng-template #controlCalibTime>
+  <section class="w-full">
+    <div class="text-lg font-medium text-secondary pt-5 pl-6">{{getSelectedCalibSerial()}}</div>
+    <hr>
+  </section>
+  <section class="w-full">
+    <form class="flex flex-col w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="controlForm">
+        <!-- radio buttons to pick chart -->
+        <mat-radio-group formControlName="selectedChart" class="mb-4 flex space-x-4">
+            <mat-radio-button value="0">Start</mat-radio-button>
+            <mat-radio-button value="1">End</mat-radio-button>
+        </mat-radio-group>
+
+        <!-- conditional chart rendering -->
+        <ng-container *ngIf="controlForm.value.selectedChart === '0'">
+            <highcharts-chart
+                [Highcharts]="Highcharts"
+                [constructorType]="'stockChart'"
+                [options]="chartOptions[0]"
+                style="width: 100%; height: 420px; display: block;"
+                (chartInstance)="chartRefs[0] = $event"
+            >
+            </highcharts-chart>
+        </ng-container>
+
+        <ng-container *ngIf="controlForm.value.selectedChart === '1'">
+            <highcharts-chart
+                [Highcharts]="Highcharts"
+                [constructorType]="'stockChart'"
+                [options]="chartOptions[1]"
+                style="width: 100%; height: 420px; display: block;"
+                (chartInstance)="chartRefs[1] = $event"
+            >
+            </highcharts-chart>
+        </ng-container>
+
+       <div class="flex space-x-4">
+            <mat-form-field appearance="outline" class="flex-1 min-w-[250px]" *ngIf="controlForm.value.selectedChart === '0'">
+                <mat-label>Start Time</mat-label>
+                <input matInput formControlName="time_start" readonly>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-1 min-w-[250px]" *ngIf="controlForm.value.selectedChart === '1'">
+                <mat-label>End Time</mat-label>
+                <input matInput formControlName="time_end" readonly>
+            </mat-form-field>
+        </div>
+    </form>
+  </section>
+
+  <hr class="mt-0">
+  <section class="w-full mb-4">
+    <div class="flex flex-row justify-end pr-8 mb-4">
+      <button mat-raised-button (click)="close()" type="submit"
+        class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+      <button mat-raised-button (click)="saveCalibtimeControl()" class="RTM-button-color p-4 border-radius-button" type="submit"
+         color="primary">Save</button>
+    </div>
+  </section>
+</ng-template>
+
+

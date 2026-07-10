@@ -1,0 +1,356 @@
+<section class="w-full h-full ">
+    <div class="w-full flex justify-between">
+
+        <!-- Breadcrum and heading Section -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">Areas</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                    <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                    <mat-icon class="icon-size-10 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'">
+                    </mat-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="w-full bg-card mt-2">
+        <div class="w-full flex-col mt-3 p-4">
+            <div class="flex">
+                <label class="form-label">Keywords:</label>
+            </div>
+            <div class="w-full flex flex-row mt-2">
+                <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchCtrlArea"
+                    placeholder="area name">
+
+                <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                    class="kitkat-mat-button RTM-button-color Querybutton ms-1" (click)="openAreaModal('add')">
+                    {{getCreateButtonLabel(true)}}
+                </button>
+            </div>
+        </div>
+
+
+        <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSrcArea">
+            <!-- id -->
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+                    <p class="header-text">No</p>
+                </th>
+
+                <td mat-cell *matCellDef="let row; let i=index">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="onSingleSelectArea(row)"
+                        [checked]="selArea.isSelected(row)">
+                        {{i+1}}
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <!-- User name -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                    Name
+                </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item.name}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="clusters">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                    Clusters
+                </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item.clusters || 0}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Owner name -->
+            <ng-container matColumnDef="owner">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                    Owner
+                </th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{item.owner}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- created time -->
+            <ng-container matColumnDef="created">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Created</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text">
+                        <p>{{removeTime(item.created)}}</p>
+                    </div>
+                </td>
+            </ng-container>
+
+           <!-- Operate -->
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Operate</th>
+                <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                    <div class="column-text" (click)="$event.stopPropagation()">
+                        <div class="example-button-row flex flex-row">
+                            <div class="example-flex-container flex flex-row">
+                                <div class="p-1" *ngIf="isOwnedArea(item)" >
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square"
+                                        style="color: #0D6EFD !important;" (click)="openAreaModal('edit',item)"></mat-icon>
+                                </div>
+                                <div class="p-1" *ngIf="isOwnedArea(item)">
+                                    <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash"
+                                        style="color: red !important;" (click)="openAreaModal('delete', item)"></mat-icon>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedAreaColumns"></tr>
+            <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedAreaColumns;"></tr>
+        </table>
+        <hr class="m-0" *ngIf="this.areas.length == 0">
+
+        <div class="flex flex-row justify-end w-full">
+            <mat-paginator
+                #areaPaginator
+                class="mt-4 mb-4 mr-16"
+                [pageSize]="5"
+                [pageSizeOptions]="[5, 10, 20]"
+                showFirstLastButtons
+            ></mat-paginator>
+        </div>
+
+    <!-- show the selected clusters -->
+    <hr style="margin-top: 0px !important;">
+    <div *ngIf="this.areaSelected" class="w-full flex justify-between">
+        <!-- Mobile Admin selection -->
+        <div class="flex flex-wrap items-center font-medium">
+            <div class="pr-4" style="border-right: 1px solid">
+                <a class="text-2xl whitespace-nowrap">{{getSelectedAreaName()}}</a>
+            </div>
+            <div class="flex items-center ml-1 whitespace-nowrap">
+                <div class="pl-3">
+                <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_solid:home'"></mat-icon>
+                </div>
+                <div class="pl-0" style="display: flex; align-items: center;">
+                <mat-icon class="icon-size-10 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                <span><a class="text-lg ml-1 text-primary-500">Clusters</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="w-full bg-card">
+
+    <div *ngIf="this.areaSelected" class="w-full flex-col mt-3 p-4">
+        <div class="flex">
+            <label class="form-label">Keywords:</label>
+        </div>
+        <div class="w-full flex flex-row mt-2">
+            <input class="searchbox flex-shrink" id="searchID" matInput type="search" [formControl]="searchCtrlClst"
+                placeholder="cluster name">
+
+            <button [color]="'primary'" mat-flat-button id="btnSearch" type="button"
+                *ngIf="isOwnedArea(areaSelected)"
+                class="kitkat-mat-button RTM-button-color Querybutton ms-1" (click)="openClusterModal('add')">
+                {{getCreateButtonLabel(false)}}
+            </button>
+        </div>
+    </div>
+
+    <hr *ngIf="this.areaSelected"style="margin-top: 0px !important;">
+
+    <!-- Mobile admin listing -->
+    <table *ngIf="this.areaSelected" class="w-full table-responsive mat-card" mat-table [dataSource]="dataSrcClst" matSort>
+      <!-- id -->
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef style="width:7rem !important;" class="text-left header-text">
+                <p class="header-text">No</p>
+            </th>
+
+            <td mat-cell *matCellDef="let row; let i=index">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="onSingleSelectClst(row)"
+                    [checked]="selClst.isSelected(row)">
+                    {{i+1}}
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <!-- User name -->
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                Name
+            </th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text">
+                    <p>{{item.name}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- Email address -->
+        <ng-container matColumnDef="users">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">
+                Users
+            </th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text">
+                    <p>{{item.users || 0}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- User permission -->
+        <ng-container matColumnDef="loggers">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Loggers</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text">
+                    <p>{{item.devices || 0}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- created time -->
+        <ng-container matColumnDef="created">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Created</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text">
+                    <p>{{removeTime(item.created)}}</p>
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- Operate -->
+        <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:8rem !important">Operate</th>
+            <td mat-cell *matCellDef="let item" class="tab-row text-left">
+                <div class="column-text" (click)="$event.stopPropagation()">
+                    <div class="example-button-row flex flex-row">
+                        <div class="example-flex-container flex flex-row cluster-table__action-cell">
+                            <div class="p-1">
+                                <mat-icon
+                                    svgIcon="heroicons_outline:pencil-square"
+                                    class="cluster-table__action-icon"
+                                    [class.cluster-table__action-icon--disabled]="!isOwnedCluster(item)"
+                                    [class.cursor-pointer]="isOwnedCluster(item)"
+                                    [style.color]="isOwnedCluster(item) ? '#0d6efd' : null"
+                                    (click)="onClusterEditClick(item)"
+                                ></mat-icon>
+                            </div>
+                            <div class="p-1">
+                                <mat-icon
+                                    svgIcon="heroicons_outline:trash"
+                                    class="cluster-table__action-icon"
+                                    [class.cluster-table__action-icon--disabled]="!isOwnedCluster(item)"
+                                    [class.cursor-pointer]="isOwnedCluster(item)"
+                                    [style.color]="isOwnedCluster(item) ? 'red' : null"
+                                    (click)="onClusterDeleteClick(item)"
+                                ></mat-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </ng-container>  
+        <tr mat-header-row *matHeaderRowDef="displayedClusterColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; let odd = odd; columns: displayedClusterColumns;"
+          [class.cluster-table__row--no-permission]="!isOwnedCluster(row)"
+        ></tr>
+    </table>
+        
+    <hr *ngIf="this.areaSelected" class="m-0" >
+    <div *ngIf="this.areaSelected" class="flex flex-row justify-end w-full">
+        <mat-paginator
+            #clusterPaginator
+            class="mt-4 mb-4 mr-16"
+            [pageSize]="10"
+            [pageSizeOptions]="[10, 20]"
+            showFirstLastButtons
+        ></mat-paginator>
+    </div>
+    </div>
+    </div>
+</section>
+
+<ng-template #add>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">{{getDialogTitle(true)}}</div>
+        <hr>
+    </section>
+    <section class="w-full">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="areaForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+                <!-- user name -->
+                <mat-form-field class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Name:</mat-label>
+                    <input matInput formControlName="name" placeholder="area name">
+                </mat-form-field>
+            </div>
+        </form>
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button (click)="closeDialog()" type="submit"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button (click)="onSubmitAreaData()" class="RTM-button-color p-4 border-radius-button"
+                type="submit" color="primary">Save</button>
+        </div>
+    </section>
+</ng-template>
+
+<ng-template #add_sub>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">{{getDialogTitle(false)}}</div>
+        <hr>
+    </section>
+    <section class="w-full">
+        <form class="flex flex-row w-full mt-0 pl-8 pr-8 pt-0 pb-4 overflow-hidden" [formGroup]="clstForm">
+            <div class="w-full flex flex-col gt-xs:flex-row pr-3 borderLine">
+
+                <!-- area of cluster -->
+                <mat-form-field class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Area of cluster:</mat-label>
+                    <mat-select formControlName="area">
+                        <mat-option *ngFor="let area of areas" [value]="area.id">
+                        {{ area.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- cluster name -->
+                <mat-form-field class="gt-xs:pr-3" appearance="fill">
+                    <mat-label>Cluster name:</mat-label>
+                    <input matInput formControlName="name" placeholder="cluster name">
+                </mat-form-field>
+            </div>
+        </form>
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button (click)="closeDialog()" type="submit"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button (click)="onSubmitClusterData()" class="RTM-button-color p-4 border-radius-button"
+                type="submit" color="primary">Save</button>
+        </div>
+    </section>
+</ng-template>
+
