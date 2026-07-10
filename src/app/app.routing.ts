@@ -40,7 +40,7 @@ export const appRoutes: Route[] = [
         },
         children   : [
              {path: 'device', loadChildren: () => import('app/modules/landing/device-management/device-management.module').then(m => m.DeviceManagementModule)},
-             {path: 'real-time-monitoring', loadChildren: () => import('app/modules/landing/real-time-monitoring/real-time-monitoring.module').then(m => m.RealTimeMonitoringModule)},
+             {path: 'real-time-monitoring', redirectTo: 'device', pathMatch: 'full'},
              {path: 'alarm', loadChildren: () => import('app/modules/landing/alarm-settings/alarm-settings.module').then(m => m.AlarmSettingsModule)},
              {path: 'reports', loadChildren: () => import('app/modules/landing/reporting/reporting.module').then(m => m.ReportingModule)},
              {path: 'message', loadChildren: () => import('app/modules/landing/message-center/message-center.module').then(m => m.MessageCenterModule)},

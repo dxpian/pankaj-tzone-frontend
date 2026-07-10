@@ -11,9 +11,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { snackBarConfig, snackBarConfigWarn, resolveRequestError } from 'app/constants/globalFunctions';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FuseConfirmDialogComponent } from '@kitkat/components/confirm-dialog/confirm-dialog.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SocketService } from '../../../../services/socket.service';
-import { DB_RESULT, PageData, PageQuery, Device, DeviceFilterType, isWebAdminPermission, PERMISSION, DownloadDeviceListItem, DeviceStatusOverview, LoggerStatusFilterItem } from '../../utils/typedef';
+import { DB_RESULT, PageData, PageQuery, Device, DeviceFilterType, isWebAdminPermission, PERMISSION, DownloadDeviceListItem, DeviceStatusOverview, LoggerStatusFilterItem, DeviceRealTime } from '../../utils/typedef';
 import { saveAs } from 'file-saver';
 import { identity } from 'lodash';
 import { GroupConfig, USER_ROLE } from '../../account/account.typedef';
@@ -21,8 +21,11 @@ import { SharedService } from '../../../../services/shared.service';
 import { Language } from '../../service/message-push-service/email/email.component';
 import { normalizeString } from '../../service/alfresa/alfresa.util';
 import { GoogleMap } from '@angular/google-maps';
+import { environment } from '../../../../enviroment/enviroment';
+import { AlarmType } from '../../alarm-settings/alarm-listing/alarm-listing.component';
 import {
     LIST_BROWSE_DEVICE_MANAGEMENT_KEY,
+    LoggerViewMode,
     readListBrowseState,
     writeListBrowseState
 } from '../../utils/list-browse-state.storage';
@@ -86,6 +89,12 @@ export class DevicesComponent implements OnInit {
     USER_ROLE = USER_ROLE
     lng = Language.ENG
     downloadingLoggers = false;
+    viewMode: LoggerViewMode = 'list';
+    deviceCardData: DeviceRealTime[] = [];
+    showSim = environment.showSimExpire;
+    offset = 0;
+    readonly listPageSizeOptions = [20, 50, 100, 200];
+    readonly cardPageSizeOptions = [20, 40, 60, 80, 100];
     statusOverview: DeviceStatusOverview = {
         total: 0,
         online: 0,
@@ -112,6 +121,7 @@ export class DevicesComponent implements OnInit {
         private _formBuilder:FormBuilder,
         private _snackBar: MatSnackBar,
         private _route:Router,
+        private _activatedRoute: ActivatedRoute,
         private _cdr:ChangeDetectorRef,
         private _serviceShared: SharedService,
         ) {
@@ -121,6 +131,21 @@ export class DevicesComponent implements OnInit {
         this.currentTime = new Date();
 
         this.userInfo = JSON.parse(localStorage.getItem('userInfo'))
+
+        const timezone = this.userInfo?.timezone;
+        try {
+            this.offset = parseFloat(timezone);
+            if (isNaN(this.offset)) {
+                this.offset = 0;
+            }
+        } catch {
+            this.offset = 0;
+        }
+
+        const queryView = this._activatedRoute.snapshot.queryParamMap.get('view');
+        if (queryView === 'card' || queryView === 'list') {
+            this.viewMode = queryView;
+        }
 
         this.getGroups();
 
@@ -160,7 +185,10 @@ export class DevicesComponent implements OnInit {
             this.filter = saved.filter as DeviceFilterType;
             this._pageQuery.keyword = saved.keyword;
             this.searchInputControl.setValue(saved.keyword, { emitEvent: false });
-            const allowedSizes = [20, 50, 100, 200];
+            if (saved.viewMode === 'card' || saved.viewMode === 'list') {
+                this.viewMode = saved.viewMode;
+            }
+            const allowedSizes = this.getPageSizeOptions();
             const pageSize = allowedSizes.includes(saved.pageSize) ? saved.pageSize : this.paginator.pageSize;
             this.paginator.pageSize = pageSize;
             this._pageQuery.pagesize = pageSize;
@@ -170,6 +198,47 @@ export class DevicesComponent implements OnInit {
             this._pageQuery.keyChanged = true;
         }
         this.getDevices(this.userInfo?.id);
+    }
+
+    get pageSizeOptions(): number[] {
+        return this.getPageSizeOptions();
+    }
+
+    private getPageSizeOptions(): number[] {
+        return this.viewMode === 'card' ? this.cardPageSizeOptions : this.listPageSizeOptions;
+    }
+
+    setViewMode(mode: LoggerViewMode): void {
+        if (this.viewMode === mode) {
+            return;
+        }
+        this.viewMode = mode;
+        this.paginator.pageIndex = 0;
+        this._pageQuery.keyChanged = true;
+        const allowedSizes = this.getPageSizeOptions();
+        if (!allowedSizes.includes(this.paginator.pageSize)) {
+            this.paginator.pageSize = allowedSizes[0];
+            this._pageQuery.pagesize = allowedSizes[0];
+        }
+        this.fetchPage(this.paginator.pageIndex, this.paginator.pageSize,
+            this._pageQuery.keyword, true,
+            this._pageQuery.total
+        ).then((response: any) => {
+            this.updateDataSource(response);
+            this.loadStatusOverview();
+        }).catch((err: HttpErrorResponse) => console.log(err));
+    }
+
+    private persistBrowseState(): void {
+        const keyword = (this.searchInputControl.value ?? '').toString().trim()
+            || (this._pageQuery.keyword || '');
+        writeListBrowseState(LIST_BROWSE_DEVICE_MANAGEMENT_KEY, {
+            filter: this.filter,
+            keyword,
+            pageIndex: this.paginator?.pageIndex ?? 0,
+            pageSize: this.paginator?.pageSize ?? this._pageQuery.pagesize,
+            viewMode: this.viewMode,
+        });
     }
 
     ngOnDestroy(): void {
@@ -233,8 +302,11 @@ export class DevicesComponent implements OnInit {
             pagesize: pageSize,
             keyword: keyword || '',
             keyChanged: keyChanged !== undefined ? keyChanged : true,
-            total: total || 0, // Ensure `total` is always defined
+            total: total || 0,
             filter: this.filter,
+        }
+        if (this.viewMode === 'card') {
+            return this._serviceDevice.getUserDeviceDetailsWithPage(this.userInfo.id, query);
         }
         return this._serviceDevice.getUserDeviceWithPage(this.userInfo.id, query);
     }
@@ -245,14 +317,27 @@ export class DevicesComponent implements OnInit {
 
         if(res && !res.error_code){
             const pageData = res.object as PageData
-            this.dataSource.data = pageData.data as Device[]
+            if (this.viewMode === 'card') {
+                this.deviceCardData = (pageData.data || []) as DeviceRealTime[];
+                this.deviceCardData.forEach(data => {
+                    if (data?.state) {
+                        data.state.isRecentAlarm = this.isRecentAlarm(data);
+                    }
+                });
+            } else {
+                this.dataSource.data = pageData.data as Device[]
+            }
             this._pageQuery.total = pageData.total
             this._pageQuery.cursor = pageData.cursor
             this._pageQuery.keyChanged = false
         }
         else{
             console.log(`failed to get api response: ${res}`)
-            this.dataSource.data = []
+            if (this.viewMode === 'card') {
+                this.deviceCardData = [];
+            } else {
+                this.dataSource.data = []
+            }
             this._pageQuery.total = 0
         }
     }
@@ -329,15 +414,21 @@ export class DevicesComponent implements OnInit {
     }
 
     viewDevice(item) {
-        const keyword = (this.searchInputControl.value ?? '').toString().trim()
-            || (this._pageQuery.keyword || '');
-        writeListBrowseState(LIST_BROWSE_DEVICE_MANAGEMENT_KEY, {
-            filter: this.filter,
-            keyword,
-            pageIndex: this.paginator?.pageIndex ?? 0,
-            pageSize: this.paginator?.pageSize ?? this._pageQuery.pagesize,
-        });
+        this.persistBrowseState();
         this._route.navigate([`device/${item.id}`], { queryParams: { data: JSON.stringify(item) } });
+    }
+
+    copyDeviceSerial(serial: unknown, event?: Event): void {
+        event?.stopPropagation();
+        const text = String(serial ?? '').trim();
+        if (!text) {
+            return;
+        }
+        navigator.clipboard?.writeText(text).then(() => {
+            this._snackBar.open('Serial number copied', '', snackBarConfig);
+        }).catch(() => {
+            this._snackBar.open('Could not copy serial number', '', snackBarConfigWarn);
+        });
     }
 
     isAdmin(): boolean{
@@ -361,7 +452,7 @@ export class DevicesComponent implements OnInit {
         return (item.time_heart)? true: false
     }
 
-    getHeartBitColor(item: Device): string {
+    getHeartBitColor(item: { time_heart?: string }): string {
         if (!item.time_heart) return 'black';
         const heartBitTime = new Date(item.time_heart);
         const now = new Date();
@@ -581,5 +672,97 @@ export class DevicesComponent implements OnInit {
         return text;
     }
 
+    getBatteryImg(battery: number): string {
+        if (battery >= 90) {
+            return 'assets/images/device/battery_100.png';
+        }
+        if (battery < 90 && battery >= 70) {
+            return 'assets/images/device/battery_80.png';
+        }
+        if (battery < 70 && battery >= 50) {
+            return 'assets/images/device/battery_60.png';
+        }
+        if (battery < 50 && battery >= 30) {
+            return 'assets/images/device/battery_40.png';
+        }
+        if (battery < 30 && battery >= 10) {
+            return 'assets/images/device/battery_20.png';
+        }
+        return 'assets/images/device/battery_0.png';
+    }
+
+    getItemExpression(item: DeviceRealTime | null, itemtype: string): string {
+        if (itemtype === 'temperature') {
+            return (item?.state?.temperature != null) ? item.state.temperature + '℃' : '--℃';
+        }
+        if (itemtype === 'ext_temperature') {
+            return (item?.state?.tempexternal != null) ? item.state.tempexternal + '℃' : '--℃';
+        }
+        if (itemtype === 'humidity') {
+            return (item?.state?.humidity != null) ? item.state.humidity + '%' : '--%';
+        }
+        if (itemtype === 'light') {
+            return (item?.state?.light != null) ? item.state.light + 'Lux' : '--Lux';
+        }
+        if (itemtype === 'vibration') {
+            return (item?.state?.vibration != null) ? item.state.vibration + 'mg' : '--mg';
+        }
+        if (itemtype === 'location') {
+            return (item?.state?.city) ? item.state.city : '--';
+        }
+        if (itemtype === 'sim') {
+            return (item?.simexpire) ? item.simexpire.slice(0, 10) : '--';
+        }
+        if (itemtype === 'alarm') {
+            return (item?.state?.alarmTime) ? item.state.alarmTime.slice(0, 16) : '--';
+        }
+        return '--';
+    }
+
+    hasHeartBitTime(item: DeviceRealTime): boolean {
+        return !!item.time_heart;
+    }
+
+    isRecentAlarm(item: DeviceRealTime): boolean {
+        if (!item.state?.alarmTime) {
+            return false;
+        }
+
+        const currentTime = new Date();
+        const offsetMinutes = -currentTime.getTimezoneOffset();
+        const newOffsetMinutes = this.offset * 60;
+        const diffMinutes = newOffsetMinutes - offsetMinutes;
+        currentTime.setTime(currentTime.getTime() + diffMinutes * 60 * 1000);
+
+        const lastModifiedTime = new Date(item.state.alarmTime.toString());
+        const timeDifference = currentTime.getTime() - lastModifiedTime.getTime();
+        const hoursDifference = timeDifference / (1000 * 3600);
+        return hoursDifference < environment.activeAlarmHours;
+    }
+
+    getAlarmType(item: DeviceRealTime): string {
+        if (item?.state?.alarmType == undefined) {
+            return '';
+        }
+        const alarmType = item.state.alarmType;
+        switch (alarmType) {
+            case AlarmType.Temperature:
+                return 'Temperature alarm';
+            case AlarmType.Humidity:
+                return 'Humidity alarm';
+            case AlarmType.Light:
+                return 'Light alarm';
+            case AlarmType.Vibration:
+                return 'Vibration alarm';
+            case AlarmType.Battery:
+                return 'Battery alarm';
+            case AlarmType.SIM:
+                return 'SIM card expiration alarm';
+            case AlarmType.ProbTemperature:
+                return 'Prob temperature alarm';
+            default:
+                return '';
+        }
+    }
 
 }

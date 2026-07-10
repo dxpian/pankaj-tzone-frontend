@@ -42,6 +42,7 @@ import { AlarmSettingsModule } from '../alarm-settings/alarm-settings.module';
 import { LoadingOverlayComponent } from './tabs/overlay/loading-overlay.component';
 import { SimManagementComponent } from './sim-management/sim-management.component';
 import { RegisterFromFileComponent } from './register-from-file/register-from-file.component';
+import { FuseFindByKeyPipeModule } from '@kitkat/pipes/find-by-key';
 @NgModule({
   declarations: [
     ViewDevicesComponent,
@@ -91,7 +92,8 @@ import { RegisterFromFileComponent } from './register-from-file/register-from-fi
     NgxBarcodeModule.forRoot(),
     MatTabsModule,
     HighchartsChartModule,
-    AlarmSettingsModule
+    AlarmSettingsModule,
+    FuseFindByKeyPipeModule,
       ],
   exports: [
     RealTimeDataComponent,

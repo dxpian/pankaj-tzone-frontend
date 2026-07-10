@@ -34,7 +34,9 @@ import {ClipboardModule} from '@angular/cdk/clipboard';
 import { HolidayComponent } from './holiday/holiday.component';
 import { AlfresaCenterComponent } from './alfresa/alfresa.center/alfresa.center.component';
 import { AlfresaAlarmComponent } from './alfresa/alfresa.alarm/alfresa.alarm.component';
+import { AlfresaShiftComponent } from './alfresa/alfresa.shift/alfresa.shift.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @NgModule({
@@ -45,7 +47,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
     BaseStationLocationServiceComponent,
     HolidayComponent,
     AlfresaCenterComponent,
-    AlfresaAlarmComponent
+    AlfresaAlarmComponent,
+    AlfresaShiftComponent
   ],
   imports: [
     CommonModule,
@@ -60,6 +63,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
     MatSelectModule,
     ReactiveFormsModule,
     MatRadioModule,
+    MatExpansionModule,
     SharedModule,
     MatFormFieldModule,
     MatSnackBarModule,

@@ -24,8 +24,8 @@
 }
 
 .custom-chip:hover {
-  background-color: #e0e0e0;         /* slightly darker on hover */
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);  /* soft shadow */
+  background-color: #e0e0e0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }
 
@@ -36,4 +36,194 @@
   line-height: 16px;
   margin-left: 6px;
   color: #555;
+}
+
+.alfresa-no-emails {
+  color: #9e9e9e;
+  margin: 0;
+}
+
+.alfresa-site-bind {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.alfresa-site-bind--workers {
+  gap: 6px;
+}
+
+.alfresa-site-bind__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.4;
+  min-height: 22px;
+}
+
+.alfresa-site-bind__icon {
+  flex-shrink: 0;
+}
+
+.alfresa-site-bind__icon--copy {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 20px !important;
+  color: #14a73c !important;
+}
+
+.alfresa-site-bind__icon--edit {
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 18px !important;
+  color: #14a73c !important;
+}
+
+.alfresa-site-bind__icon--remove {
+  width: 16px !important;
+  height: 16px !important;
+  font-size: 16px !important;
+  color: #dc3545 !important;
+}
+
+.alfresa-bind-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid rgba(20, 167, 60, 0.45);
+  border-radius: 50%;
+  background: rgba(20, 167, 60, 0.12);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.alfresa-bind-btn--worker {
+  border-color: rgba(13, 110, 253, 0.45);
+  background: rgba(13, 110, 253, 0.12);
+}
+
+.alfresa-bind-btn:hover {
+  background: rgba(20, 167, 60, 0.22);
+}
+
+.alfresa-bind-btn--worker:hover {
+  background: rgba(13, 110, 253, 0.22);
+}
+
+:host ::ng-deep .alfresa-bind-btn .mat-icon {
+  width: 16px !important;
+  height: 16px !important;
+  font-size: 16px !important;
+  color: #14a73c !important;
+}
+
+:host ::ng-deep .alfresa-bind-btn--worker .mat-icon {
+  color: #0d6efd !important;
+}
+
+:host ::ng-deep .alfresa-bind-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+:host ::ng-deep .alfresa-site-bind__icon--copy svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+:host ::ng-deep .alfresa-site-bind__icon--edit svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+:host ::ng-deep .alfresa-site-bind__icon--remove svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.alfresa-admin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  max-width: 100%;
+  background: rgba(108, 117, 125, 0.14);
+  color: #495057;
+  border: 1px solid rgba(108, 117, 125, 0.28);
+}
+
+.alfresa-admin-chip__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12rem;
+}
+
+.alfresa-chip-name--link {
+  cursor: pointer;
+}
+
+.alfresa-chip-name--link:hover {
+  text-decoration: underline;
+}
+
+:host ::ng-deep .alfresa-center-row--selected {
+  background: rgba(13, 110, 253, 0.08) !important;
+}
+
+:host ::ng-deep .alfresa-branch-row--selected {
+  background: rgba(20, 167, 60, 0.1) !important;
+}
+
+.alfresa-worker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.alfresa-worker-chip__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12rem;
+}
+
+.alfresa-worker-chip--day {
+  background: rgba(20, 167, 60, 0.18);
+  color: #0f7a2d;
+  border: 1px solid rgba(20, 167, 60, 0.28);
+}
+
+.alfresa-worker-chip--night {
+  background: rgba(13, 110, 253, 0.16);
+  color: #0d6efd;
+  border: 1px solid rgba(13, 110, 253, 0.28);
+}
+
+.alfresa-worker-chip--unknown {
+  background: rgba(158, 158, 158, 0.14);
+  color: #616161;
+  border: 1px solid rgba(158, 158, 158, 0.24);
+}
+
+.alfresa-worker-chip--inactive {
+  background: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+  border: 1px solid rgba(108, 117, 125, 0.35);
 }

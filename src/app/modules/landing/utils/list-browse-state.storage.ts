@@ -3,11 +3,14 @@
 export const LIST_BROWSE_DEVICE_MANAGEMENT_KEY = 'landing:listBrowse:device-management';
 export const LIST_BROWSE_REAL_TIME_MONITORING_KEY = 'landing:listBrowse:real-time-monitoring';
 
+export type LoggerViewMode = 'list' | 'card';
+
 export interface ListBrowseState {
   filter: number;
   keyword: string;
   pageIndex: number;
   pageSize: number;
+  viewMode?: LoggerViewMode;
 }
 
 export function readListBrowseState(key: string): ListBrowseState | null {

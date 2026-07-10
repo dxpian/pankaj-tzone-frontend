@@ -1,0 +1,52 @@
+.alfresa-shift-schedule__panel {
+    width: 100%;
+}
+
+.alfresa-shift-schedule__title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.alfresa-shift-schedule__accordion {
+    display: block;
+    width: 100%;
+}
+
+.alfresa-shift-schedule__center-panel,
+.alfresa-shift-schedule__branch-panel {
+    margin: 0 16px 8px;
+}
+
+.alfresa-shift-schedule__site-block {
+    margin-bottom: 16px;
+}
+
+.alfresa-shift-schedule__site-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.alfresa-shift-schedule__table {
+    width: 100%;
+}
+
+.alfresa-shift-status-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #9e9e9e;
+    vertical-align: middle;
+}
+
+.alfresa-shift-status-dot--enabled {
+    background-color: #14a73c;
+}
+
+.alfresa-shift-schedule__branch-panel {
+    margin-left: 24px;
+}

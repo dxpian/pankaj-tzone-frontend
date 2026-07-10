@@ -31,6 +31,8 @@ import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 import { MobileRoutingModule } from './mobile-routing.module';
 import { MobileAdminManagementComponent } from '../mobile/mobile-admin-management/mobile-admin-management.component';
 import { MobileManagementComponent } from '../mobile/mobile-management/mobile-management.component';
+import { AlfresaMobileManagementComponent } from './alfresa-mobile-management/alfresa-mobile-management.component';
+import { MobileUserPageComponent } from './mobile-user-page/mobile-user-page.component';
 import { ClusterAreaComponent } from './cluster-area/cluster-area.component';
 import { ManageClusterComponent } from './manage-cluster/manage-cluster.component';
 import { MobileAlarmComponent } from './mobile-alarm/mobile-alarm.component';
@@ -39,6 +41,8 @@ import { MobileAlarmComponent } from './mobile-alarm/mobile-alarm.component';
   declarations: [
     MobileAdminManagementComponent,
     MobileManagementComponent,
+    AlfresaMobileManagementComponent,
+    MobileUserPageComponent,
     ClusterAreaComponent,
     ManageClusterComponent,
     MobileAlarmComponent,

@@ -321,6 +321,10 @@ export interface MobileAdmin{
     name: string; 
     email: string; 
     clusters?: string[];
+    site_type?: number;
+    site?: string;
+    center?: string;
+    branch?: string;
     permission: number; 
     password?:string; 
     created?: string; 
@@ -333,9 +337,23 @@ export interface MobileUser{
     name: string; 
     email: string; 
     clusters?: string[]; // cluster name. not cluster-id
+    site_type?: number;
+    site?: string;
+    center?: string;
+    branch?: string;
     permission: number;
     password?:string; 
     created?: string; 
+}
+
+export interface MobileUserSignUpCredentials {
+    name: string;
+    email: string;
+    password?: string;
+    account_type?: number;
+    clusters?: string[];
+    site_type?: number;
+    site?: string;
 }
 
 

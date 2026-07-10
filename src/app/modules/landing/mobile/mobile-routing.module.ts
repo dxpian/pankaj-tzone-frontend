@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MobileAdminManagementComponent } from './mobile-admin-management/mobile-admin-management.component';
-import { MobileManagementComponent } from './mobile-management/mobile-management.component';
+import { MobileUserPageComponent } from './mobile-user-page/mobile-user-page.component';
 import { ClusterAreaComponent } from './cluster-area/cluster-area.component';
 import { ManageClusterComponent } from './manage-cluster/manage-cluster.component';
 import { MobileAlarmComponent } from './mobile-alarm/mobile-alarm.component';
@@ -16,7 +16,7 @@ const routes: Routes = [
   },
   {
     path: 'mobile-user-management',
-    component: MobileManagementComponent
+    component: MobileUserPageComponent
   },
   {
     path: 'cluster-area', 

@@ -93,7 +93,7 @@
                     </p>
                 </ng-container>
                 <ng-template #noEmails>
-                    <p>No emails available</p>
+                    <p class="alfresa-no-emails">No emails available</p>
                 </ng-template>
             </div>
           </td>
@@ -110,12 +110,71 @@
                     </p>
                 </ng-container>
                 <ng-template #noEmails>
-                    <p>No emails available</p>
+                    <p class="alfresa-no-emails">No emails available</p>
                 </ng-template>
             </div>
           </td>
         </ng-container>
 
+        <!-- Admin -->
+        <ng-container matColumnDef="admin">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Admin</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left" (click)="$event.stopPropagation()">
+            <ng-container *ngIf="getCenterAdmin(item) as admin; else noAdmin">
+              <div class="alfresa-admin-chip" [matTooltip]="getAdminTooltip(admin)">
+                <span class="alfresa-admin-chip__name alfresa-chip-name--link"
+                  matTooltip="Open in Mobile Users"
+                  (click)="navigateToMobileUserAdmin(admin, $event)">{{ admin.name }}</span>
+                <mat-icon class="alfresa-site-bind__icon alfresa-site-bind__icon--copy cursor-pointer"
+                  svgIcon="heroicons_outline:document-duplicate"
+                  matTooltip="Copy admin email"
+                  (click)="copyAdminEmail(item, $event)"></mat-icon>
+              </div>
+            </ng-container>
+            <ng-template #noAdmin>
+              <button *ngIf="isAdmin()" type="button" class="alfresa-bind-btn"
+                matTooltip="Bind mobile admin"
+                (click)="promptBindAdmin(item, $event)">
+                <mat-icon svgIcon="heroicons_outline:user-add"></mat-icon>
+              </button>
+              <span *ngIf="!isAdmin()" class="text-secondary">—</span>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <!-- Workers -->
+        <ng-container matColumnDef="workers">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Workers</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left" (click)="$event.stopPropagation()">
+            <div class="alfresa-site-bind alfresa-site-bind--workers">
+              <div *ngFor="let worker of getCenterWorkers(item)"
+                class="alfresa-worker-chip"
+                [ngClass]="getWorkerShiftClass(worker)"
+                [matTooltip]="getWorkerShiftTooltip(worker)">
+                <span class="alfresa-worker-chip__name alfresa-chip-name--link"
+                  matTooltip="Open in Mobile Users"
+                  (click)="navigateToMobileUserWorker(item, worker, $event)">{{ worker.name }}</span>
+                <mat-icon *ngIf="isAdmin()" class="alfresa-site-bind__icon alfresa-site-bind__icon--edit cursor-pointer"
+                  svgIcon="heroicons_outline:pencil-square"
+                  matTooltip="Edit schedule"
+                  (click)="openEditWorkerDialog(item, worker, $event)"></mat-icon>
+                <mat-icon class="alfresa-site-bind__icon alfresa-site-bind__icon--copy cursor-pointer"
+                  svgIcon="heroicons_outline:document-duplicate"
+                  matTooltip="Copy worker email"
+                  (click)="copyWorkerEmail(worker, $event)"></mat-icon>
+                <mat-icon *ngIf="isAdmin()" class="alfresa-site-bind__icon alfresa-site-bind__icon--remove cursor-pointer"
+                  svgIcon="heroicons_outline:x"
+                  matTooltip="Remove worker"
+                  (click)="confirmUnbindWorker(item, worker, $event)"></mat-icon>
+              </div>
+              <button *ngIf="canBindWorker(item)" type="button" class="alfresa-bind-btn alfresa-bind-btn--worker"
+                matTooltip="Bind worker"
+                (click)="openBindWorkerDialog(item, $event)">
+                <mat-icon svgIcon="heroicons_outline:user-add"></mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
 
         <!-- Created Time -->
         <ng-container matColumnDef="time">
@@ -148,7 +207,8 @@
 
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"
+        [class.alfresa-center-row--selected]="selection.isSelected(row)"></tr>
     </table>
 
     <div class="flex flex-row justify-end w-full">
@@ -241,12 +301,37 @@
                     </p>
                 </ng-container>
                 <ng-template #noEmails>
-                    <p>No emails available</p>
+                    <p class="alfresa-no-emails">No emails available</p>
                 </ng-template>
             </div>
           </td>
         </ng-container>
 
+        <!-- Admin -->
+        <ng-container matColumnDef="admin">
+          <th mat-header-cell *matHeaderCellDef class="text-left header-text">Admin</th>
+          <td mat-cell *matCellDef="let item" class="tab-row text-left" (click)="$event.stopPropagation()">
+            <ng-container *ngIf="getBranchAdmin(item) as admin; else noBranchAdmin">
+              <div class="alfresa-admin-chip" [matTooltip]="getAdminTooltip(admin)">
+                <span class="alfresa-admin-chip__name alfresa-chip-name--link"
+                  matTooltip="Open in Mobile Users"
+                  (click)="navigateToMobileUserAdmin(admin, $event)">{{ admin.name }}</span>
+                <mat-icon class="alfresa-site-bind__icon alfresa-site-bind__icon--copy cursor-pointer"
+                  svgIcon="heroicons_outline:document-duplicate"
+                  matTooltip="Copy admin email"
+                  (click)="copyBranchAdminEmail(item, $event)"></mat-icon>
+              </div>
+            </ng-container>
+            <ng-template #noBranchAdmin>
+              <button *ngIf="isAdmin()" type="button" class="alfresa-bind-btn"
+                matTooltip="Bind mobile admin"
+                (click)="promptBindBranchAdmin(item, $event)">
+                <mat-icon svgIcon="heroicons_outline:user-add"></mat-icon>
+              </button>
+              <span *ngIf="!isAdmin()" class="text-secondary">—</span>
+            </ng-template>
+          </td>
+        </ng-container>
 
         <!-- Created Time -->
         <ng-container matColumnDef="time">
@@ -278,7 +363,8 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedBranchColumns"></tr>
-      <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedBranchColumns;"></tr>
+      <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedBranchColumns;"
+        [class.alfresa-branch-row--selected]="selectionBranch.isSelected(row)"></tr>
     </table>
 
   </div>
@@ -486,6 +572,62 @@
         class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
       <button mat-raised-button (click)="saveBranch()" class="RTM-button-color p-4 border-radius-button" type="submit"
          color="primary">Save</button>
+    </div>
+  </section>
+</ng-template>
+
+<ng-template #bindWorkerDialog>
+  <section class="w-full">
+    <div class="text-lg font-medium text-secondary pt-5 pl-6">{{ workerBindDialogTitle }}</div>
+    <hr>
+  </section>
+  <section class="w-full">
+    <form class="flex flex-col w-full mt-0 pl-8 pr-8 pt-0 pb-4" [formGroup]="workerBindForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Worker</mat-label>
+        <mat-select formControlName="user" [disabled]="workerBindEditMode">
+          <mat-option *ngFor="let opt of workerUserOptions" [value]="opt.id">
+            {{ opt.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Shift</mat-label>
+        <mat-select formControlName="shift">
+          <mat-option *ngFor="let opt of shiftOptions" [value]="opt.shift_type">
+            {{ opt.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Valid from</mat-label>
+        <input matInput [matDatepicker]="validFromPicker" formControlName="valid_from">
+        <mat-datepicker-toggle matSuffix [for]="validFromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #validFromPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Valid to</mat-label>
+        <input matInput [matDatepicker]="validToPicker" formControlName="valid_to">
+        <mat-hint>Optional — leave empty for open-ended</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="validToPicker"></mat-datepicker-toggle>
+        <mat-datepicker #validToPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-slide-toggle formControlName="status" color="primary" class="mb-2">
+        Active
+      </mat-slide-toggle>
+    </form>
+  </section>
+  <hr class="mt-0">
+  <section class="w-full mb-4">
+    <div class="flex flex-row justify-end pr-8 mb-4">
+      <button mat-raised-button type="button" (click)="closeWorkerBindDialog()"
+        class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+      <button mat-raised-button type="button" (click)="saveWorkerBind()"
+        class="RTM-button-color p-4 border-radius-button" color="primary">Save</button>
     </div>
   </section>
 </ng-template>

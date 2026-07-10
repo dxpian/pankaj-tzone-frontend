@@ -7,6 +7,7 @@ import { EmailComponent } from './message-push-service/email/email.component';
 import { HolidayComponent } from './holiday/holiday.component';
 import { AlfresaCenterComponent } from './alfresa/alfresa.center/alfresa.center.component';
 import { AlfresaAlarmComponent } from './alfresa/alfresa.alarm/alfresa.alarm.component';
+import { AlfresaShiftComponent } from './alfresa/alfresa.shift/alfresa.shift.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,10 @@ const routes: Routes = [
   {
     path: 'alfresa-alarms',
     component: AlfresaAlarmComponent,
+  },
+  {
+    path: 'alfresa-shifts',
+    component: AlfresaShiftComponent,
   },
 
   {

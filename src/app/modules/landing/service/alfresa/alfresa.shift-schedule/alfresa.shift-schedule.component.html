@@ -1,0 +1,144 @@
+<div class="alfresa-shift-schedule w-full">
+    <div class="alfresa-shift-schedule__panel">
+        <div class="p-4 pt-0">
+            <h3 class="alfresa-shift-schedule__title">Shift Schedule</h3>
+            <p class="text-secondary m-0 mt-2">
+                Each center and branch shows its mobile admin and shift workers. Workers can be managed at center level only.
+            </p>
+        </div>
+
+        <mat-accordion class="alfresa-shift-schedule__accordion" multi>
+            <mat-expansion-panel *ngFor="let group of centerGroups"
+                class="alfresa-shift-schedule__center-panel"
+                (opened)="onSitePanelOpened(group.center)">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>{{ group.center.label }}</mat-panel-title>
+                    <mat-panel-description>Center</mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <div class="alfresa-shift-schedule__site-block">
+                    <div class="alfresa-shift-schedule__site-toolbar">
+                        <span class="font-medium">Center schedule</span>
+                        <button *ngIf="canAddWorker(group.center)" mat-flat-button type="button"
+                            class="kitkat-mat-button RTM-button-color Querybutton"
+                            (click)="openWorkerDialog('add', group.center)">
+                            + Worker
+                        </button>
+                    </div>
+                    <ng-container *ngTemplateOutlet="siteTable; context: { site: group.center }"></ng-container>
+                </div>
+
+                <mat-expansion-panel *ngFor="let branch of group.branches"
+                    class="alfresa-shift-schedule__branch-panel"
+                    (opened)="onSitePanelOpened(branch)">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>{{ branch.label }}</mat-panel-title>
+                        <mat-panel-description>Branch</mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <ng-container *ngTemplateOutlet="siteTable; context: { site: branch }"></ng-container>
+                </mat-expansion-panel>
+            </mat-expansion-panel>
+        </mat-accordion>
+
+        <p *ngIf="centerGroups.length === 0" class="p-4 text-secondary">No Alfresa centers found.</p>
+    </div>
+</div>
+
+<ng-template #siteTable let-site="site">
+    <table class="w-full table-responsive mat-card alfresa-shift-schedule__table" mat-table
+        [dataSource]="getDataSource(site)">
+        <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Role</th>
+            <td mat-cell *matCellDef="let row" class="tab-row text-left">{{ getRoleLabel(row.role) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Name</th>
+            <td mat-cell *matCellDef="let row" class="tab-row text-left">{{ row.userName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="shift">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Shift</th>
+            <td mat-cell *matCellDef="let row" class="tab-row text-left">{{ row.shiftLabel }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="hours">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Hours</th>
+            <td mat-cell *matCellDef="let row" class="tab-row text-left">{{ formatHours(row) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text">Status</th>
+            <td mat-cell *matCellDef="let row" class="tab-row text-left">
+                <span class="alfresa-shift-status-dot"
+                    [class.alfresa-shift-status-dot--enabled]="isShiftEnabled(row)"
+                    [matTooltip]="isShiftEnabled(row) ? 'Active' : 'Inactive'">
+                </span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="text-left header-text" style="width:6rem">Operate</th>
+            <td mat-cell *matCellDef="let row" class="tab-row text-left">
+                <div *ngIf="row.editable && isAdminUser" class="example-flex-container flex flex-row"
+                    (click)="$event.stopPropagation()">
+                    <div class="p-1">
+                        <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:pencil-square"
+                            style="color: #0D6EFD !important;"
+                            (click)="openWorkerDialog('edit', site, row)"></mat-icon>
+                    </div>
+                    <div class="p-1">
+                        <mat-icon class="cursor-pointer" svgIcon="heroicons_outline:trash"
+                            style="color: red !important;"
+                            (click)="confirmRemoveWorker(site, row)"></mat-icon>
+                    </div>
+                </div>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell p-4 text-secondary" [attr.colspan]="displayedColumns.length">
+                No schedule loaded.
+            </td>
+        </tr>
+    </table>
+</ng-template>
+
+<ng-template #workerDialog>
+    <section class="w-full">
+        <div class="text-lg font-medium text-secondary pt-5 pl-6">{{ workerDialogTitle }}</div>
+        <hr>
+    </section>
+    <section class="w-full">
+        <form class="flex flex-col w-full mt-0 pl-8 pr-8 pt-0 pb-4" [formGroup]="workerForm">
+            <mat-form-field appearance="fill">
+                <mat-label>Worker</mat-label>
+                <mat-select formControlName="user">
+                    <mat-option *ngFor="let opt of workerUserOptions" [value]="opt.id">
+                        {{ opt.label }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Shift</mat-label>
+                <mat-select formControlName="shift">
+                    <mat-option *ngFor="let opt of activeShiftOptions" [value]="opt.shift_type">
+                        {{ opt.label }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+    </section>
+    <hr class="mt-0">
+    <section class="w-full mb-4">
+        <div class="flex flex-row justify-end pr-8 mb-4">
+            <button mat-raised-button type="button" (click)="closeWorkerDialog()"
+                class="p-4 pr-4 mr-4 border-radius-button">Cancel</button>
+            <button mat-raised-button type="button" (click)="saveWorker()"
+                class="RTM-button-color p-4 border-radius-button" color="primary">Save</button>
+        </div>
+    </section>
+</ng-template>

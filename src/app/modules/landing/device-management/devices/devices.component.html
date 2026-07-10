@@ -81,6 +81,33 @@
     </div>
     <hr style="margin-top: 0px !important;">
 
+    <div class="logger-content-toolbar">
+      <span class="logger-content-toolbar__title">
+        {{ viewMode === 'list' ? 'Logger list' : 'Real-time cards' }}
+      </span>
+      <div class="logger-view-toggle" role="group" aria-label="View mode">
+        <button type="button" class="logger-view-toggle__btn"
+          [class.logger-view-toggle__btn--active]="viewMode === 'list'"
+          [class.logger-view-toggle__btn--inactive]="viewMode !== 'list'"
+          (click)="setViewMode('list')"
+          matTooltip="List view"
+          [attr.aria-pressed]="viewMode === 'list'"
+          [attr.aria-label]="'List view'">
+          <mat-icon svgIcon="heroicons_outline:view-list"></mat-icon>
+        </button>
+        <button type="button" class="logger-view-toggle__btn"
+          [class.logger-view-toggle__btn--active]="viewMode === 'card'"
+          [class.logger-view-toggle__btn--inactive]="viewMode !== 'card'"
+          (click)="setViewMode('card')"
+          matTooltip="Card view"
+          [attr.aria-pressed]="viewMode === 'card'"
+          [attr.aria-label]="'Card view'">
+          <mat-icon svgIcon="heroicons_outline:squares-2x2"></mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="viewMode === 'list'">
     <table class="w-full table-responsive mat-card" mat-table [dataSource]="dataSource" matSort>
 
         <!-- id -->
@@ -115,8 +142,14 @@
         <ng-container matColumnDef="serial">
           <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-left header-text">Device ID </th>
           <td mat-cell *matCellDef="let item" class="tab-row text-left">
-            <div class="column-text">
+            <div class="column-text logger-serial-row">
               <p>{{item?.serial}}</p>
+              <button type="button" class="logger-serial-copy"
+                *ngIf="item?.serial"
+                (click)="copyDeviceSerial(item.serial, $event)"
+                matTooltip="Copy serial number">
+                <mat-icon class="icon-size-4" svgIcon="heroicons_outline:clipboard-copy"></mat-icon>
+              </button>
             </div>
           </td>
         </ng-container>
@@ -220,10 +253,100 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; let odd = odd; columns: displayedColumns;"></tr>
     </table>
+    </ng-container>
+
+    <div *ngIf="viewMode === 'card'" class="logger-card-view">
+      <div class="logger-card-view__grid">
+        <div class="logger-card rtm-bg-color"
+          *ngFor="let item of deviceCardData"
+          [appChangeColorBasedOnTime]="{lastTime: item.time, alarmTime: item?.state?.alarmTime}">
+          <div class="logger-card__header">
+            <div>
+              <h6 class="mb-0">{{ item?.name || '--' }}</h6>
+              <div class="logger-serial-row logger-serial-row--card">
+                <p class="mb-0">{{ item?.serial || '--' }}</p>
+                <button type="button" class="logger-serial-copy"
+                  *ngIf="item?.serial"
+                  (click)="copyDeviceSerial(item.serial, $event)"
+                  matTooltip="Copy serial number">
+                  <mat-icon class="icon-size-4" svgIcon="heroicons_outline:clipboard-copy"></mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="ml-auto">
+              <div class="cursor-pointer flex items-center">
+                <img [src]="getBatteryImg(item?.state?.battery)" class="w-10" alt="">
+                --V/{{ item?.state?.battery || '' }}%
+              </div>
+            </div>
+          </div>
+          <hr class="hr-color my-4">
+          <table class="table table-borderless mb-0 w-full">
+            <tbody>
+              <tr>
+                <th class="flex">Temperature</th>
+                <td class="text-lg">{{ getItemExpression(item, 'temperature') }}</td>
+              </tr>
+              <tr *ngIf="item?.state?.tempexternal != undefined; else emptyRow">
+                <th class="flex">External Temperature</th>
+                <td class="text-lg">{{ getItemExpression(item, 'ext_temperature') }}</td>
+              </tr>
+              <tr>
+                <th class="flex">Humidity</th>
+                <td class="text-lg">{{ getItemExpression(item, 'humidity') }}</td>
+              </tr>
+              <tr>
+                <th class="flex">Light</th>
+                <td colspan="2" class="text-lg">{{ getItemExpression(item, 'light') }}</td>
+              </tr>
+              <tr>
+                <th class="flex">Vibration</th>
+                <td colspan="2" class="text-lg">{{ getItemExpression(item, 'vibration') }}</td>
+              </tr>
+              <tr *ngIf="showSim">
+                <th class="flex">SIM expiration</th>
+                <td colspan="2" class="text-lg">{{ getItemExpression(item, 'sim') }}</td>
+              </tr>
+              <tr>
+                <th class="flex">Location</th>
+                <td colspan="2" class="text-lg"
+                  [matTooltip]="item?.state?.address"
+                  [ngStyle]="item?.state?.address ? {'cursor': 'pointer'} : {}">
+                  {{ getItemExpression(item, 'location') }}
+                </td>
+              </tr>
+              <tr *ngIf="item?.state?.isRecentAlarm; else emptyRow">
+                <th class="flex">Last Alarm</th>
+                <td colspan="2" [matTooltip]="getAlarmType(item)">
+                  {{ getItemExpression(item, 'alarm') }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr class="hr-color my-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="mb-0" matTooltip="Last Log Time">{{ item?.time }}</p>
+              <div class="mt-1" style="min-height: 1.0rem;">
+                <p *ngIf="hasHeartBitTime(item)" matTooltip="Last HeartBit Time"
+                  [style.color]="getHeartBitColor(item)" class="mb-0">{{ item?.time_heart }}</p>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <p class="cursor-pointer mb-0">
+                <a (click)="viewDevice(item)">&rarr; Details</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #emptyRow><tr></tr></ng-template>
+    </div>
+
     <div class="flex flex-row justify-end w-full">
       <mat-paginator class="mt-4 mb-4 mr-16"
         [pageSize]="20"
-        [pageSizeOptions]="[20, 50, 100, 200]"
+        [pageSizeOptions]="pageSizeOptions"
         [length]="_pageQuery.total"
         (page)="onPageChange($event)">
       </mat-paginator>

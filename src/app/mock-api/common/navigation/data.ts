@@ -43,11 +43,37 @@ export const defaultNavigation: FuseNavigationItem[] = [
         ]
     },
     {
-        id: 'Real Time Monitoring',
-        title: 'Real Time Monitoring',
-        type: 'basic',
-        icon: 'heroicons_outline:squares-2x2',
-        link: '/real-time-monitoring'
+        id: 'Alfresa',
+        title: 'Alfresa',
+        type: 'collapsable',
+        icon: 'heroicons_outline:office-building',
+        link: '/service/alfresa-center',
+        children: [
+            {
+                id: 'Alfresa-Center',
+                title: 'Center & Branch',
+                type: 'basic',
+                icon: 'heroicons_outline:office-building',
+                link: '/service/alfresa-center',
+                exactMatch: true,
+            },
+            {
+                id: 'Alfresa-Alarm',
+                title: 'Alfresa Alarm',
+                type: 'basic',
+                icon: 'heroicons_outline:bell-alert',
+                link: '/service/alfresa-alarms',
+                exactMatch: true,
+            },
+            {
+                id: 'Alfresa-Shift',
+                title: 'Shift Management',
+                type: 'basic',
+                icon: 'heroicons_outline:clock',
+                link: '/service/alfresa-shifts',
+                exactMatch: true,
+            },
+        ]
     },
     {
         id: 'Reports',
@@ -238,20 +264,6 @@ export const defaultNavigation: FuseNavigationItem[] = [
                         type: 'collapsable',
                         icon: 'heroicons_outline:chat',
                         children: [
-                            {
-                                id: 'Alfresa-Center',
-                                title: 'Alfresa Centers',
-                                type: 'basic',
-                                icon: 'heroicons_outline:office-building',
-                                link: '/service/alfresa-center'
-                            },
-                            {
-                                id: 'Alfresa-Alarm',
-                                title: 'Alfresa Alarm',
-                                type: 'basic',
-                                icon: 'heroicons_outline:mail',
-                                link: '/service/alfresa-alarms'
-                            },
                             {
                                 id: 'Email',
                                 title: 'E-mail',

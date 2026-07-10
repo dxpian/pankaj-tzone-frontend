@@ -25,6 +25,131 @@ export const ALFLOC = {
     BRANCH: 1           // branch
 }
 
+/** AlfresaShiftType — branch/center day and night presets */
+export const ALF_SHIFT_TYPE = {
+    BRANCH_DAY: 0,
+    BRANCH_NIGHT: 1,
+    CENTER_DAY: 2,
+    CENTER_NIGHT: 3,
+} as const;
+
+export const ALL_ALF_SHIFT_TYPES = [
+    ALF_SHIFT_TYPE.BRANCH_DAY,
+    ALF_SHIFT_TYPE.BRANCH_NIGHT,
+    ALF_SHIFT_TYPE.CENTER_DAY,
+    ALF_SHIFT_TYPE.CENTER_NIGHT,
+] as const;
+
+export function getAlfShiftTypeLabel(shiftType: number): string {
+    switch (shiftType) {
+        case ALF_SHIFT_TYPE.BRANCH_DAY:
+            return 'Branch day';
+        case ALF_SHIFT_TYPE.BRANCH_NIGHT:
+            return 'Branch night';
+        case ALF_SHIFT_TYPE.CENTER_DAY:
+            return 'Center day';
+        case ALF_SHIFT_TYPE.CENTER_NIGHT:
+            return 'Center night';
+        default:
+            return 'Unknown';
+    }
+}
+
+export function isAlfShiftNightType(shiftType: number | null | undefined): boolean {
+    return shiftType === ALF_SHIFT_TYPE.BRANCH_NIGHT || shiftType === ALF_SHIFT_TYPE.CENTER_NIGHT;
+}
+
+export function isAlfShiftCenterType(shiftType: number): boolean {
+    return shiftType === ALF_SHIFT_TYPE.CENTER_DAY || shiftType === ALF_SHIFT_TYPE.CENTER_NIGHT;
+}
+
+export function isAlfShiftBranchType(shiftType: number): boolean {
+    return shiftType === ALF_SHIFT_TYPE.BRANCH_DAY || shiftType === ALF_SHIFT_TYPE.BRANCH_NIGHT;
+}
+
+export interface AlfresaShiftConfig {
+    id?: string;
+    shift_type: number;
+    name: string;
+    start_time: string;
+    end_time: string;
+    cross_midnight?: boolean;
+    timezone?: string;
+    des?: string;
+    enabled?: boolean;
+    created?: string;
+    updated?: string;
+}
+
+export interface AlfresaShiftWorkerBind {
+    user: string;
+    site_type: number;
+    site_id: string;
+    shift_type: number;
+    valid_from?: string;
+    valid_to?: string | null;
+    status?: number;
+}
+
+/** AlfShiftStatus — 0=inactive, 1=active */
+export const ALF_SHIFT_STATUS = {
+    INACTIVE: 0,
+    ACTIVE: 1,
+} as const;
+
+export interface AlfresaShiftWorkerQuery {
+    site_type: number;
+    site_id: string;
+}
+
+export interface AlfresaShiftTableWorkerRow {
+    id: string;
+    user: string;
+    shift_type: number | null;
+    status: boolean;
+    valid_from?: string;
+    valid_to?: string | null;
+    start_time: string;
+    end_time: string;
+    cross_midnight: boolean;
+    timezone: string;
+}
+
+export interface AlfresaShiftTableResult {
+    admin: {
+        id: string | null;
+        user: string | null;
+        status: boolean;
+    };
+    users: AlfresaShiftTableWorkerRow[];
+}
+
+export interface AlfresaShiftWorkerControl {
+    enabled: boolean;
+}
+
+export interface AlfresaShiftScheduleSiteView {
+    siteType: number;
+    siteId: string;
+    label: string;
+    isBranch: boolean;
+    allowWorkers: boolean;
+}
+
+export interface AlfresaShiftScheduleRow {
+    scheduleId: string | null;
+    userId: string | null;
+    userName: string;
+    role: 'admin' | 'worker';
+    shiftType: number | null;
+    shiftLabel: string;
+    startTime: string;
+    endTime: string;
+    crossMidnight: boolean;
+    status: boolean;
+    editable: boolean;
+}
+
 export const CALIB_STATUS = {
     PLANNED: 0,  // calib isn't started
     PROG: 1,

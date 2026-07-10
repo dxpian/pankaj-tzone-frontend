@@ -60,6 +60,7 @@ export class NavigationMockApi
                     const isAdmin = permission === PERMISSION.ADMIN
                     const isNormalUser = permission === PERMISSION.NORMAL;
                     const isAlfres = type === ACCOUNT_TYPE.ALFRESA
+                    const isAlfresaWebAdmin = isAlfres && isWebAdminPermission(permission)
 
                     // Filter children recursively if they exist
                     if (item.children) {
@@ -119,11 +120,10 @@ export class NavigationMockApi
                         return null;
                     }
 
-                    if(item.id == 'Alfresa-Center' && !isAlfres){ // hide alfresa center page for non-Alfresa account
+                    if ((item.id === 'Alfresa' || item.id === 'Alfresa-Center' || item.id === 'Alfresa-Alarm'
+                        || item.id === 'Alfresa-Shift')
+                        && !isAlfresaWebAdmin) {
                         return null;
-                    }
-                    if(item.id == 'Alfresa-Alarm' && !isAlfres){ // hide alfresa alarm page for non-Alfresa ccount
-                        return null
                     }
                     
                     if(role != USER_ROLE.STD){
@@ -141,7 +141,49 @@ export class NavigationMockApi
                 })
                 .filter((item): item is FuseNavigationItem => item !== null);
         };
-        return filterRecursive(nav);
+
+        const filtered = filterRecursive(nav);
+        return this._restructureNavigationForAlfresa(filtered, this.isAlfresaWebAdmin(permission, type));
+    }
+
+    private isAlfresaWebAdmin(permission: number, type: number): boolean {
+        return type === ACCOUNT_TYPE.ALFRESA && isWebAdminPermission(permission);
+    }
+
+    private _findNavItem(items: FuseNavigationItem[], id: string): FuseNavigationItem | undefined {
+        return items.find(item => item.id === id);
+    }
+
+    /** For Alfresa admin/web-admin, show Mobile Users under Alfresa instead of Mobile. */
+    private _restructureNavigationForAlfresa(nav: FuseNavigationItem[], moveMobileUsers: boolean): FuseNavigationItem[] {
+        if (!moveMobileUsers) {
+            return nav;
+        }
+
+        const alfresa = this._findNavItem(nav, 'Alfresa');
+        const mobile = this._findNavItem(nav, 'Mobile');
+        if (!alfresa?.children || !mobile?.children) {
+            return nav;
+        }
+
+        const centerIndex = alfresa.children.findIndex(child => child.id === 'Alfresa-Center');
+        if (centerIndex === -1) {
+            return nav;
+        }
+
+        const mobileUserIndex = mobile.children.findIndex(child => child.id === 'MobileUser');
+        if (mobileUserIndex === -1) {
+            return nav;
+        }
+
+        const [mobileUser] = mobile.children.splice(mobileUserIndex, 1);
+        alfresa.children.splice(centerIndex + 1, 0, mobileUser);
+
+        if (mobile.children.length === 0) {
+            return nav.filter(item => item.id !== 'Mobile');
+        }
+
+        return nav;
     }
 
 
